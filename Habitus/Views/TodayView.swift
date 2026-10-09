@@ -104,6 +104,7 @@ struct TodayView: View {
                 iconName: habit.iconName,
                 color: color,
                 status: engine.status(snapshot, on: shownDay),
+                rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: shownDay)),
                 dots: engine.weekDots(snapshot, on: shownDay),
                 onTap: { editingHabit = habit }
             ) {

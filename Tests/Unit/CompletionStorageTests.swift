@@ -15,6 +15,8 @@ struct CompletionStorageTests {
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         context = container.mainContext
+        // Ohne Autosave Timer, der nach dem Test noch auf einen freigegebenen Container zugreifen könnte.
+        context.autosaveEnabled = false
     }
 
     func makeHabit() -> Habit {

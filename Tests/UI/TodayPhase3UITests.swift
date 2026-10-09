@@ -145,9 +145,10 @@ final class TodayPhase3UITests: XCTestCase {
         app.buttons["weekday-\(other)"].tap()
         XCTAssertTrue(app.buttons["weekday-\(other)"].isSelected)
         app.buttons["weekday-\(today)"].tap()
-        sleep(2)
-        XCTAssertFalse(app.buttons["weekday-\(today)"].isSelected)
-        print("DEBUG", app.debugDescription)
+        let deselected = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "isSelected == false"), object: app.buttons["weekday-\(today)"]
+        )
+        XCTAssertEqual(XCTWaiter().wait(for: [deselected], timeout: 5), .completed)
     }
 
     // MARK: Pro Woche / pro Monat

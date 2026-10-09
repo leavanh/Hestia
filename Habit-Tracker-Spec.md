@@ -154,7 +154,7 @@ Prozent = erledigte Punkte geteilt durch Punkte, gerundet auf ganze Zahl. Bei 0 
 
 | Baustein | Inhalt |
 |---|---|
-| `HabitCard` | Links Icon in Habitfarbe, daneben Name und kleiner Statuspunkt, darunter 7 Tage Punkte. Rechts Abhakkreis oder Counter. Kein weiterer Text (kein "2/3 im Fenster"). |
+| `HabitCard` | Links Icon in Habitfarbe, daneben Name und kleiner Statuspunkt, darunter eine kleine Zeile mit dem Rhythmus (siehe 4.3.1), darunter 7 Tage Punkte. Rechts Abhakkreis oder Counter. Kein weiterer Text. |
 | `CheckCircle` | Kreis mit Umriss in Habitfarbe, abgehakt gefüllt mit Häkchen. |
 | `CounterControl` | Minus im Kreis, Ring mit Zahl in der Mitte (Ring füllt sich mit Fortschritt), Plus im Kreis. Gleiche Kreisgröße wie `CheckCircle`, alles auf einer Linie. |
 | `WeekDots` | Die 7 Punkte aus 3.6. |
@@ -162,6 +162,21 @@ Prozent = erledigte Punkte geteilt durch Punkte, gerundet auf ganze Zahl. Bei 0 
 | `ProgressHeader` | Fortschrittsring und Text "5 von 16 · 31 %". |
 | `GlassBackground` | Farbverlauf für alle Bildschirme. |
 | `SegmentedChoice` | Segmentfeld im Glas Stil, z.B. für den Rhythmus und seine Variante. |
+
+#### 4.3.1 Rhythmus Zeile auf der `HabitCard`
+
+Kleine Zeile (`.caption`, sekundäre Farbe) unter dem Namen, vor den 7 Tage Punkten. Sie sagt, wie oft der Habit wiederholt werden soll. Bei Woche und Monat steht davor, wie viele Erledigungen im Fenster des angezeigten Tags schon da sind (`windowProgress`).
+
+| Rhythmus | Text | Beispiel |
+|---|---|---|
+| Täglich, Anzahl 1 | "Täglich" | Täglich |
+| Täglich, Anzahl n größer 1 | "n pro Tag" | 2 pro Tag |
+| Woche, Anzahl | "erledigt von Ziel diese Woche" | 1 von 3 diese Woche |
+| Monat, Anzahl | "erledigt von Ziel diesen Monat" | 1 von 1 diesen Monat |
+| Feste Wochentage | Kurzname der Tage | Mo, Do |
+| Fester Monatstag | "Am n. des Monats" | Am 15. des Monats |
+
+*Ersetzt nach Phase 3.1 die dort entfernte Anzeige "x/y im Fenster". Das Format ist neu und steht jetzt in der Zeile unter dem Namen, nicht mehr neben den Punkten.*
 
 ### 4.4 Icons
 

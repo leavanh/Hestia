@@ -168,18 +168,38 @@ final class TodayPhase31UITests: XCTestCase {
         XCTAssertTrue(app.steppers["target-stepper"].exists)
     }
 
-    // MARK: Kein Text zum Fenster
+    // MARK: Rhythmus Zeile
 
     @MainActor
-    func testWeeklyHabitShowsNoWindowText() {
+    func testCardsShowTheRhythmLine() {
         let app = launchFresh()
         openEditor(named: "Sport", rhythm: "Woche", variant: "Anzahl", in: app)
         app.buttons["target-stepper-Increment"].tap()
         app.buttons["Speichern"].tap()
         XCTAssertTrue(app.staticTexts["Sport"].waitForExistence(timeout: 5))
-        app.buttons["check-Sport"].tap()
+        XCTAssertEqual(app.staticTexts["repeat-Sport"].label, "0 von 2 diese Woche")
 
-        let counts = app.staticTexts.matching(NSPredicate(format: "label MATCHES %@", "\\d+/\\d+.*"))
-        XCTAssertEqual(counts.count, 0, "Auf der Karte steht kein Stand wie 1/2")
+        app.buttons["check-Sport"].tap()
+        XCTAssertEqual(app.staticTexts["repeat-Sport"].label, "1 von 2 diese Woche")
+
+        openEditor(named: "Pflanzen", rhythm: "Monat", variant: "Anzahl", in: app)
+        app.buttons["Speichern"].tap()
+        XCTAssertEqual(app.staticTexts["repeat-Pflanzen"].label, "0 von 1 diesen Monat")
+
+        app.buttons["Neuer Habit"].tap()
+        let field = app.textFields["name-field"]
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.tap()
+        field.typeText("Wasser\n")
+        app.buttons["target-stepper-Increment"].tap()
+        app.buttons["Speichern"].tap()
+        XCTAssertEqual(app.staticTexts["repeat-Wasser"].label, "2 pro Tag")
+
+        app.buttons["Neuer Habit"].tap()
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.tap()
+        field.typeText("Lesen\n")
+        app.buttons["Speichern"].tap()
+        XCTAssertEqual(app.staticTexts["repeat-Lesen"].label, "Täglich")
     }
 }

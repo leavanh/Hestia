@@ -20,6 +20,8 @@ struct SampleDataTests {
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         context = container.mainContext
+        // Ohne Autosave Timer, der nach dem Test noch auf einen freigegebenen Container zugreifen könnte.
+        context.autosaveEnabled = false
     }
 
     func date(_ year: Int, _ month: Int, _ day: Int, _ hour: Int = 12) -> Date {
