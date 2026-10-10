@@ -162,10 +162,10 @@ struct HabitEditorSheet: View {
                 } label: {
                     Image(systemName: icon)
                         .font(.title3)
-                        .foregroundStyle(icon == iconName ? habitColor.color : .secondary)
+                        .foregroundStyle(icon == iconName ? habitColor.mutedColor : .secondary)
                         .frame(width: Theme.iconSize, height: Theme.iconSize)
                         .background(
-                            habitColor.color.opacity(icon == iconName ? Theme.iconBackgroundOpacity : 0),
+                            habitColor.mutedColor.opacity(icon == iconName ? Theme.iconBackgroundOpacity : 0),
                             in: Circle()
                         )
                         .contentShape(Circle())

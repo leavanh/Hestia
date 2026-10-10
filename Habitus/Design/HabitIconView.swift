@@ -1,31 +1,69 @@
 import SwiftUI
 
-/// Icon in Habitfarbe auf zarter Kreisfläche derselben Farbe, außen ein Ring in Statusfarbe.
+/// Icon in gedämpfter Habitfarbe auf zarter Kreisfläche derselben Farbe. Bei Status gelb oder rot sitzt oben rechts
+/// eine kleine runde Statusmarke, die den Kreis leicht überlappt und durch einen freien Rand von ihm abgesetzt ist.
+/// Bei grün gibt es keine Marke, der Status bleibt für VoiceOver und Tests trotzdem als Wert verfügbar.
 struct HabitIconView: View {
+    let habitName: String
     let iconName: String
-    let color: Color
+    let color: HabitColor
     let status: HabitStatus
 
     var body: some View {
         Image(systemName: iconName)
             .font(.title3)
-            .foregroundStyle(color)
+            .foregroundStyle(color.mutedColor)
             .frame(width: Theme.iconSize, height: Theme.iconSize)
-            .background(color.opacity(Theme.iconBackgroundOpacity), in: Circle())
-            .padding(Theme.statusRingGap + Theme.statusRingWidth)
-            .overlay {
-                Circle()
-                    .inset(by: Theme.statusRingWidth / 2)
-                    .stroke(statusColor, lineWidth: Theme.statusRingWidth)
+            .background(color.mutedColor.opacity(Theme.iconBackgroundOpacity), in: Circle())
+            .mask {
+                if badgeColor != nil {
+                    badgeCutout
+                } else {
+                    Rectangle()
+                }
             }
+            .overlay { badge }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Status")
             .accessibilityValue(statusTitle)
+            .accessibilityIdentifier("status-\(habitName)")
     }
 
-    private var statusColor: Color {
+    /// Mittelpunkt der Marke: auf dem Rand der Kreisfläche, oben rechts im Winkel von 45 Grad.
+    private var badgeCenter: CGPoint {
+        let radius = Theme.iconSize / 2
+        let offset = radius / 2.0.squareRoot()
+        return CGPoint(x: radius + offset, y: radius - offset)
+    }
+
+    /// Schneidet rund um die Marke den freien Rand aus der Kreisfläche.
+    private var badgeCutout: some View {
+        Rectangle()
+            .overlay {
+                Circle()
+                    .frame(width: Theme.statusBadgeSize + 2 * Theme.statusBadgeGap)
+                    .position(badgeCenter)
+                    .blendMode(.destinationOut)
+            }
+            .compositingGroup()
+    }
+
+    @ViewBuilder
+    private var badge: some View {
+        if let badgeColor {
+            Circle()
+                .fill(badgeColor)
+                .frame(width: Theme.statusBadgeSize, height: Theme.statusBadgeSize)
+                .position(badgeCenter)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Statusmarke")
+                .accessibilityIdentifier("status-badge-\(habitName)")
+        }
+    }
+
+    private var badgeColor: Color? {
         switch status {
-        case .green: Theme.statusGreen
+        case .green: nil
         case .yellow: Theme.statusYellow
         case .red: Theme.statusRed
         }
@@ -42,9 +80,9 @@ struct HabitIconView: View {
 
 #Preview {
     HStack(spacing: Theme.spacing) {
-        HabitIconView(iconName: "figure.run", color: HabitColor.orange.color, status: .green)
-        HabitIconView(iconName: "drop.fill", color: HabitColor.teal.color, status: .yellow)
-        HabitIconView(iconName: "book.fill", color: HabitColor.violet.color, status: .red)
+        HabitIconView(habitName: "Sport", iconName: "figure.run", color: .orange, status: .green)
+        HabitIconView(habitName: "Wasser", iconName: "drop.fill", color: .teal, status: .yellow)
+        HabitIconView(habitName: "Lesen", iconName: "book.fill", color: .violet, status: .red)
     }
     .padding()
 }

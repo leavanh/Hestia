@@ -1,7 +1,7 @@
 import XCTest
 
 /// Prüft die Definition of Done von Phase 3.2 direkt in der Oberfläche: erledigte Habits nach unten,
-/// Bearbeiten per langem Drücken und Status als Ring um das Icon.
+/// Bearbeiten per langem Drücken und Status am Icon (ab Phase 3.3 als Statusmarke).
 /// Jeder Test startet mit leerem Datenbestand (`-HabitusResetData`).
 final class TodayPhase32UITests: XCTestCase {
     override func setUp() {
@@ -154,8 +154,8 @@ final class TodayPhase32UITests: XCTestCase {
             let status = app.descendants(matching: .any)["status-\(name)"].firstMatch
             XCTAssertTrue(status.exists, name)
             XCTAssertEqual(status.value as? String, value, name)
-            // Der Ring umschließt das Icon (Kreisfläche 44 pt plus Ring), ein Punkt neben dem Namen wäre viel kleiner.
-            XCTAssertGreaterThanOrEqual(status.frame.width, 44, "\(name): Ring um das Icon")
+            // Das Icon misst 44 pt, ein Punkt neben dem Namen wäre viel kleiner.
+            XCTAssertGreaterThanOrEqual(status.frame.width, 44, "\(name): am Icon")
             XCTAssertLessThanOrEqual(status.frame.maxX, app.staticTexts[name].frame.minX, "\(name): links vom Namen")
         }
     }

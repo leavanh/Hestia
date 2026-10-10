@@ -1,12 +1,12 @@
 import SwiftUI
 
-/// Karte eines Habits: links Icon mit Statusring, Name, Rhythmus Zeile und 7 Tage Punkte, rechts Abhakkreis oder Counter.
+/// Karte eines Habits: links Icon mit Statusmarke, Name, Rhythmus Zeile und 7 Tage Punkte, rechts Abhakkreis oder Counter.
 /// Festes Drücken (`Theme.editPressDuration`) auf die linke Seite ruft `onEdit` auf (auch als VoiceOver Aktion "Bearbeiten"),
 /// die rechte Seite bedient sich selbst. Dabei sinkt die Karte kurz ein und gibt einen leichten, beim Auslösen einen festen Impuls.
 struct HabitCard<Control: View>: View {
     let name: String
     let iconName: String
-    let color: Color
+    let habitColor: HabitColor
     let status: HabitStatus
     let rhythmText: String
     let dots: [WeekDot]
@@ -21,8 +21,7 @@ struct HabitCard<Control: View>: View {
     var body: some View {
         HStack(spacing: Theme.spacing) {
             HStack(spacing: Theme.spacing) {
-                HabitIconView(iconName: iconName, color: color, status: status)
-                    .accessibilityIdentifier("status-\(name)")
+                HabitIconView(habitName: name, iconName: iconName, color: habitColor, status: status)
                 VStack(alignment: .leading, spacing: 6) {
                     Text(name)
                         .font(.headline)
@@ -31,7 +30,7 @@ struct HabitCard<Control: View>: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                         .accessibilityIdentifier("repeat-\(name)")
-                    WeekDots(dots: dots, color: color)
+                    WeekDots(dots: dots, color: habitColor.color)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -68,21 +67,21 @@ struct HabitCard<Control: View>: View {
         GlassBackground()
         VStack(spacing: Theme.spacing) {
             HabitCard(
-                name: "Sport", iconName: "figure.run", color: HabitColor.orange.color, status: .yellow,
+                name: "Sport", iconName: "figure.run", habitColor: .orange, status: .yellow,
                 rhythmText: "1 von 3 diese Woche",
                 dots: [.fill(0), .fill(0), .fill(1), .fill(1), .fill(0), .fill(1), .fill(0)], onEdit: {}
             ) {
                 CheckCircle(isChecked: false, color: HabitColor.orange.color) {}
             }
             HabitCard(
-                name: "Wasser trinken", iconName: "drop.fill", color: HabitColor.teal.color, status: .green,
+                name: "Wasser trinken", iconName: "drop.fill", habitColor: .teal, status: .green,
                 rhythmText: "3 pro Tag",
                 dots: [.fill(1), .fill(0.66), .fill(0.33), .fill(1), .fill(0), .fill(1), .fill(0.66)], onEdit: {}
             ) {
                 CounterControl(count: 2, target: 3, color: HabitColor.teal.color, id: "p", onDecrement: {}, onIncrement: {})
             }
             HabitCard(
-                name: "Yoga", iconName: "figure.walk", color: HabitColor.violet.color, status: .red,
+                name: "Yoga", iconName: "figure.walk", habitColor: .violet, status: .red,
                 rhythmText: "Mo, Do",
                 dots: [.fill(0), .fill(1), .fill(0), .fill(0), .fill(1), .fill(0), .fill(0)], onEdit: {}
             ) {

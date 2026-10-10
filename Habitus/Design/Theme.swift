@@ -27,9 +27,9 @@ enum Theme {
     static let strokeWidth: CGFloat = 2
     /// Höhe eines Segments in `SegmentedChoice`.
     static let segmentHeight: CGFloat = 32
-    /// Strichstärke und Abstand des Statusrings um die Kreisfläche von `HabitIconView`.
-    static let statusRingWidth: CGFloat = 2.5
-    static let statusRingGap: CGFloat = 2
+    /// Durchmesser der Statusmarke oben rechts an `HabitIconView` und Breite des freien Rands zwischen Marke und Kreisfläche.
+    static let statusBadgeSize: CGFloat = 12
+    static let statusBadgeGap: CGFloat = 2
     /// Strichstärke und Abstand des äußeren Rings um den angezeigten Tag in `WeekDots`.
     static let dotRingWidth: CGFloat = 1.5
     static let dotRingGap: CGFloat = 2
@@ -67,8 +67,7 @@ enum Theme {
 
     /// Akzentfarbe für Fortschritt, der keinem Habit gehört (Fortschrittsring, später Kalender).
     static let accent = Color.accentColor
-    /// Statusfarben, nur für den Ring um das Icon.
-    static let statusGreen = Color(uiColor: .systemGreen)
+    /// Statusfarben, nur für die Statusmarke am Icon. Für grün gibt es keine Farbe.
     static let statusYellow = Color(uiColor: .systemYellow)
     static let statusRed = Color(uiColor: .systemRed)
     /// Spur und gewähltes Segment in `SegmentedChoice`.

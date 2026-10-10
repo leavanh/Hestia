@@ -70,14 +70,6 @@ struct TodayView: View {
                 ToolbarItem(placement: .principal) {
                     barTitle
                 }
-                if daysAgo > 0 {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Heute") {
-                            show(today, enteringFrom: .trailing)
-                        }
-                        .accessibilityIdentifier("back-to-today")
-                    }
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Neuer Habit", systemImage: "plus") {
                         isCreating = true
@@ -180,6 +172,21 @@ struct TodayView: View {
         RelativeDay.text(daysAgo: daysAgo)
     }
 
+    /// Springt auf der Datumszeile animiert zu heute zurück. Das Chevron zeigt vorwärts in Richtung heute.
+    private var backToTodayButton: some View {
+        Button {
+            show(today, enteringFrom: .trailing)
+        } label: {
+            HStack(spacing: 2) {
+                Text("Heute")
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+            }
+            .font(.subheadline.weight(.semibold))
+        }
+        .accessibilityIdentifier("back-to-today")
+    }
+
     /// Kopfbereich ohne Karte: Wochentag als großer Titel, Datum als Untertitel, darunter der Fortschritt.
     private func header(for due: [Habit]) -> some View {
         VStack(alignment: .leading, spacing: Theme.spacing) {
@@ -195,6 +202,10 @@ struct TodayView: View {
                         .accessibilityIdentifier("today-subtitle")
                     DayBadge(text: dayLabel, isToday: daysAgo == 0)
                         .accessibilityIdentifier("today-badge")
+                    Spacer(minLength: 0)
+                    if daysAgo > 0 {
+                        backToTodayButton
+                    }
                 }
             }
             ProgressHeader(progress: engine.dayProgress(due.map(\.snapshot), on: shownDay))
@@ -222,13 +233,14 @@ struct TodayView: View {
     private func card(for habit: Habit) -> some View {
         // Ein eben gelöschter Habit kann hier noch einmal ankommen, bevor die Liste neu aufgebaut ist.
         if habit.isAlive {
-            let color = HabitColor(key: habit.colorKey).color
+            let habitColor = HabitColor(key: habit.colorKey)
+            let color = habitColor.color
             let snapshot = habit.snapshot
 
             HabitCard(
                 name: habit.name,
                 iconName: habit.iconName,
-                color: color,
+                habitColor: habitColor,
                 status: engine.status(snapshot, on: shownDay),
                 rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: shownDay)),
                 dots: engine.weekDots(snapshot, on: shownDay),
