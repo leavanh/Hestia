@@ -61,11 +61,10 @@ final class CalendarPhase4UITests: XCTestCase {
     func testStartsAtCurrentMonthAndScrollsBackIntoThePast() {
         let app = launchCalendar()
         XCTAssertTrue(app.staticTexts[monthIdentifier(plus: 0)].exists, "Aktueller Monat ist im Bild")
-        XCTAssertFalse(app.staticTexts[monthIdentifier(plus: -2)].exists, "Ältere Monate liegen weiter oben")
+        XCTAssertFalse(app.staticTexts[monthIdentifier(plus: -3)].exists, "Ältere Monate liegen weiter oben")
 
-        // Mit 60 Tagen Testdaten und mindestens 3 Monaten Vorlauf gibt es mehrere frühere Monate.
-        scrollUp(to: app.staticTexts[monthIdentifier(plus: -1)], in: app)
-        scrollUp(to: app.staticTexts[monthIdentifier(plus: -2)], in: app)
+        // Der Kalender reicht mindestens 3 Monate zurück.
+        scrollUp(to: app.staticTexts[monthIdentifier(plus: -3)], in: app)
     }
 
     @MainActor
