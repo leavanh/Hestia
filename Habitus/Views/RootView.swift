@@ -8,7 +8,7 @@ struct RootView: View {
                 TodayView()
             }
             Tab("Kalender", systemImage: "calendar") {
-                PlaceholderView(title: "Kalender", systemImage: "calendar")
+                CalendarView()
             }
             Tab("Einstellungen", systemImage: "gearshape") {
                 SettingsView()

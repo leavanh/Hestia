@@ -2,7 +2,6 @@ import SwiftData
 import SwiftUI
 
 struct TodayView: View {
-    @Environment(\.modelContext) private var context
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Query(sort: \Habit.createdAt) private var habits: [Habit]
@@ -25,9 +24,7 @@ struct TodayView: View {
 
     /// Habits, die am angezeigten Tag fällig sind (Spezifikation 3.2): offene zuerst, dann erledigte.
     private var dueHabits: [Habit] {
-        Habit.inTodayOrder(habits.filter { $0.isAlive && engine.isDue($0.snapshot, on: shownDay) }) {
-            engine.isCompleted($0.snapshot, on: shownDay)
-        }
+        Habit.dueInTodayOrder(habits, on: shownDay, engine: engine)
     }
 
     var body: some View {
@@ -39,7 +36,7 @@ struct TodayView: View {
                         .dayEntrance(from: entranceEdge, index: 0)
                     VStack(spacing: Theme.spacing) {
                         ForEach(Array(due.enumerated()), id: \.element.id) { index, habit in
-                            card(for: habit)
+                            DayHabitCard(habit: habit, day: shownDay) { editingHabit = habit }
                                 .dayEntrance(from: entranceEdge, index: index + 1)
                         }
                     }
@@ -227,55 +224,6 @@ struct TodayView: View {
         .opacity(showsBarTitle ? 1 : 0)
         .animation(.easeInOut(duration: 0.2), value: showsBarTitle)
         .accessibilityHidden(true)
-    }
-
-    @ViewBuilder
-    private func card(for habit: Habit) -> some View {
-        // Ein eben gelöschter Habit kann hier noch einmal ankommen, bevor die Liste neu aufgebaut ist.
-        if habit.isAlive {
-            let habitColor = HabitColor(key: habit.colorKey)
-            let color = habitColor.color
-            let snapshot = habit.snapshot
-
-            HabitCard(
-                name: habit.name,
-                iconName: habit.iconName,
-                habitColor: habitColor,
-                status: engine.status(snapshot, on: shownDay),
-                rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: shownDay)),
-                dots: engine.weekDots(snapshot, on: shownDay),
-                onEdit: { editingHabit = habit }
-            ) {
-                control(for: habit, snapshot: snapshot, color: color)
-            }
-        }
-    }
-
-    /// Counter bei täglich mit Anzahl größer 1, sonst Abhakkreis. Abgehakt wird für den angezeigten Tag.
-    @ViewBuilder
-    private func control(for habit: Habit, snapshot: HabitSnapshot, color: Color) -> some View {
-        let target = engine.dailyTarget(snapshot)
-        let count = min(engine.count(on: shownDay, in: snapshot.counts), target)
-
-        if engine.usesCounter(snapshot) {
-            CounterControl(
-                count: count,
-                target: target,
-                color: color,
-                id: "counter-\(habit.name)",
-                onDecrement: {
-                    habit.setCount(engine.decrementedCount(count), on: shownDay, engine: engine, in: context)
-                },
-                onIncrement: {
-                    habit.setCount(engine.incrementedCount(count, target: target), on: shownDay, engine: engine, in: context)
-                }
-            )
-        } else {
-            CheckCircle(isChecked: count >= 1, color: color) {
-                habit.setCount(engine.toggledCount(count), on: shownDay, engine: engine, in: context)
-            }
-            .accessibilityIdentifier("check-\(habit.name)")
-        }
     }
 }
 

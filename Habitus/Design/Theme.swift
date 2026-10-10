@@ -58,6 +58,9 @@ enum Theme {
     static let swipeBounceDistance: CGFloat = 28
     /// Ab dieser Scrolltiefe steht der Titel von Heute klein in der Leiste.
     static let barTitleScrollOffset: CGFloat = 44
+    /// Durchmesser eines Tages in `MonthCalendar` und Abstand zwischen den Tagen.
+    static let calendarDaySize: CGFloat = 40
+    static let calendarDaySpacing: CGFloat = 6
 
     // MARK: Farben
 
@@ -65,7 +68,7 @@ enum Theme {
     static let backgroundTop = dynamic(light: (0.91, 0.95, 1.00), dark: (0.04, 0.08, 0.19))
     static let backgroundBottom = dynamic(light: (0.95, 0.92, 1.00), dark: (0.15, 0.08, 0.25))
 
-    /// Akzentfarbe für Fortschritt, der keinem Habit gehört (Fortschrittsring, später Kalender).
+    /// Akzentfarbe für Fortschritt, der keinem Habit gehört (Fortschrittsring, Kalender).
     static let accent = Color.accentColor
     /// Statusfarben, nur für die Statusmarke am Icon. Für grün gibt es keine Farbe.
     static let statusYellow = Color(uiColor: .systemYellow)
@@ -75,6 +78,8 @@ enum Theme {
     static let segmentSelected = dynamic(light: (1.00, 1.00, 1.00), dark: (0.39, 0.39, 0.40))
     /// Vordergrund auf gefüllten Habitfarben (z.B. Häkchen).
     static let onHabitColor = Color.white
+    /// Vordergrund auf der gefüllten Akzentfarbe (Tageszahl in `MonthCalendar`).
+    static let onAccent = Color.white
     /// Deckkraft der Icon Fläche in Habitfarbe.
     static let iconBackgroundOpacity: Double = 0.18
     /// Deckkraft der Spur hinter dem Fortschritt in `ProgressRing`.
@@ -85,6 +90,12 @@ enum Theme {
     static let badgeOpacity: Double = 0.18
     /// Deckkraft des äußeren Rings um den angezeigten Tag in `WeekDots`.
     static let dotRingOpacity: Double = 0.4
+    /// Deckkraft der Akzentfarbe in `MonthCalendar`: von knapp über 0 % bis 100 % Tagesfortschritt. Bei 0 % keine Farbe.
+    static let calendarFillOpacity: ClosedRange<Double> = 0.15...0.9
+    /// Ab dieser Deckkraft steht die Tageszahl in `onAccent` statt in der Textfarbe.
+    static let calendarOnAccentThreshold: Double = 0.5
+    /// Deckkraft zukünftiger, gesperrter Tage in `MonthCalendar`.
+    static let calendarFutureOpacity: Double = 0.35
     /// Deckkraft eines Bedienelements, das gerade nicht benutzbar ist (z.B. Minus bei 0).
     static let disabledOpacity: Double = 0.35
 

@@ -62,4 +62,12 @@ extension Habit {
             return lhs.sortOrder != rhs.sortOrder ? lhs.sortOrder < rhs.sortOrder : lhs.createdAt < rhs.createdAt
         }
     }
+
+    /// Die Habits, die an `day` in der Liste erscheinen (Spezifikation 3.2), in der Reihenfolge von Heute.
+    /// Heute, der Kalender und das Sheet "Tag bearbeiten" zeigen damit dieselbe Liste.
+    static func dueInTodayOrder(_ habits: [Habit], on day: Date, engine: HabitEngine) -> [Habit] {
+        inTodayOrder(habits.filter { $0.isAlive && engine.isDue($0.snapshot, on: day) }) {
+            engine.isCompleted($0.snapshot, on: day)
+        }
+    }
 }

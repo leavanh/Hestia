@@ -162,6 +162,7 @@ Prozent = erledigte Punkte geteilt durch Punkte, gerundet auf ganze Zahl. Bei 0 
 | `WeekDots` | Die 7 Punkte aus 3.6, der angezeigte Tag mit äußerem Ring. |
 | `HabitIconView` | Icon in gedämpfter Habitfarbe auf zarter Kreisfläche derselben Farbe. Bei Status gelb oder rot oben rechts eine kleine runde Statusmarke in Statusfarbe, die den Kreis leicht überlappt und durch einen schmalen freien Rand von ihm abgesetzt ist. Bei grün keine Marke. |
 | `ProgressHeader` | Fortschrittsring und Text "5 von 16 · 31 %". Ohne Karte, direkt auf dem Hintergrund. |
+| `MonthCalendar` | Ein Monat im durchgehenden Kalender (5.4), Monatsname und Tage ohne Karte. Jeder Tag ist ein Kreis, nach Tagesfortschritt in der Akzentfarbe eingefärbt (keine Farbe bei 0 %, bis 100 % zunehmend kräftiger), heute mit Ring, zukünftige Tage blass und gesperrt. Werte in `Theme`. |
 | `GlassBackground` | Farbverlauf für alle Bildschirme. |
 | `SegmentedChoice` | Segmentfeld im Glas Stil, z.B. für den Rhythmus und seine Variante. |
 
@@ -225,7 +226,7 @@ Speichern nur möglich, wenn Name nicht leer.
 
 ### 5.4 Kalender
 
-- Oben Monatsansicht mit Wechsel zum vorherigen/nächsten Monat.
+- Durchgehender Kalender: Die Monate stehen untereinander, ich scrolle hoch (Vergangenheit) und runter. Er beginnt beim aktuellen Monat, der unten endet, einen späteren Monat gibt es nicht. Er reicht mindestens 3 Monate zurück, sonst bis zum Monat des ältesten Habits. Über den Tagen steht eine feste Wochentagszeile Mo bis So.
 - Jeder Tag eingefärbt nach Tagesfortschritt (3.4) an diesem Tag: keine Farbe bei 0 %, dann zunehmend kräftigere Akzentfarbe bis 100 %. Zukünftige Tage blass.
 - Tag antippen öffnet Sheet "Tag bearbeiten": dieselbe Liste wie "Heute" für diesen Tag, mit Abhaken und Counter. Zukünftige Tage sind nicht antippbar.
 - Darunter Liste aller Habits (aktive zuerst, dann beendete) mit aktuellem Streak.
@@ -490,8 +491,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Ziel:** Ich sehe meine Vergangenheit und kann alte Tage korrigieren.
 
 **Umfang**
-- Monatsansicht mit Einfärbung nach Tagesfortschritt (5.4).
-- Monatswechsel.
+- Durchgehender, scrollbarer Kalender mit Einfärbung nach Tagesfortschritt (5.4).
 - Sheet "Tag bearbeiten" mit derselben Liste wie Heute für den gewählten Tag.
 - Zukünftige Tage gesperrt.
 
