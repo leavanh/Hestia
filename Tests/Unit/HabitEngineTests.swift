@@ -77,6 +77,28 @@ struct HabitEngineTests {
         #expect(engine.decrementedCount(0) == 0)
     }
 
+    // MARK: Erledigt (Spezifikation 5.2)
+
+    @Test func counterIsOpenUntilTheTargetIsReached() {
+        #expect(!engine.isCompleted(daily(target: 3, [(day, 2)]), on: day))
+        #expect(engine.isCompleted(daily(target: 3, [(day, 3)]), on: day))
+        #expect(!engine.isCompleted(daily(target: 3), on: day))
+    }
+
+    @Test func checkedHabitIsCompleted() {
+        #expect(!engine.isCompleted(daily(), on: day))
+        #expect(engine.isCompleted(daily([(day, 1)]), on: day))
+    }
+
+    @Test func weeklyHabitWithFulfilledWindowStaysOpenIfNotCheckedOnTheShownDay() {
+        let yesterday = date(2026, 10, 7, 14)
+        var weekly = daily(target: 1, [(yesterday, 1)])
+        weekly.rhythm = .weekly
+        #expect(engine.donePoints(weekly, on: day) == 1, "Das Fenster ist erfüllt")
+        #expect(!engine.isCompleted(weekly, on: day))
+        #expect(engine.isCompleted(weekly, on: yesterday))
+    }
+
     // MARK: Punkte (Spezifikation 3.4)
 
     @Test func pointsEqualDailyTarget() {

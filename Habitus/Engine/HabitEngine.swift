@@ -172,6 +172,12 @@ nonisolated struct HabitEngine: Sendable {
         habit.rhythm == .daily ? max(habit.targetCount, 1) : 1
     }
 
+    /// Erledigt heißt: das Tagesziel ist am Tag erreicht (Kreis abgehakt, Counter voll). Ein Wochen
+    /// oder Monats Habit mit erfülltem Fenster, der am Tag nicht abgehakt ist, bleibt offen.
+    func isCompleted(_ habit: HabitSnapshot, on day: Date) -> Bool {
+        count(on: day, in: habit.counts) >= dailyTarget(habit)
+    }
+
     /// Punkte, die ein Habit am Tag wert ist (3x täglich = 3, alle anderen Rhythmen 1).
     func points(_ habit: HabitSnapshot, on day: Date) -> Int {
         dailyTarget(habit)

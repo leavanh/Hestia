@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Karte eines Habits: links Icon, Name mit Statuspunkt, Rhythmus Zeile und 7 Tage Punkte, rechts Abhakkreis oder Counter.
-/// Tippen auf die linke Seite ruft `onTap` auf, die rechte Seite bedient sich selbst.
+/// Karte eines Habits: links Icon mit Statusring, Name, Rhythmus Zeile und 7 Tage Punkte, rechts Abhakkreis oder Counter.
+/// Festes Drücken (`Theme.editPressDuration`) auf die linke Seite ruft `onEdit` auf (auch als VoiceOver Aktion "Bearbeiten"),
+/// die rechte Seite bedient sich selbst. Dabei sinkt die Karte kurz ein und gibt einen leichten, beim Auslösen einen festen Impuls.
 struct HabitCard<Control: View>: View {
     let name: String
     let iconName: String
@@ -9,20 +10,22 @@ struct HabitCard<Control: View>: View {
     let status: HabitStatus
     let rhythmText: String
     let dots: [WeekDot]
-    let onTap: () -> Void
+    let onEdit: () -> Void
     @ViewBuilder var control: Control
+
+    @State private var editCount = 0
+    @State private var isPressing = false
+    /// Wird nach `Theme.editPressPreviewDelay` Drücken wahr, nicht schon beim bloßen Berühren (z.B. zum Scrollen).
+    @State private var isPreviewing = false
 
     var body: some View {
         HStack(spacing: Theme.spacing) {
             HStack(spacing: Theme.spacing) {
-                HabitIconView(iconName: iconName, color: color)
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 8) {
-                        Text(name)
-                            .font(.headline)
-                        StatusDot(status: status)
-                            .accessibilityIdentifier("status-\(name)")
-                    }
+                HabitIconView(iconName: iconName, color: color, status: status)
+                    .accessibilityIdentifier("status-\(name)")
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(name)
+                        .font(.headline)
                     Text(rhythmText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -33,11 +36,30 @@ struct HabitCard<Control: View>: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .contentShape(Rectangle())
-            .onTapGesture(perform: onTap)
+            .onLongPressGesture(minimumDuration: Theme.editPressDuration) {
+                editCount += 1
+                onEdit()
+            } onPressingChanged: { pressing in
+                isPressing = pressing
+            }
+            .task(id: isPressing) {
+                guard isPressing else {
+                    isPreviewing = false
+                    return
+                }
+                try? await Task.sleep(for: .seconds(Theme.editPressPreviewDelay))
+                if !Task.isCancelled { isPreviewing = true }
+            }
+            .sensoryFeedback(.impact(weight: .light), trigger: isPreviewing) { _, preview in preview }
+            .sensoryFeedback(.impact(flexibility: .rigid, intensity: 1), trigger: editCount)
+            .accessibilityElement(children: .contain)
+            .accessibilityAction(named: "Bearbeiten", onEdit)
 
             control
         }
         .glassCard()
+        .scaleEffect(isPreviewing ? Theme.pressedCardScale : 1)
+        .animation(.spring(duration: 0.25, bounce: 0.3), value: isPreviewing)
     }
 }
 
@@ -48,21 +70,21 @@ struct HabitCard<Control: View>: View {
             HabitCard(
                 name: "Sport", iconName: "figure.run", color: HabitColor.orange.color, status: .yellow,
                 rhythmText: "1 von 3 diese Woche",
-                dots: [.fill(0), .fill(0), .fill(1), .fill(1), .fill(0), .fill(1), .fill(0)], onTap: {}
+                dots: [.fill(0), .fill(0), .fill(1), .fill(1), .fill(0), .fill(1), .fill(0)], onEdit: {}
             ) {
                 CheckCircle(isChecked: false, color: HabitColor.orange.color) {}
             }
             HabitCard(
                 name: "Wasser trinken", iconName: "drop.fill", color: HabitColor.teal.color, status: .green,
                 rhythmText: "3 pro Tag",
-                dots: [.fill(1), .fill(0.66), .fill(0.33), .fill(1), .fill(0), .fill(1), .fill(0.66)], onTap: {}
+                dots: [.fill(1), .fill(0.66), .fill(0.33), .fill(1), .fill(0), .fill(1), .fill(0.66)], onEdit: {}
             ) {
                 CounterControl(count: 2, target: 3, color: HabitColor.teal.color, id: "p", onDecrement: {}, onIncrement: {})
             }
             HabitCard(
                 name: "Yoga", iconName: "figure.walk", color: HabitColor.violet.color, status: .red,
                 rhythmText: "Mo, Do",
-                dots: [.fill(0), .fill(1), .fill(0), .fill(0), .fill(1), .fill(0), .fill(0)], onTap: {}
+                dots: [.fill(0), .fill(1), .fill(0), .fill(0), .fill(1), .fill(0), .fill(0)], onEdit: {}
             ) {
                 CheckCircle(isChecked: false, color: HabitColor.violet.color) {}
             }

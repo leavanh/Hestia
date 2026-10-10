@@ -78,12 +78,12 @@ final class TodayPhase2UITests: XCTestCase {
     }
 
     @MainActor
-    func testTappingCardOpensEditorAndChangesTarget() {
+    func testLongPressingCardOpensEditorAndChangesTarget() {
         let app = launchFresh()
         createHabit(named: "Lesen", in: app)
         XCTAssertTrue(app.buttons["check-Lesen"].exists)
 
-        app.staticTexts["Lesen"].tap()
+        app.staticTexts["Lesen"].press(forDuration: 1.5)
         XCTAssertTrue(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 5))
         let field = app.textFields["name-field"]
         XCTAssertEqual(field.value as? String, "Lesen", "Das Sheet zeigt die bisherigen Werte")

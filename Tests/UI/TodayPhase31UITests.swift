@@ -16,14 +16,29 @@ final class TodayPhase31UITests: XCTestCase {
         return app
     }
 
-    /// Datum wie in der Datumskarte, `offset` Tage nach heute.
-    private func dateText(plus offset: Int = 0) -> String {
+    /// Wochentag (Titel) und Datum (Untertitel) von Heute, `offset` Tage nach heute.
+    private func expectedDay(plus offset: Int = 0) -> (title: String, subtitle: String) {
         let date = Calendar.current.date(byAdding: .day, value: offset, to: .now)!
-        return date.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "de_DE")))
+        let locale = Locale(identifier: "de_DE")
+        return (
+            date.formatted(.dateTime.weekday(.wide).locale(locale)),
+            date.formatted(.dateTime.day().month(.wide).locale(locale))
+        )
     }
 
-    private func shownDate(in app: XCUIApplication) -> String {
-        app.staticTexts["today-date"].label
+    /// Wartet, bis Titel und Untertitel den Tag zeigen und nur noch ein Kopf im Bild ist (nach der Animation).
+    @MainActor
+    private func assertShownDay(plus offset: Int, in app: XCUIApplication, _ message: String) {
+        let expected = expectedDay(plus: offset)
+        let title = app.staticTexts.matching(identifier: "today-title")
+        let subtitle = app.staticTexts.matching(identifier: "today-subtitle")
+        let deadline = Date().addingTimeInterval(5)
+        while Date() < deadline {
+            if title.count == 1, subtitle.count == 1,
+               title.firstMatch.label == expected.title, subtitle.firstMatch.label == expected.subtitle { return }
+            Thread.sleep(forTimeInterval: 0.1)
+        }
+        XCTFail("\(message): erwartet \(expected.title), \(expected.subtitle)")
     }
 
     @MainActor
@@ -40,37 +55,37 @@ final class TodayPhase31UITests: XCTestCase {
     // MARK: Tag wechseln
 
     @MainActor
-    func testSwipingOnTheDateCardChangesTheDay() {
+    func testSwipingOnTheListChangesTheDay() {
         let app = launchFresh(extraArguments: ["-HabitusSampleData"])
-        let card = app.otherElements["date-card"]
-        XCTAssertTrue(card.waitForExistence(timeout: 5))
-        XCTAssertEqual(shownDate(in: app), dateText())
+        let list = app.scrollViews["today-list"]
+        XCTAssertTrue(list.waitForExistence(timeout: 5))
+        assertShownDay(plus: 0, in: app, "Start")
 
-        card.swipeRight()
-        XCTAssertEqual(shownDate(in: app), dateText(plus: -1), "Wischen nach rechts zeigt gestern")
+        list.swipeRight()
+        assertShownDay(plus: -1, in: app, "Wischen nach rechts zeigt gestern")
 
-        card.swipeRight()
-        XCTAssertEqual(shownDate(in: app), dateText(plus: -2), "Weiter zurück geht es")
+        list.swipeRight()
+        assertShownDay(plus: -2, in: app, "Weiter zurück geht es")
 
-        card.swipeLeft()
-        card.swipeLeft()
-        XCTAssertEqual(shownDate(in: app), dateText(), "Wischen nach links zeigt wieder heute")
+        list.swipeLeft()
+        list.swipeLeft()
+        assertShownDay(plus: 0, in: app, "Wischen nach links zeigt wieder heute")
 
-        card.swipeLeft()
-        XCTAssertEqual(shownDate(in: app), dateText(), "Über heute hinaus geht es nicht")
+        list.swipeLeft()
+        assertShownDay(plus: 0, in: app, "Über heute hinaus geht es nicht")
     }
 
     @MainActor
     func testCheckingOnAPastDayDoesNotChangeToday() {
         let app = launchFresh(extraArguments: ["-HabitusSampleData"])
-        let card = app.otherElements["date-card"]
-        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        let list = app.scrollViews["today-list"]
+        XCTAssertTrue(list.waitForExistence(timeout: 5))
         // Beispieldaten: "Meditieren" ist weder heute noch gestern erledigt.
         XCTAssertFalse(app.buttons["check-Meditieren"].isSelected)
         let todayProgress = app.staticTexts["progress-text"].label
 
-        card.swipeRight()
-        XCTAssertEqual(shownDate(in: app), dateText(plus: -1))
+        list.swipeRight()
+        assertShownDay(plus: -1, in: app, "Gestern")
         XCTAssertTrue(app.buttons["check-Meditieren"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["check-Meditieren"].isSelected)
         let pastProgress = app.staticTexts["progress-text"].label
@@ -79,27 +94,28 @@ final class TodayPhase31UITests: XCTestCase {
         XCTAssertTrue(app.buttons["check-Meditieren"].isSelected, "Gestern ist abgehakt")
         XCTAssertNotEqual(app.staticTexts["progress-text"].label, pastProgress, "Der Fortschritt von gestern ändert sich")
 
-        card.swipeLeft()
-        XCTAssertEqual(shownDate(in: app), dateText())
+        list.swipeLeft()
+        assertShownDay(plus: 0, in: app, "Heute")
         XCTAssertFalse(app.buttons["check-Meditieren"].isSelected, "Heute bleibt unverändert")
         XCTAssertEqual(app.staticTexts["progress-text"].label, todayProgress)
 
-        card.swipeRight()
+        list.swipeRight()
+        assertShownDay(plus: -1, in: app, "Gestern")
         XCTAssertTrue(app.buttons["check-Meditieren"].isSelected, "Der Wert von gestern ist gespeichert")
     }
 
     @MainActor
     func testReturningToTheAppShowsToday() {
         let app = launchFresh(extraArguments: ["-HabitusSampleData"])
-        let card = app.otherElements["date-card"]
-        XCTAssertTrue(card.waitForExistence(timeout: 5))
-        card.swipeRight()
-        XCTAssertEqual(shownDate(in: app), dateText(plus: -1))
+        let list = app.scrollViews["today-list"]
+        XCTAssertTrue(list.waitForExistence(timeout: 5))
+        list.swipeRight()
+        assertShownDay(plus: -1, in: app, "Gestern")
 
         XCUIDevice.shared.press(.home)
         app.activate()
-        XCTAssertTrue(card.waitForExistence(timeout: 5))
-        XCTAssertEqual(shownDate(in: app), dateText())
+        XCTAssertTrue(list.waitForExistence(timeout: 5))
+        assertShownDay(plus: 0, in: app, "Zurück in der App")
     }
 
     // MARK: Liste
@@ -147,21 +163,21 @@ final class TodayPhase31UITests: XCTestCase {
         app.buttons["Speichern"].tap()
         XCTAssertTrue(app.staticTexts["Sport"].waitForExistence(timeout: 5))
 
-        app.staticTexts["Yoga"].tap()
+        app.staticTexts["Yoga"].press(forDuration: 1.5)
         XCTAssertTrue(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.otherElements["rhythm-picker"].buttons["Woche"].isSelected)
         XCTAssertTrue(app.otherElements["variant-picker"].buttons["Wochentage"].isSelected)
         XCTAssertTrue(app.buttons["weekday-1"].exists)
         app.buttons["Abbrechen"].tap()
 
-        app.staticTexts["Miete"].tap()
+        app.staticTexts["Miete"].press(forDuration: 1.5)
         XCTAssertTrue(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.otherElements["rhythm-picker"].buttons["Monat"].isSelected)
         XCTAssertTrue(app.otherElements["variant-picker"].buttons["Monatstag"].isSelected)
         XCTAssertTrue(app.buttons["monthday-picker"].exists)
         app.buttons["Abbrechen"].tap()
 
-        app.staticTexts["Sport"].tap()
+        app.staticTexts["Sport"].press(forDuration: 1.5)
         XCTAssertTrue(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.otherElements["rhythm-picker"].buttons["Woche"].isSelected)
         XCTAssertTrue(app.otherElements["variant-picker"].buttons["Anzahl"].isSelected)

@@ -265,7 +265,7 @@ final class TodayPhase3UITests: XCTestCase {
         save("Lesen", in: app)
         XCTAssertTrue(app.buttons["check-Lesen"].waitForExistence(timeout: 5))
 
-        app.staticTexts["Lesen"].tap()
+        app.staticTexts["Lesen"].press(forDuration: 1.5)
         XCTAssertTrue(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 5))
         let picker = app.otherElements["rhythm-picker"]
         XCTAssertTrue(picker.buttons["Täglich"].isSelected, "Das Sheet zeigt den bisherigen Rhythmus")
@@ -276,7 +276,7 @@ final class TodayPhase3UITests: XCTestCase {
         XCTAssertTrue(app.buttons["check-Lesen"].waitForExistence(timeout: 5))
 
         // Wieder öffnen: Rhythmus und Anzahl sind gespeichert.
-        app.staticTexts["Lesen"].tap()
+        app.staticTexts["Lesen"].press(forDuration: 1.5)
         XCTAssertTrue(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.otherElements["rhythm-picker"].buttons["Woche"].isSelected)
         XCTAssertEqual(stepperText(in: app), "2x pro Woche")
@@ -301,7 +301,7 @@ final class TodayPhase3UITests: XCTestCase {
         XCTAssertTrue(app.buttons["check-Sport"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["check-Sport"].isSelected)
 
-        app.staticTexts["Sport"].tap()
+        app.staticTexts["Sport"].press(forDuration: 1.5)
         XCTAssertTrue(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.otherElements["rhythm-picker"].buttons["Woche"].isSelected)
         XCTAssertEqual(stepperText(in: app), "2x pro Woche")

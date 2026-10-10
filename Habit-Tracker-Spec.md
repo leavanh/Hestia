@@ -106,6 +106,7 @@ Prozent = erledigte Punkte geteilt durch Punkte, gerundet auf ganze Zahl. Bei 0 
 - Füllung: Wert des Tages geteilt durch Tagesziel (bei nicht täglichen Habits ist das Tagesziel 1). 0 = nur Umriss, Zwischenwerte = Habitfarbe mit steigender Deckkraft, 100 % = voll gefüllt.
 - Tage vor der Erstellung: leerer Umriss wie ein Tag ohne Erledigung. Es sind also auch am Erstelltag alle 7 Punkte zu sehen. Status, Streaks und Statistik ändern sich dadurch nicht.
 - Pausierte Tage: kleiner grauer Strich statt Punkt.
+- Der angezeigte Tag (der Punkt ganz rechts) ist immer gut erkennbar: Er hat zusätzlich einen äußeren Ring in Habitfarbe mit verringerter Deckkraft und etwas Abstand zum Punkt. Das gilt für jede Füllung und auch für einen pausierten Tag. Der Ring verändert Abstände und Ausrichtung der Punkte nicht.
 
 ### 3.7 Streaks und Statistik
 
@@ -145,21 +146,22 @@ Prozent = erledigte Punkte geteilt durch Punkte, gerundet auf ganze Zahl. Bei 0 
 ### 4.2 Farben
 
 - **Hintergrund:** Ruhiger Farbverlauf. Hell: sehr helles Blau zu hellem Flieder. Dunkel: tiefes Marineblau zu dunklem Violett.
-- **Karten, Tab Bar, Header:** Liquid Glass (`.glassEffect()`), damit der Verlauf leicht durchscheint.
-- **Habitfarben:** Feste Palette mit 8 Farben (Blau, Türkis, Grün, Gelb, Orange, Rot, Pink, Violett). Nur für Icon, Ring, Abhakkreis und 7 Tage Punkte.
-- **Statusfarben:** Systemgrün, Systemgelb, Systemrot. Nur für den Statuspunkt.
+- **Karten und Tab Bar:** Liquid Glass (`.glassEffect()`), damit der Verlauf leicht durchscheint.
+- **Habitfarben:** Feste Palette mit 8 Farben (Blau, Türkis, Grün, Gelb, Orange, Rot, Pink, Violett). Nur für Icon, Ring im Counter, Abhakkreis und 7 Tage Punkte.
+- **Gedämpfte Habitfarben für Icons:** Zu jeder Habitfarbe gibt es eine gedämpfte Variante (weniger Sättigung, hell und dunkel abgestimmt auf den Hintergrundverlauf). Symbol und Kreisfläche von `HabitIconView` nutzen nur diese gedämpfte Variante, auch in der Icon Vorschau im Sheet. Abhakkreis, Counter und 7 Tage Punkte bleiben in der normalen Habitfarbe.
+- **Statusfarben:** Systemgelb und Systemrot. Nur für die Statusmarke am Icon (4.3). Für grün gibt es keine Anzeige und keine Farbe.
 - Alle Farben als zentrale Definition im Designsystem, nirgendwo Farbwerte direkt im Code der Ansichten.
 
 ### 4.3 Bausteine (einmal bauen, überall nutzen)
 
 | Baustein | Inhalt |
 |---|---|
-| `HabitCard` | Links Icon in Habitfarbe, daneben Name und kleiner Statuspunkt, darunter eine kleine Zeile mit dem Rhythmus (siehe 4.3.1), darunter 7 Tage Punkte. Rechts Abhakkreis oder Counter. Kein weiterer Text. |
+| `HabitCard` | Links `HabitIconView` mit Statusmarke, daneben der Name, darunter eine kleine Zeile mit dem Rhythmus (siehe 4.3.1), darunter 7 Tage Punkte. Rechts Abhakkreis oder Counter. Kein weiterer Text. |
 | `CheckCircle` | Kreis mit Umriss in Habitfarbe, abgehakt gefüllt mit Häkchen. |
 | `CounterControl` | Minus im Kreis, Ring mit Zahl in der Mitte (Ring füllt sich mit Fortschritt), Plus im Kreis. Gleiche Kreisgröße wie `CheckCircle`, alles auf einer Linie. |
-| `WeekDots` | Die 7 Punkte aus 3.6. |
-| `StatusDot` | Kleiner Punkt in Statusfarbe. |
-| `ProgressHeader` | Fortschrittsring und Text "5 von 16 · 31 %". |
+| `WeekDots` | Die 7 Punkte aus 3.6, der angezeigte Tag mit äußerem Ring. |
+| `HabitIconView` | Icon in gedämpfter Habitfarbe auf zarter Kreisfläche derselben Farbe. Bei Status gelb oder rot oben rechts eine kleine runde Statusmarke in Statusfarbe, die den Kreis leicht überlappt und durch einen schmalen freien Rand von ihm abgesetzt ist. Bei grün keine Marke. |
+| `ProgressHeader` | Fortschrittsring und Text "5 von 16 · 31 %". Ohne Karte, direkt auf dem Hintergrund. |
 | `GlassBackground` | Farbverlauf für alle Bildschirme. |
 | `SegmentedChoice` | Segmentfeld im Glas Stil, z.B. für den Rhythmus und seine Variante. |
 
@@ -194,13 +196,15 @@ Auswahl aus ca. 30 kuratierten SF Symbols (z.B. figure.run, drop.fill, book.fill
 
 ### 5.2 Heute
 
-- Oben: Datum des angezeigten Tags (z.B. "Donnerstag, 8. Oktober") und `ProgressHeader`.
-- **Tag wechseln:** Wischen auf der Datumskarte nach rechts zeigt den vorherigen Tag, nach links den nächsten Tag. Weiter als bis heute geht es nicht, zukünftige Tage sind nicht erreichbar. Beim Start der App, beim Zurückkehren in die App und beim Tageswechsel um Mitternacht zeigt die Ansicht wieder heute.
+- **Kopfbereich ohne Karte:** Oben steht das Datum des angezeigten Tags im Stil eines großen Navigationstitels (Large Title einer `NavigationStack`: Schrift, Gewicht, Einzug links). Titel ist der Wochentag ("Donnerstag"), darunter als Untertitel das Datum ("8. Oktober"). Beim Scrollen verhält sich der Titel wie ein Large Title und wird klein in der Leiste angezeigt. Darunter der `ProgressHeader`, ebenfalls ohne Karte und ohne Glas direkt auf dem Hintergrund. Neben dem Datum steht eine kleine Kapsel: "Heute" in Akzentfarbe, an vergangenen Tagen neutral "Gestern", "Vorgestern" oder "Vor n Tagen". In der kleinen Leiste steht sie hinter dem Datum.
+- **Tag wechseln:** Waagrechtes Wischen im Inhalt von Heute (Kopfbereich und Liste) nach rechts zeigt den vorherigen Tag, nach links den nächsten Tag. Senkrechtes Scrollen, Abhakkreis und Counter funktionieren weiter wie bisher. Weiter als bis heute geht es nicht, zukünftige Tage sind nicht erreichbar. Beim Start der App, beim Zurückkehren in die App und beim Tageswechsel um Mitternacht zeigt die Ansicht wieder heute.
+- **Animation beim Tageswechsel:** Titel, Untertitel, Fortschritt und Liste gleiten in Wischrichtung heraus und der neue Tag gleitet von der anderen Seite herein (zurück in die Vergangenheit: Inhalt kommt von links, vorwärts: von rechts), kurz und weich (ca. 0,3 s). Wird nicht gewechselt, weil heute schon erreicht ist, federt der Inhalt nur kurz zurück. Der neue Tag federt dabei Kopf und Karten nacheinander (leicht versetzt) herein. Bei "Bewegung reduzieren" (Reduce Motion) nur Überblenden. Das Zurückspringen auf heute (Start, Rückkehr, Mitternacht) ist nicht animiert.
 - Für den angezeigten Tag gelten Fälligkeit, Fortschritt, Abhaken, Status und 7 Tage Punkte so, als wäre dieser Tag heute. Tage vor der Erstellung eines Habits und pausierte Tage verhalten sich wie in Abschnitt 3 beschrieben.
-- Oben rechts: Plus Button für neuen Habit. Oben links: Button "Sortieren".
+- Oben rechts: Plus Button für neuen Habit. Zeigt die Ansicht einen vergangenen Tag, steht links daneben ein Button "Heute", der (animiert, wie ein Wischen nach vorn) zu heute zurückspringt. Auf heute ist er nicht zu sehen. Oben links: Button "Sortieren".
 - Darunter eine einzige Liste mit `HabitCard`s, ohne Abschnitte und ohne Überschriften.
-- Tippen auf die Karte (nicht auf Kreis/Counter) öffnet das Bearbeiten Sheet.
-- **Sortieren:** Im Sortiermodus Habits per Drag and Drop verschieben. Es gibt eine Reihenfolge für alle Habits, sie wird gespeichert.
+- **Reihenfolge:** Oben die offenen Habits, darunter die erledigten. Innerhalb beider Teile gilt die gespeicherte Reihenfolge (`sortOrder`, dann `createdAt`). Erledigt heißt: Am angezeigten Tag ist das Tagesziel erreicht, also Abhakkreis abgehakt bzw. Counter voll. Ein Wochen oder Monats Habit, dessen Fenster erfüllt ist, der am angezeigten Tag aber nicht abgehakt ist, bleibt oben. Wird ein Habit erledigt, rutscht er animiert nach unten, wird es wieder aufgehoben, rutscht er animiert zurück an seinen Platz.
+- **Bearbeiten:** Festes Drücken (ca. 0,6 s) auf die Karte (nicht auf Kreis/Counter) öffnet das Bearbeiten Sheet. Die Karte sinkt dabei ein und gibt ein haptisches Signal, beim Auslösen ein festeres. Einfaches Tippen auf die Karte tut nichts. Für VoiceOver gibt es auf der Karte die Aktion "Bearbeiten".
+- **Sortieren:** Im Sortiermodus Habits per Drag and Drop verschieben. Es gibt eine Reihenfolge für alle Habits, sie wird gespeichert. Auch im Sortiermodus stehen erledigte Habits unten. Verschieben lassen sich nur die offenen Habits, die erledigten sind im Sortiermodus nicht verschiebbar. Nach dem Verschieben bekommen die offenen Habits in ihrer neuen Reihenfolge die vorderen Plätze in `sortOrder`, die erledigten folgen dahinter in ihrer bisherigen Reihenfolge.
 
 ### 5.3 Sheet "Habit anlegen / bearbeiten"
 
@@ -324,7 +328,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Gleicher Wert in allen Gruppen eines Habits. *(In Phase 3.1 wieder entfernt.)*
 - `ProgressHeader` mit Tagesfortschritt (3.4) für tägliche Habits.
 - `WeekDots` (3.6).
-- Karte antippen öffnet Bearbeiten Sheet.
+- Karte antippen öffnet Bearbeiten Sheet. *(Ab Phase 3.2 langes Drücken.)*
 - Erste `HabitEngine` Funktionen mit Unit Tests: `points`, `donePoints`, `dayProgress`, `weekDots`.
 
 **Definition of Done**
@@ -345,7 +349,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Umfang**
 - Rhythmen Woche, Monat, Wochentage, Monatstag im Sheet (5.3).
 - Fälligkeit (3.2), Zählung im Fortschritt (3.4).
-- Status (3.5) als `StatusDot` auf der Karte.
+- Status (3.5) als `StatusDot` auf der Karte. *(Ab Phase 3.2 Ring um das Icon.)*
 - Text "x/y im Fenster" bei Woche und Monat. *(In Phase 3.1 wieder entfernt.)*
 - Einstellungen > Entwickler: "Testdaten erzeugen" (legt Beispielhabits mit 60 Tagen Historie an) und "Alle Daten zurücksetzen".
 - Umfangreiche Unit Tests für `isDue` und `status` mit festen Daten.
@@ -380,7 +384,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - **Tagesgruppen entfernen:** Kein Morgens, Mittags, Abends, Ganztägig mehr, weder im Sheet noch in Heute. Heute zeigt eine einzige Liste ohne Abschnitte (5.2, 5.3).
 - **Datenmodell:** `timeSlots` und `sortIndex` aus `Habit` entfernen, `sortOrder: Int` (Standard 0) hinzufügen (6). Heute sortiert nach `sortOrder`, dann `createdAt`. Vorhandene Daten bleiben bei der Migration erhalten.
 - **7 Tage Punkte:** Tage vor der Erstellung als leerer Umriss statt unsichtbar, also immer 7 Punkte (3.6).
-- **Tag wechseln per Wischen** auf der Datumskarte in Heute, nur zwischen vergangenen Tagen und heute (5.2).
+- **Tag wechseln per Wischen** auf der Datumskarte in Heute, nur zwischen vergangenen Tagen und heute (5.2). *(Ab Phase 3.2 ohne Karte, Wischen im ganzen Inhalt.)*
 - **Rhythmus im Sheet:** Nur noch Täglich, Woche, Monat. Wochentage und Monatstag als Variante unter Woche bzw. Monat (5.3). Das Datenmodell (`Rhythm` mit fünf Fällen) und die `HabitEngine` bleiben unverändert.
 - **"x/y im Fenster" entfernen** aus `HabitCard` und Heute (4.3). `windowProgress` in der `HabitEngine` bleibt, weil der Tagesfortschritt es braucht (3.4).
 - Testdaten (Einstellungen > Entwickler) ohne Tagesgruppen.
@@ -412,6 +416,72 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - [ ] Auf keiner Karte steht "x/y im Fenster". Der Tagesfortschritt zählt Wochen und Monats Habits weiterhin wie in 3.4.
 - [ ] Nach dem Update sind vorhandene Habits und Erledigungen noch da (kein Absturz bei der Migration).
 - [ ] Die Suche aus "Aufräumen" findet nichts mehr, es gibt keine ungenutzten Dateien, Typen oder Funktionen.
+
+---
+
+### Phase 3.2: Heute aufräumen und lebendiger machen
+
+**Ziel:** Heute wirkt ruhiger und klarer: kein Kartenkopf mehr, Status direkt am Icon, erledigte Habits rutschen weg, und ich sehe beim Wischen sofort, dass sich der Tag geändert hat. Alles, was dadurch wegfällt, ist vollständig aus Code und Tests entfernt.
+
+**Umfang**
+- **Animation beim Tageswechsel** in Heute: Inhalt gleitet in Wischrichtung, Reduce Motion nur Überblenden, kein Wechsel über heute hinaus mit kurzem Zurückfedern (5.2).
+- **Kopfbereich ohne Karte:** Datum als Large Title (Wochentag als Titel, Datum als Untertitel) wie bei einer `NavigationStack`, beim Scrollen klein in der Leiste. `ProgressHeader` ohne Glaskarte darunter (4.2, 4.3, 5.2). Ob dafür der echte Navigationstitel oder ein eigener Kopf im selben Stil genutzt wird, ist frei, solange Optik, Scrollverhalten und Animation stimmen.
+- **Wischen** wechselt den Tag im ganzen Inhalt von Heute statt nur auf der früheren Datumskarte (5.2).
+- **Bearbeiten per langem Drücken** auf die Karte statt per Tippen, plus VoiceOver Aktion "Bearbeiten" (5.2).
+- **Erledigte Habits nach unten**, animiert, wieder aufgehoben zurück an ihren Platz (5.2). Die Reihenfolge wird ohne Oberfläche berechnet (offene zuerst, dann erledigte, jeweils `sortOrder`, dann `createdAt`) und ist per Unit Test prüfbar. `sortOrder` wird dabei nicht verändert.
+- **Status als Ring um das Icon** statt Statuspunkt neben dem Namen (4.2, 4.3). *(In Phase 3.3 ersetzt durch die Statusmarke.)* Der Ring liegt außen um die Kreisfläche von `HabitIconView`, Strichstärke und Abstand als Werte in `Theme`. Statuslogik (3.5) bleibt unverändert.
+- **Angezeigter Tag in den 7 Punkten** mit äußerem, leicht durchsichtigem Ring in Habitfarbe (3.6). Ringstärke, Abstand und Deckkraft als Werte in `Theme`.
+
+**Aufräumen (Pflicht, keine Überbleibsel)**
+- Löschen: `StatusDot` (Datei, auch aus `Habitus.xcodeproj`), `Theme.statusDotSize`, die Glaskarte um den Kopfbereich in `TodayView`, `onTap` in `HabitCard` (ersetzt durch langes Drücken).
+- Accessibility Identifier `date-card` ersetzen (z.B. `today-header`), `status-<Name>` sitzt jetzt am Icon und liefert weiter den Wert Grün, Gelb oder Rot.
+- Kommentare anpassen, die von Datumskarte, Statuspunkt oder Tippen zum Bearbeiten sprechen.
+- Tests anpassen, die die Datumskarte, den Statuspunkt oder Tippen zum Bearbeiten nutzen (u.a. `TodayPhase2UITests`, `TodayPhase3UITests`, `TodayPhase31UITests`).
+- Abschluss: Eine Suche im Projekt nach `StatusDot`, `statusDotSize`, `date-card`, `Datumskarte` und `Statuspunkt` findet nichts mehr. Ausnahme ist nur diese Spezifikation.
+
+**Pflicht Testfälle**
+- Unit Test: Reihenfolge mit drei Habits (sortOrder 0, 1, 2), der erste ist erledigt: Ergebnis 1, 2, 0. Wieder aufgehoben: 0, 1, 2.
+- Unit Test: Ein Counter Habit mit Ziel 3 und Wert 2 gilt als offen, mit Wert 3 als erledigt.
+- Unit Test: Ein Wochen Habit mit erfülltem Fenster, am angezeigten Tag nicht abgehakt, gilt als offen.
+- UI Test: Abhaken des obersten Habits schiebt ihn ans Ende der Liste, Aufheben bringt ihn zurück nach oben.
+- UI Test: Tippen auf die Karte öffnet kein Sheet, langes Drücken öffnet das Bearbeiten Sheet mit diesem Habit.
+- UI Test: Wischen nach rechts auf der Liste zeigt gestern (Titel und Untertitel passen), Wischen nach links wieder heute, ein weiteres Wischen nach links bleibt bei heute.
+- UI Test: Mit Testdaten liefert `status-<Name>` die Werte Grün, Gelb und Rot, und es gibt keinen Statuspunkt mehr neben dem Namen.
+
+**Definition of Done**
+- [ ] Beim Wischen sehe ich deutlich, dass der Tag wechselt, und in welche Richtung. Mit Reduce Motion wird nur überblendet.
+- [ ] Oben ist keine Karte mehr. Das Datum sieht aus wie ein großer Navigationstitel und wird beim Scrollen klein in der Leiste angezeigt. Der Fortschritt steht ohne Karte darunter.
+- [ ] Tippen auf eine Karte macht nichts, langes Drücken öffnet das Bearbeiten Sheet. Abhakkreis und Counter reagieren weiter auf einfaches Tippen.
+- [ ] Erledigte Habits rutschen sichtbar nach unten, aufgehobene zurück an ihren Platz. Nach Neustart ist die gespeicherte Reihenfolge unverändert.
+- [ ] Der Status ist als farbiger Ring um das Icon zu sehen, neben dem Namen steht kein Punkt mehr.
+- [ ] In den 7 Punkten ist der angezeigte Tag (ganz rechts) bei jeder Füllung gut erkennbar, auch an vergangenen Tagen.
+- [ ] Die Suche aus "Aufräumen" findet nichts mehr, es gibt keine ungenutzten Dateien, Typen oder Funktionen.
+
+---
+
+### Phase 3.3: Ruhigere Farben am Icon
+
+**Ziel:** Auf der Karte ist im Normalfall nur noch die Habitfarbe zu sehen. Statusfarbe taucht nur auf, wenn ich etwas tun sollte, und die Icons wirken ruhiger.
+
+**Umfang**
+- **Statusmarke statt Statusring** (4.2, 4.3): Der Ring in Statusfarbe um das Icon entfällt. Bei Status gelb oder rot sitzt oben rechts am Icon eine kleine runde Marke in Systemgelb bzw. Systemrot, bei grün ist nichts zu sehen. Größe der Marke und Breite des freien Rands als Werte in `Theme`. Die Statuslogik (3.5) bleibt unverändert.
+- **Gedämpfte Icon Farben** (4.2): Jede der 8 Habitfarben bekommt eine gedämpfte Variante, zentral in `HabitColor` (keine Farbwerte in den Ansichten). `HabitIconView` nutzt für Symbol und Kreisfläche nur diese Variante, überall wo es vorkommt (Karte, Icon Vorschau im Sheet). Die gedämpften Farben sind in Hell und Dunkel gut lesbar und passen zum Verlauf. Abhakkreis, Counter und 7 Tage Punkte behalten die normale Habitfarbe.
+- **Accessibility:** `status-<Name>` sitzt weiter am Icon und liefert Grün, Gelb oder Rot, auch wenn bei grün keine Marke zu sehen ist. Die Marke selbst hat den Identifier `status-badge-<Name>` und existiert nur bei gelb und rot.
+
+**Aufräumen (Pflicht, keine Überbleibsel)**
+- Löschen: `Theme.statusRingWidth`, `Theme.statusRingGap`, `Theme.statusGreen` und die Ring Darstellung in `HabitIconView`.
+- Kommentare anpassen, die vom Statusring sprechen.
+- Abschluss: Eine Suche im Projekt nach `statusRing`, `statusGreen` und `Statusring` findet nichts mehr. Ausnahme ist nur diese Spezifikation.
+
+**Pflicht Testfälle**
+- Unit Test: Jede der 8 Habitfarben hat eine gedämpfte Variante, die sich von der normalen Farbe unterscheidet.
+- UI Test: Mit Testdaten hat ein grüner Habit keine `status-badge-<Name>`, ein gelber und ein roter Habit haben eine. `status-<Name>` liefert in allen drei Fällen den richtigen Wert.
+
+**Definition of Done**
+- [ ] Grüne Habits zeigen am Icon keine Statusfarbe, gelbe und rote eine kleine Marke oben rechts.
+- [ ] Um das Icon gibt es keinen Ring mehr.
+- [ ] Die Icons wirken in Hell und Dunkel sichtbar gedämpfter als Abhakkreis und Punkte, alle 8 Farben sind noch gut voneinander zu unterscheiden.
+- [ ] Die Suche aus "Aufräumen" findet nichts mehr, es gibt keine ungenutzten Werte oder Funktionen.
 
 ---
 
@@ -459,7 +529,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Einstellungen > Pausen (3.8, 5.5).
 - Pausentage in Status, Fortschritt, Punkten (grauer Strich), Kalender (grau) und Statistik berücksichtigen.
 - Habit beenden im Bearbeiten Sheet, Einstellungen > Beendete Habits mit "Wieder aktivieren" und "Löschen" (3.9).
-- Sortiermodus in Heute mit Drag and Drop, eine Reihenfolge für alle Habits über `sortOrder` (5.2).
+- Sortiermodus in Heute mit Drag and Drop, eine Reihenfolge für alle Habits über `sortOrder` (5.2). Nur offene Habits sind verschiebbar, erledigte bleiben unten (Phase 3.2).
 - Unit Tests: Fenster überspringen Pausentage, Streak wird durch Pause nicht unterbrochen, Löschen entfernt Habit, Erledigungen und Pausenzuordnung (leere Pausen verschwinden).
 
 **Definition of Done**
@@ -482,7 +552,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Umfang**
 - Leerzustände: Heute ohne Habits ("Lege deinen ersten Habit an" mit Button), Kalender ohne Daten, keine Pausen.
 - App Icon (minimalistisch, passend zum Farbverlauf).
-- VoiceOver Beschriftungen für Abhakkreis, Counter und Statuspunkt.
+- VoiceOver Beschriftungen für Abhakkreis, Counter und Statusmarke.
 - Prüfung mit großer Schrift (Dynamic Type) und Korrektur von Umbrüchen.
 - Durchsicht aller Bildschirme auf einheitliche Abstände, Schriftgrößen und Farben.
 

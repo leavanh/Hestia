@@ -53,10 +53,13 @@ final class Habit {
 }
 
 extension Habit {
-    /// Reihenfolge der Heute Ansicht: nach `sortOrder`, bei Gleichstand nach `createdAt`.
-    static func inTodayOrder(_ habits: [Habit]) -> [Habit] {
-        habits.sorted { lhs, rhs in
-            lhs.sortOrder != rhs.sortOrder ? lhs.sortOrder < rhs.sortOrder : lhs.createdAt < rhs.createdAt
+    /// Reihenfolge der Heute Ansicht: offene Habits zuerst, dann die erledigten. Innerhalb beider Teile
+    /// nach `sortOrder`, bei Gleichstand nach `createdAt`. `sortOrder` selbst bleibt unverändert.
+    static func inTodayOrder(_ habits: [Habit], isCompleted: (Habit) -> Bool) -> [Habit] {
+        let done = Dictionary(uniqueKeysWithValues: habits.map { ($0.id, isCompleted($0)) })
+        return habits.sorted { lhs, rhs in
+            if done[lhs.id] != done[rhs.id] { return done[rhs.id] == true }
+            return lhs.sortOrder != rhs.sortOrder ? lhs.sortOrder < rhs.sortOrder : lhs.createdAt < rhs.createdAt
         }
     }
 }

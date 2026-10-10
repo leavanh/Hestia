@@ -27,10 +27,37 @@ enum Theme {
     static let strokeWidth: CGFloat = 2
     /// Höhe eines Segments in `SegmentedChoice`.
     static let segmentHeight: CGFloat = 32
-    /// Durchmesser des `StatusDot` neben dem Namen.
-    static let statusDotSize: CGFloat = 10
-    /// Mindeststrecke, ab der ein Wischen auf der Datumskarte den Tag wechselt.
+    /// Strichstärke und Abstand des Statusrings um die Kreisfläche von `HabitIconView`.
+    static let statusRingWidth: CGFloat = 2.5
+    static let statusRingGap: CGFloat = 2
+    /// Strichstärke und Abstand des äußeren Rings um den angezeigten Tag in `WeekDots`.
+    static let dotRingWidth: CGFloat = 1.5
+    static let dotRingGap: CGFloat = 2
+    /// Mindeststrecke, ab der ein Wischen in Heute den Tag wechselt.
     static let swipeDistance: CGFloat = 40
+    /// Dauer des Tageswechsels in Heute.
+    static let dayChangeDuration: Double = 0.5
+    /// Der ausgleitende Tag wird dabei auf diesen Anteil verkleinert.
+    static let dayChangeScale: CGFloat = 0.9
+    /// Beim Tageswechsel gleiten Kopf und Karten um so viel von der Seite herein, nacheinander im Abstand `entranceStagger`.
+    static let entranceOffset: CGFloat = 90
+    static let entranceStagger: Double = 0.05
+    static let entranceMaxStaggeredItems = 8
+    /// Abstand zwischen Leiste und großem Titel in Heute.
+    static let headerTopSpacing: CGFloat = 28
+    /// So lange muss eine Karte gedrückt werden, bis das Bearbeiten Sheet öffnet.
+    static let editPressDuration: Double = 0.6
+    /// Nach dieser Zeit gibt die Karte beim Drücken ein erstes Zeichen (leichter Impuls, kurz einsinken).
+    static let editPressPreviewDelay: Double = 0.25
+    /// Größe der Karte, solange sie gedrückt wird.
+    static let pressedCardScale: CGFloat = 0.97
+    /// Innenabstände der Kapsel `DayBadge`.
+    static let badgePaddingHorizontal: CGFloat = 8
+    static let badgePaddingVertical: CGFloat = 2
+    /// Wie weit der Inhalt beim Wischen über heute hinaus nachgibt, bevor er zurückfedert.
+    static let swipeBounceDistance: CGFloat = 28
+    /// Ab dieser Scrolltiefe steht der Titel von Heute klein in der Leiste.
+    static let barTitleScrollOffset: CGFloat = 44
 
     // MARK: Farben
 
@@ -40,7 +67,7 @@ enum Theme {
 
     /// Akzentfarbe für Fortschritt, der keinem Habit gehört (Fortschrittsring, später Kalender).
     static let accent = Color.accentColor
-    /// Statusfarben, nur für den `StatusDot`.
+    /// Statusfarben, nur für den Ring um das Icon.
     static let statusGreen = Color(uiColor: .systemGreen)
     static let statusYellow = Color(uiColor: .systemYellow)
     static let statusRed = Color(uiColor: .systemRed)
@@ -55,6 +82,10 @@ enum Theme {
     static let ringTrackOpacity: Double = 0.2
     /// Deckkraft eines 7 Tage Punkts bei Teilerledigung: von knapp über 0 % bis knapp unter 100 %.
     static let dotPartialOpacity: ClosedRange<Double> = 0.3...0.8
+    /// Deckkraft der Fläche hinter "Heute" in `DayBadge`.
+    static let badgeOpacity: Double = 0.18
+    /// Deckkraft des äußeren Rings um den angezeigten Tag in `WeekDots`.
+    static let dotRingOpacity: Double = 0.4
     /// Deckkraft eines Bedienelements, das gerade nicht benutzbar ist (z.B. Minus bei 0).
     static let disabledOpacity: Double = 0.35
 

@@ -71,8 +71,9 @@ final class TodayUITests: XCTestCase {
         XCTAssertFalse(app.buttons["check-\(name)"].isSelected)
 
         let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: .now)!
-        let expected = tomorrow.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "de_DE")))
-        XCTAssertEqual(app.staticTexts["today-date"].label, expected)
+        let locale = Locale(identifier: "de_DE")
+        XCTAssertEqual(app.staticTexts["today-title"].label, tomorrow.formatted(.dateTime.weekday(.wide).locale(locale)))
+        XCTAssertEqual(app.staticTexts["today-subtitle"].label, tomorrow.formatted(.dateTime.day().month(.wide).locale(locale)))
 
         // Zurück zu heute: das Häkchen von heute ist unverändert.
         app.terminate()
