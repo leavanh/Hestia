@@ -164,13 +164,13 @@ final class TodayPhase3UITests: XCTestCase {
 
         XCTAssertTrue(app.staticTexts["Sport"].waitForExistence(timeout: 5))
         XCTAssertEqual(status(of: "Sport", in: app), "Grün", "Neu angelegt: kein Rot im ersten Fenster")
-        XCTAssertEqual(app.staticTexts["progress-text"].label, "0 von 1 · 0 %")
+        XCTAssertEqual(app.staticTexts["progress-text"].label, "0 von 1 · 0\u{00A0}%")
 
         // Abhaken zählt im Fortschritt.
         app.buttons["check-Sport"].tap()
-        XCTAssertEqual(app.staticTexts["progress-text"].label, "1 von 1 · 100 %")
+        XCTAssertEqual(app.staticTexts["progress-text"].label, "1 von 1 · 100\u{00A0}%")
         app.buttons["check-Sport"].tap()
-        XCTAssertEqual(app.staticTexts["progress-text"].label, "0 von 1 · 0 %")
+        XCTAssertEqual(app.staticTexts["progress-text"].label, "0 von 1 · 0\u{00A0}%")
     }
 
     @MainActor
@@ -213,7 +213,7 @@ final class TodayPhase3UITests: XCTestCase {
         app.launchArguments = ["-HabitusDayOffset", "1"]
         app.launch()
         XCTAssertTrue(app.staticTexts["Wäsche"].waitForExistence(timeout: 5))
-        XCTAssertEqual(app.staticTexts["progress-text"].label, "0 von 1 · 0 %")
+        XCTAssertEqual(app.staticTexts["progress-text"].label, "0 von 1 · 0\u{00A0}%")
 
         // Und am Tag danach ist er wieder weg.
         app.terminate()
@@ -230,9 +230,9 @@ final class TodayPhase3UITests: XCTestCase {
         save("Yoga", in: app)
 
         XCTAssertTrue(app.staticTexts["Yoga"].waitForExistence(timeout: 5))
-        XCTAssertEqual(app.staticTexts["progress-text"].label, "0 von 1 · 0 %")
+        XCTAssertEqual(app.staticTexts["progress-text"].label, "0 von 1 · 0\u{00A0}%")
         app.buttons["check-Yoga"].tap()
-        XCTAssertEqual(app.staticTexts["progress-text"].label, "1 von 1 · 100 %")
+        XCTAssertEqual(app.staticTexts["progress-text"].label, "1 von 1 · 100\u{00A0}%")
     }
 
     @MainActor
@@ -253,7 +253,7 @@ final class TodayPhase3UITests: XCTestCase {
         openEditor(named: "Miete", rhythm: "Monat", variant: "Monatstag", in: app)
         save("Miete", in: app)
         XCTAssertTrue(app.staticTexts["Miete"].waitForExistence(timeout: 5))
-        XCTAssertEqual(app.staticTexts["progress-text"].label, "0 von 1 · 0 %")
+        XCTAssertEqual(app.staticTexts["progress-text"].label, "0 von 1 · 0\u{00A0}%")
     }
 
     // MARK: Bearbeiten
@@ -293,7 +293,7 @@ final class TodayPhase3UITests: XCTestCase {
         app.buttons["target-stepper-Increment"].tap()
         save("Sport", in: app)
         app.buttons["check-Sport"].tap()
-        XCTAssertEqual(app.staticTexts["progress-text"].label, "1 von 1 · 100 %")
+        XCTAssertEqual(app.staticTexts["progress-text"].label, "1 von 1 · 100\u{00A0}%")
 
         app.terminate()
         app.launchArguments = []

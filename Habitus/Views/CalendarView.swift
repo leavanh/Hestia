@@ -60,7 +60,6 @@ struct CalendarView: View {
             .accessibilityIdentifier("calendar-scroll")
             .background { GlassBackground() }
             .navigationTitle("Kalender")
-            .navigationBarTitleDisplayMode(.inline)
             .sheet(item: $selectedDay) { selected in
                 DayEditSheet(day: selected.day)
             }
@@ -80,9 +79,17 @@ struct CalendarView: View {
 }
 
 extension CalendarView {
-    /// Alle Habits mit aktuellem Streak, aktive zuerst, dann beendete.
+    /// Alle Habits mit aktuellem Streak, aktive zuerst, dann beendete. Ohne Habits ein Leerzustand.
     private var habitList: some View {
         VStack(spacing: Theme.spacing) {
+            if listedHabits.isEmpty {
+                EmptyState(
+                    systemImage: "calendar",
+                    title: "Noch keine Daten",
+                    message: "Sobald du in Heute Habits anlegst und abhakst, färben sich hier die Tage und deine Streaks erscheinen.",
+                    identifier: "calendar-empty"
+                )
+            }
             ForEach(listedHabits) { habit in
                 let snapshot = habit.snapshot
                 HabitStatRow(

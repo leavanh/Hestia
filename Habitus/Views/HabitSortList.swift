@@ -20,7 +20,7 @@ struct HabitSortList: View {
 
         List {
             Section {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text("Sortieren")
                         .font(.largeTitle.bold())
                         .accessibilityAddTraits(.isHeader)

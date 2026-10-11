@@ -15,10 +15,11 @@ struct ProgressHeader: View {
         .accessibilityElement(children: .combine)
     }
 
+    /// Zwischen Zahl und Prozentzeichen ein geschütztes Leerzeichen, damit "%" bei großer Schrift nicht allein umbricht.
     private var text: String {
         progress.total == 0
             ? "Heute nichts fällig"
-            : "\(progress.done) von \(progress.total) · \(progress.percent) %"
+            : "\(progress.done) von \(progress.total) · \(progress.percent)\u{00A0}%"
     }
 }
 

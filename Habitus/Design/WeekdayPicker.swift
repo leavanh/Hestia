@@ -19,6 +19,7 @@ struct WeekdayPicker: View {
                 } label: {
                     Text(day.initial)
                         .font(.subheadline.weight(.semibold))
+                        .fixedCircleTypeSize()
                         .foregroundStyle(isSelected ? Theme.onHabitColor : color)
                         .frame(width: Theme.controlSize, height: Theme.controlSize)
                         .background {

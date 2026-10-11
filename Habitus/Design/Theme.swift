@@ -9,6 +9,12 @@ enum Theme {
     static let sectionSpacing: CGFloat = 24
     static let cardPadding: CGFloat = 16
     static let cornerRadius: CGFloat = 24
+    /// Abstand zwischen Textzeilen, die zusammengehören (Name und Rhythmus Zeile, Titel und Untertitel).
+    static let textSpacing: CGFloat = 6
+    /// Abstand zwischen kleinen Elementen in einer Zeile (Name und Kapsel) und zwischen Überschrift und Glaskarte.
+    static let inlineSpacing: CGFloat = 8
+    /// Größte Schrift für Symbole und Zahlen in Kreisen fester Größe (Abhakkreis, Counter, Icon, Kalendertag).
+    static let maxCircleTypeSize: DynamicTypeSize = .xxxLarge
     /// Größe von `CheckCircle` und der Kreise in `CounterControl`.
     static let controlSize: CGFloat = 36
     /// Abstand zwischen den Kreisen in `CounterControl`.

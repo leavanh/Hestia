@@ -42,7 +42,7 @@ struct HabitDetailSheet: View {
             header(snapshot: snapshot, habitColor: habitColor)
             calendar(snapshot: snapshot, habitColor: habitColor)
             GlassSection(title: "Statistik") {
-                HStack(alignment: .top) {
+                AdaptiveStack(verticalAlignment: .top) {
                     StatValue(title: "Aktueller Streak", value: StatValue.daysText(stats.currentStreak), identifier: "stat-current-streak")
                     StatValue(title: "Längster Streak", value: StatValue.daysText(stats.longestStreak), identifier: "stat-longest-streak")
                     StatValue(title: "Quote 30 Tage", value: StatValue.rateText(stats.ratePercent), identifier: "stat-rate-30")
@@ -54,9 +54,9 @@ struct HabitDetailSheet: View {
     }
 
     private func header(snapshot: HabitSnapshot, habitColor: HabitColor) -> some View {
-        HStack(spacing: Theme.spacing) {
-            HabitIconView(habitName: habit.name, iconName: habit.iconName, color: habitColor, status: .green)
-            VStack(alignment: .leading, spacing: 6) {
+        AdaptiveStack {
+            HabitIconView(habitName: habit.name, iconName: habit.iconName, color: habitColor)
+            VStack(alignment: .leading, spacing: Theme.textSpacing) {
                 Text(habit.name)
                     .font(.title2.weight(.semibold))
                     .accessibilityIdentifier("detail-name")

@@ -19,7 +19,7 @@ struct SegmentedChoice<Value: Hashable>: View {
                         .font(.footnote.weight(isSelected ? .semibold : .regular))
                         .foregroundStyle(.primary)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .minimumScaleFactor(0.5)
                         .padding(.horizontal, 4)
                         .frame(maxWidth: .infinity, minHeight: Theme.segmentHeight)
                         .background {

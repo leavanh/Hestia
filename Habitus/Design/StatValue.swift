@@ -7,7 +7,7 @@ struct StatValue: View {
     let identifier: String
 
     var body: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: Theme.textSpacing) {
             Text(value)
                 .font(.title2.weight(.semibold))
                 .minimumScaleFactor(0.7)

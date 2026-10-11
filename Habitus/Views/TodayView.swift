@@ -4,6 +4,7 @@ import SwiftUI
 struct TodayView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Query(sort: \Habit.createdAt) private var habits: [Habit]
 
     @State private var today = AppClock.now
@@ -34,6 +35,11 @@ struct TodayView: View {
         Habit.pausedInTodayOrder(habits, on: shownDay, engine: engine)
     }
 
+    /// Ob es noch keinen aktiven Habit gibt. Dann zeigt Heute statt der Liste den Leerzustand.
+    private var hasNoActiveHabits: Bool {
+        !habits.contains { $0.isAlive && $0.endedAt == nil }
+    }
+
     var body: some View {
         let due = dueHabits
         NavigationStack {
@@ -59,6 +65,7 @@ struct TodayView: View {
                     ) {
                         isSorting.toggle()
                     }
+                    .disabled(hasNoActiveHabits && !isSorting)
                     .accessibilityIdentifier("sort-toggle")
                 }
                 if !isSorting {
@@ -92,6 +99,17 @@ struct TodayView: View {
             VStack(alignment: .leading, spacing: Theme.sectionSpacing) {
                 header(for: due)
                     .dayEntrance(from: entranceEdge, index: 0)
+                if hasNoActiveHabits && due.isEmpty && paused.isEmpty {
+                    EmptyState(
+                        systemImage: "checkmark.circle",
+                        title: "Noch keine Habits",
+                        message: "Hier erscheinen deine Habits an jedem Tag, an dem sie fällig sind.",
+                        identifier: "today-empty",
+                        actionTitle: "Lege deinen ersten Habit an",
+                        action: { isCreating = true }
+                    )
+                    .dayEntrance(from: entranceEdge, index: 1)
+                }
                 VStack(spacing: Theme.spacing) {
                     ForEach(Array((due + paused).enumerated()), id: \.element.id) { index, habit in
                         DayHabitCard(habit: habit, day: shownDay) { editingHabit = habit }
@@ -221,16 +239,20 @@ struct TodayView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(weekdayText)
                     .font(.largeTitle.bold())
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityIdentifier("today-title")
-                HStack(spacing: 8) {
+                AdaptiveStack(spacing: Theme.inlineSpacing) {
                     Text(dateText)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .accessibilityIdentifier("today-subtitle")
                     DayBadge(text: dayLabel, isToday: daysAgo == 0)
                         .accessibilityIdentifier("today-badge")
-                    Spacer(minLength: 0)
+                    if !dynamicTypeSize.isAccessibilitySize {
+                        Spacer(minLength: 0)
+                    }
                     if daysAgo > 0 {
                         backToTodayButton
                     }

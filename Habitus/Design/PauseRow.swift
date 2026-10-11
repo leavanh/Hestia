@@ -9,8 +9,8 @@ struct PauseRow: View {
     let onEnd: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
+        VStack(alignment: .leading, spacing: Theme.inlineSpacing) {
+            AdaptiveStack(verticalAlignment: .firstTextBaseline, spacing: Theme.inlineSpacing) {
                 Text(habitNames)
                     .font(.headline)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -21,6 +21,7 @@ struct PauseRow: View {
                 .foregroundStyle(.secondary)
             Button(phase == .running ? "Pause beenden" : "Pause entfernen", action: onEnd)
                 .font(.subheadline.weight(.semibold))
+                .multilineTextAlignment(.leading)
                 .buttonStyle(.borderless)
                 .accessibilityIdentifier("end-pause-\(habitNames)")
         }

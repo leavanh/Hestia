@@ -21,12 +21,15 @@ final class CalendarPhase5UITests: XCTestCase {
         return app
     }
 
-    /// Scrollt nach unten, bis das Element im Bild ist.
+    /// Scrollt nach unten, bis das Element im Bild ist. Liegt es schon oberhalb, wieder nach oben.
     @MainActor
     private func scrollDown(to element: XCUIElement, in app: XCUIApplication) {
         let scroll = app.scrollViews["calendar-scroll"]
         for _ in 0..<12 where !element.exists || !element.isHittable {
             scroll.swipeUp()
+        }
+        for _ in 0..<12 where !element.exists || !element.isHittable {
+            scroll.swipeDown()
         }
         XCTAssertTrue(element.exists && element.isHittable, "Element nicht gefunden: \(element)")
     }

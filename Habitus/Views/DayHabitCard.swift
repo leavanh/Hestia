@@ -45,6 +45,7 @@ struct DayHabitCard: View {
                 count: count,
                 target: target,
                 color: color,
+                label: habit.name,
                 id: "counter-\(habit.name)",
                 onDecrement: {
                     habit.setCount(engine.decrementedCount(count), on: day, engine: engine, in: context)
@@ -54,7 +55,7 @@ struct DayHabitCard: View {
                 }
             )
         } else {
-            CheckCircle(isChecked: count >= 1, color: color) {
+            CheckCircle(isChecked: count >= 1, color: color, label: habit.name) {
                 habit.setCount(engine.toggledCount(count), on: day, engine: engine, in: context)
             }
             .accessibilityIdentifier("check-\(habit.name)")

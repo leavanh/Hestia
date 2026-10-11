@@ -13,6 +13,20 @@ enum HabitColor: String, CaseIterable, Identifiable {
 
     var color: Color { Color(uiColor: uiColor) }
 
+    /// Deutscher Name für VoiceOver in der Farbauswahl.
+    var title: String {
+        switch self {
+        case .blue: "Blau"
+        case .teal: "Türkis"
+        case .green: "Grün"
+        case .yellow: "Gelb"
+        case .orange: "Orange"
+        case .red: "Rot"
+        case .pink: "Pink"
+        case .violet: "Violett"
+        }
+    }
+
     /// Gedämpfte Variante für Symbol und Kreisfläche von `HabitIconView`: weniger Sättigung, in Hell etwas
     /// dunkler, in Dunkel etwas heller, damit sie auf dem Verlauf lesbar bleibt. Der Farbton bleibt erhalten.
     var mutedColor: Color {

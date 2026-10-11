@@ -38,14 +38,15 @@ private struct PausesSection: View {
         let today = AppClock.now
         let listed = listedPauses(today: today)
 
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: Theme.inlineSpacing) {
             SectionTitle("Pausen")
             if listed.isEmpty {
-                Text("Keine laufenden oder geplanten Pausen.")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .glassCard()
-                    .accessibilityIdentifier("no-pauses")
+                EmptyState(
+                    systemImage: "pause.circle",
+                    title: "Keine Pausen",
+                    message: "Es gibt keine laufenden oder geplanten Pausen. Mit einer Pause zählen Tage, an denen du einen Habit nicht machen kannst, nicht mit.",
+                    identifier: "no-pauses"
+                )
             }
             ForEach(listed) { pause in
                 PauseRow(
@@ -83,7 +84,7 @@ private struct DeveloperSection: View {
 
     var body: some View {
         GlassSection(title: "Entwickler") {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: Theme.spacing) {
                 Button("Testdaten erzeugen") {
                     let habits = DebugData.insertSampleHabits(into: context)
                     message = "\(habits.count) Beispielhabits mit \(DebugData.historyDays) Tagen Historie angelegt."

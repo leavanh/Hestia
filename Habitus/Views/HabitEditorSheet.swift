@@ -132,7 +132,7 @@ struct HabitEditorSheet: View {
     }
 
     private var rhythmSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: Theme.spacing) {
             SegmentedChoice(
                 options: RhythmGroup.allCases,
                 selection: groupBinding,
@@ -200,6 +200,7 @@ struct HabitEditorSheet: View {
                 } label: {
                     Image(systemName: icon)
                         .font(.title3)
+                        .fixedCircleTypeSize()
                         .foregroundStyle(icon == iconName ? habitColor.mutedColor : .secondary)
                         .frame(width: Theme.iconSize, height: Theme.iconSize)
                         .background(
@@ -209,6 +210,8 @@ struct HabitEditorSheet: View {
                         .contentShape(Circle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(HabitIcons.title(for: icon))
+                .accessibilityAddTraits(icon == iconName ? .isSelected : [])
                 .accessibilityIdentifier("icon-\(icon)")
             }
         }
@@ -232,6 +235,8 @@ struct HabitEditorSheet: View {
                         .contentShape(Circle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(option.title)
+                .accessibilityAddTraits(option == habitColor ? .isSelected : [])
                 .accessibilityIdentifier("color-\(option.rawValue)")
                 .frame(maxWidth: .infinity)
             }

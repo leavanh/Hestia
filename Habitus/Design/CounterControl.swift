@@ -1,10 +1,13 @@
 import SwiftUI
 
 /// Minus im Kreis, Ring mit Zahl in der Mitte, Plus im Kreis. Kreise wie bei `CheckCircle`.
+/// Für VoiceOver ist der Ring ein einstellbares Element ("Sport, 2 von 3"), Wischen nach oben oder unten zählt.
 struct CounterControl: View {
     let count: Int
     let target: Int
     let color: Color
+    /// Was VoiceOver für den Ring liest, z.B. der Habit Name.
+    var label = "Erledigt"
     /// Grundlage für die Bezeichner der drei Teile ("<id>-minus", "<id>-value", "<id>-plus").
     let id: String
     let onDecrement: () -> Void
@@ -15,6 +18,7 @@ struct CounterControl: View {
             StepButton(systemImage: "minus", color: color, action: onDecrement)
                 .disabled(count <= 0)
                 .accessibilityLabel("Weniger")
+                .accessibilityHint("Zählt eins zurück.")
                 .accessibilityIdentifier("\(id)-minus")
 
             ZStack {
@@ -25,16 +29,25 @@ struct CounterControl: View {
                     .minimumScaleFactor(0.6)
                     .lineLimit(1)
                     .padding(Theme.ringWidth + 1)
+                    .fixedCircleTypeSize()
             }
             .frame(width: Theme.controlSize, height: Theme.controlSize)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Erledigt")
+            .accessibilityLabel(label)
             .accessibilityValue("\(count) von \(target)")
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment: if count < target { onIncrement() }
+                case .decrement: if count > 0 { onDecrement() }
+                @unknown default: break
+                }
+            }
             .accessibilityIdentifier("\(id)-value")
 
             StepButton(systemImage: "plus", color: color, action: onIncrement)
                 .disabled(count >= target)
                 .accessibilityLabel("Mehr")
+                .accessibilityHint("Zählt eins dazu.")
                 .accessibilityIdentifier("\(id)-plus")
         }
     }
@@ -55,6 +68,7 @@ private struct StepButton: View {
                 Image(systemName: systemImage)
                     .font(.body.weight(.bold))
                     .foregroundStyle(color)
+                    .fixedCircleTypeSize()
             }
             .frame(width: Theme.controlSize, height: Theme.controlSize)
             .contentShape(Circle())

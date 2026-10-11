@@ -83,6 +83,7 @@ struct MonthCalendar: View {
 
         let label = Text("\(engine.calendar.component(.day, from: day))")
             .font(.subheadline.weight(isToday ? .bold : .regular))
+            .fixedCircleTypeSize()
             .foregroundStyle(opacity >= Theme.calendarOnAccentThreshold ? Theme.onAccent : Color.primary)
             .frame(width: Theme.calendarDaySize, height: Theme.calendarDaySize)
             .background {
@@ -145,6 +146,7 @@ struct CalendarWeekdayHeader: View {
             ForEach(Self.weekdays, id: \.self) { weekday in
                 Text(weekday)
                     .font(.caption.weight(.semibold))
+                    .fixedCircleTypeSize()
                     .foregroundStyle(.secondary)
             }
         }

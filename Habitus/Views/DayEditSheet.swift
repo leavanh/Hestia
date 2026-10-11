@@ -21,6 +21,14 @@ struct DayEditSheet: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: Theme.sectionSpacing) {
                     ProgressHeader(progress: engine.dayProgress(due.map(\.snapshot), on: day))
+                    if due.isEmpty && paused.isEmpty {
+                        EmptyState(
+                            systemImage: "calendar",
+                            title: "Nichts fällig",
+                            message: "An diesem Tag gab es keinen fälligen Habit.",
+                            identifier: "day-empty"
+                        )
+                    }
                     VStack(spacing: Theme.spacing) {
                         ForEach(due + paused) { habit in
                             DayHabitCard(habit: habit, day: day) { editingHabit = habit }

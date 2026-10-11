@@ -61,7 +61,7 @@ struct PauseEditorSheet: View {
     @ViewBuilder
     private var habitChoices: some View {
         if choices.isEmpty {
-            Text("Es gibt keine aktiven Habits.")
+            Text("Es gibt keine aktiven Habits. Lege zuerst in Heute einen Habit an.")
                 .font(.body)
                 .foregroundStyle(.secondary)
         } else {
@@ -70,10 +70,10 @@ struct PauseEditorSheet: View {
                     let habitColor = HabitColor(key: habit.colorKey)
                     let pausedText = pausedText(for: habit)
                     HStack(spacing: Theme.spacing) {
-                        HabitIconView(habitName: habit.name, iconName: habit.iconName, color: habitColor, status: .green)
+                        HabitIconView(habitName: habit.name, iconName: habit.iconName, color: habitColor)
                             .opacity(pausedText == nil ? 1 : Theme.pausedOpacity)
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack(spacing: 8) {
+                        VStack(alignment: .leading, spacing: Theme.textSpacing) {
+                            AdaptiveStack(spacing: Theme.inlineSpacing) {
                                 Text(habit.name)
                                     .font(.body)
                                     .foregroundStyle(pausedText == nil ? Color.primary : Color.secondary)
@@ -90,7 +90,10 @@ struct PauseEditorSheet: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .accessibilityElement(children: .combine)
                         .accessibilityIdentifier("pause-state-\(habit.name)")
-                        CheckCircle(isChecked: selection.contains(habit.id), color: habitColor.color) {
+                        CheckCircle(
+                            isChecked: selection.contains(habit.id), color: habitColor.color, label: habit.name,
+                            checkedText: "Ausgewählt", uncheckedText: "Nicht ausgewählt"
+                        ) {
                             toggle(habit)
                         }
                         .accessibilityIdentifier("pause-habit-\(habit.name)")

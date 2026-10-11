@@ -21,12 +21,13 @@ struct HabitCard<Control: View>: View {
     @State private var isPreviewing = false
 
     var body: some View {
-        HStack(spacing: Theme.spacing) {
-            HStack(spacing: Theme.spacing) {
+        // Bei großer Schrift stehen Icon, Texte und Bedienelement untereinander, damit nichts abgeschnitten wird.
+        AdaptiveStack {
+            AdaptiveStack {
                 HabitIconView(habitName: name, iconName: iconName, color: habitColor, status: isPaused ? .green : status)
                     .opacity(isPaused ? Theme.pausedOpacity : 1)
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack(spacing: 8) {
+                VStack(alignment: .leading, spacing: Theme.textSpacing) {
+                    AdaptiveStack(spacing: Theme.inlineSpacing) {
                         Text(name)
                             .font(.headline)
                             .foregroundStyle(isPaused ? Color.secondary : Color.primary)
@@ -38,7 +39,6 @@ struct HabitCard<Control: View>: View {
                     Text(rhythmText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                        .lineLimit(1)
                         .accessibilityIdentifier("repeat-\(name)")
                     WeekDots(dots: dots, color: habitColor.color)
                 }

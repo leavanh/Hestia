@@ -12,16 +12,16 @@ struct HabitStatRow: View {
 
     var body: some View {
         Button(action: onSelect) {
-            HStack(spacing: Theme.spacing) {
-                HabitIconView(habitName: name, iconName: iconName, color: habitColor, status: .green)
-                VStack(alignment: .leading, spacing: 6) {
+            // Bei großer Schrift stehen Icon, Texte und Streak untereinander.
+            AdaptiveStack {
+                HabitIconView(habitName: name, iconName: iconName, color: habitColor)
+                VStack(alignment: .leading, spacing: Theme.textSpacing) {
                     Text(name)
                         .font(.headline)
                         .foregroundStyle(.primary)
                     Text(rhythmText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                        .lineLimit(1)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 Label(StatValue.daysText(streak), systemImage: "flame.fill")

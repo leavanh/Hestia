@@ -594,7 +594,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Durchsicht aller Bildschirme auf einheitliche Abstände, Schriftgrößen und Farben.
 
 **Definition of Done**
-- [ ] Jeder Bildschirm hat einen sinnvollen Leerzustand.
-- [ ] App Icon ist auf dem Homescreen sichtbar.
-- [ ] Bei größter Schriftgröße ist nichts abgeschnitten.
-- [ ] Abstände, Ecken und Schriftgrößen sind auf allen Bildschirmen gleich.
+- [x] Jeder Bildschirm hat einen sinnvollen Leerzustand.
+- [x] App Icon ist auf dem Homescreen sichtbar.
+- [x] Bei größter Schriftgröße ist nichts abgeschnitten.
+- [x] Abstände, Ecken und Schriftgrößen sind auf allen Bildschirmen gleich.

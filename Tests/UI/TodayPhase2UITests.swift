@@ -67,14 +67,14 @@ final class TodayPhase2UITests: XCTestCase {
 
         createHabit(named: "Sport", target: 1, in: app)
         createHabit(named: "Wasser", target: 3, in: app)
-        XCTAssertEqual(app.staticTexts["progress-text"].label, "0 von 4 · 0 %")
+        XCTAssertEqual(app.staticTexts["progress-text"].label, "0 von 4 · 0\u{00A0}%")
 
         app.buttons["check-Sport"].tap()
         app.buttons["counter-Wasser-plus"].tap()
-        XCTAssertEqual(app.staticTexts["progress-text"].label, "2 von 4 · 50 %")
+        XCTAssertEqual(app.staticTexts["progress-text"].label, "2 von 4 · 50\u{00A0}%")
 
         app.buttons["check-Sport"].tap()
-        XCTAssertEqual(app.staticTexts["progress-text"].label, "1 von 4 · 25 %")
+        XCTAssertEqual(app.staticTexts["progress-text"].label, "1 von 4 · 25\u{00A0}%")
     }
 
     @MainActor
