@@ -190,8 +190,9 @@ Alle Farben stehen zentral in `Theme` bzw. `HabitColor`. In den Ansichten stehen
 | `band` (Kopfband Heute) | `brand` | `brand` |
 | `onBand` | `paper` | `paper` |
 | `onBandSecondary` | `paper` mit 80 % | `paper` mit 80 % |
+| `progress` (ab Phase 8.1, Einfärbung des Kalenders im Tab) | `brand` | `#7979F2` (Leuchtfarbe Blau) |
 
-Die 70 % bzw. 80 % sind bewusst höher als in den Mockups (60 %), damit kleine Schrift den Kontrast 4,5 : 1 erreicht.
+`progress` sorgt dafür, dass der Kalender im Tab auch im dunklen Modus blau ist und nicht grau wie `ink`. Die 70 % bzw. 80 % sind bewusst höher als in den Mockups (60 %), damit kleine Schrift den Kontrast 4,5 : 1 erreicht.
 
 **Habitfarben**
 
@@ -250,7 +251,7 @@ Drei freie Schriften (SIL Open Font License 1.1, dürfen in die App eingebettet 
 - Alle Rollen nutzen `Font.custom(_:size:relativeTo:)`, damit Dynamic Type wirkt. In Ansichten wird nur noch `Theme.Typography` verwendet, keine `.font(.headline)` usw. mehr.
 - Laufweite und Versalien sind als Modifier gebündelt (z.B. `.labelStyle()` / `.metaStyle()` als View Extension), damit sie nicht an jeder Stelle einzeln stehen.
 - **Einbinden:** Die Schriftdateien (`.ttf`) liegen in `Habitus/Design/Fonts/` und werden beim Start registriert (`CTFontManagerRegisterFontsForURL`, einmalig, z.B. in `FontRegistry.registerAll()` beim App Start und in Previews). Das Projekt erzeugt seine Info.plist selbst (`GENERATE_INFOPLIST_FILE`), deshalb kein `UIAppFonts` Eintrag. Fehlt eine Schrift, meldet ein Debug Assert das sofort.
-- Die Systemschrift bleibt nur dort, wo das System sie selbst setzt (Tab Bar, Systemleisten in Sheets, Datumsauswahl, Alerts).
+- Die Systemschrift bleibt nur dort, wo das System sie selbst setzt (Systemleisten in Sheets, Datumsauswahl, Alerts). Bis Phase 8.1 gehört auch die Tab Bar dazu.
 
 ### 4.4 Formen, Linien, Abstände
 
@@ -275,15 +276,18 @@ Werte, die nur zum Glas Design gehörten (z.B. `cornerRadius` 24, `iconBackgroun
 | `text` | ohne Fläche, Schrift `ink`, Rolle `label` | "Sortieren", "Fertig" in Heute |
 | `destructive` | wie `secondary`, Schrift und Fläche in Statusrot | "Habit beenden" |
 
-Systemleisten in Sheets (Abbrechen, Sichern, Fertig) bleiben Systembuttons, getönt in `ink`. Ihr Liquid Glass Aussehen wird akzeptiert, eigene Glasflächen gibt es nicht.
+Systemleisten in Sheets (Abbrechen, Sichern, Fertig) bleiben Systembuttons, getönt in `ink`. Ihr Liquid Glass Aussehen wird akzeptiert, weil Sheets nur kurz zu sehen sind. Eigene Glasflächen gibt es nicht.
+
+**Ab Phase 8.1 kein Liquid Glass außerhalb von Sheets:** Die Tab Bar ist eine eigene flache Leiste (`PaperTabBar`, 4.5). Buttons in der Navigationsleiste eines Tabs (z.B. Plus und Sortieren in Heute) haben keine Glasfläche (`sharedBackgroundVisibility(.hidden)`) und nutzen `HermesButtonStyle`.
 
 ### 4.5 Bausteine (einmal bauen, überall nutzen)
 
 | Baustein | Inhalt |
 |---|---|
 | `PaperBackground` | Fläche `background` für alle Bildschirme und Sheets. Ersetzt `GlassBackground`. |
+| `PaperTabBar` (ab Phase 8.1) | Eigene Tab Bar statt der des Systems (5.1). Volle Breite bis zum unteren Rand, Fläche `background`, oben eine Haarlinie. Drei gleich breite Felder mit SF Symbol (Schnitt regular, 20 pt) und Label in Rolle `label`. Gewählter Tab in `ink` mit einem 2 pt Strich in `ink` an der Oberkante des Felds, die anderen in `inkSecondary`. Keine Fläche, kein Glas, kein Schatten. |
 | `PaperSection` | Abschnitt mit Überschrift in Rolle `meta` und darunter dem Inhalt, oben eine Haarlinie. Keine Karte. Ersetzt `GlassSection` und `glassCard()`. |
-| `HabitCard` | Flache Zeile ohne Karte, oben eine Haarlinie. Links `HabitIconView`, daneben Name (Rolle `title`), darunter die Rhythmus Zeile (4.5.1) und daneben die 7 Tage Punkte, rechts `CheckBox` oder `CounterControl`. Kein weiterer Text. Langes Drücken, Einsinken und VoiceOver Aktion wie bisher. |
+| `HabitCard` | Flache Zeile ohne Karte, oben eine Haarlinie. Links `HabitIconView`, daneben Name (Rolle `title`), darunter die Rhythmus Zeile (4.5.1) und in derselben Zeile rechts daneben die 7 Tage Punkte (ab Phase 9, wie im Mockup; reicht der Platz bei großer Schrift nicht, stehen die Punkte darunter), rechts `CheckBox` oder `CounterControl`. Kein weiterer Text. Langes Drücken, Einsinken und VoiceOver Aktion wie bisher. |
 | `CheckBox` | Quadrat 36 pt mit 1 pt Rand in Habitfarbe. Abgehakt: gefüllt mit Habitfarbe, Häkchen in `onColor`. Ersetzt `CheckCircle`. |
 | `CounterControl` | Taste "−" (Quadrat 26 pt), Wert als "5/8" (Rolle `meta` in Medium, gleich breite Ziffern), Taste "+". Kein Ring mehr. Gesperrte Taste mit `disabledOpacity`. Gesamthöhe wie `CheckBox`. |
 | `WeekDots` | 7 Quadrate (6 pt). Füllung wie 3.6 (Deckkraft nach Anteil), 0 = Habitfarbe mit 22 %. Der angezeigte Tag hat einen äußeren quadratischen Rahmen in Habitfarbe mit verringerter Deckkraft. Pausierte Tage: kurzer waagrechter Strich in `ink` mit Pausen Deckkraft. |
@@ -292,9 +296,10 @@ Systemleisten in Sheets (Abbrechen, Sichern, Fertig) bleiben Systembuttons, get�
 | `DayHeader` | Das Kopfband in Heute (5.2): Datumszeile, Titel, Fortschritt, `SegmentBar`, `WeekStrip`. Ersetzt `ProgressHeader` und den bisherigen Kopf. |
 | `SegmentBar` | Fortschritt als Reihe kurzer Balken (3 pt hoch, 3 pt Abstand), ein Balken pro Punkt (3.4), erledigte Punkte voll, offene mit 25 %. Bei mehr als 12 Punkten ein durchgehender Balken mit Füllung nach Prozent. Ersetzt `ProgressRing`. |
 | `WeekStrip` | 7 Felder Mo bis So der Woche des angezeigten Tags (Rolle `label`). Der angezeigte Tag invertiert (Fläche `onBand`, Schrift `band`). Tage nach heute mit `calendarFutureOpacity` und nicht antippbar. Antippen eines anderen Tags wechselt dorthin (5.2). |
-| `MonthCalendar` | Wie bisher (Monat mit Pfeilen, Grenzen, Wochentagszeile), aber jeder Tag ist ein Quadrat mit der Tageszahl (Rolle `meta`, ohne Versalien). Monatsname in Rolle `meta`. Heute mit äußerem quadratischem Rahmen. Einfärbung, Pausen, Zukunft, Tippen wie bisher. |
+| `MonthCalendar` | Wie bisher (Monat mit Pfeilen, Grenzen, Wochentagszeile), aber jeder Tag ist ein Quadrat mit der Tageszahl (Rolle `meta`, ohne Versalien). Monatsname in Rolle `meta`. Heute mit äußerem quadratischem Rahmen. Einfärbung, Pausen, Zukunft, Tippen wie bisher. Im Tab in `progress`, im Habit Detail in Habitfarbe. Ab Phase 11 gibt es im Habit Detail eine kompakte Darstellung wie im Mockup: Quadrate ohne Tageszahl mit 3 pt Abstand, heute mit Rahmen. VoiceOver liest jeden Tag weiter mit Datum und Erledigung. |
 | `HabitStatRow` | Flache Zeile mit Haarlinie: `HabitIconView` ohne Statusmarke, Name, Rhythmus Zeile, rechts der aktuelle Streak als Zahl (Rolle `stat`, kleiner: 32 pt) mit "Tage" darunter (Rolle `meta`). Kein Flammensymbol. Antippen öffnet das Habit Detail. |
-| `StatValue` | Eine Kennzahl: großer Wert (Rolle `stat`), darunter die Beschriftung (Rolle `meta`). |
+| `StatValue` | Eine Kennzahl: großer Wert (Rolle `stat`), darunter die Beschriftung (Rolle `meta`). Ab Phase 11 steht im großen Wert nur die Zahl bzw. Prozentzahl, die Einheit gehört in die Beschriftung ("4" über "Längster Streak · Tage", nicht "4 Tage"). |
+| `StepperControl` (ab Phase 8.1) | Ersetzt den System `Stepper` und das Menü für den Monatstag im Sheet: Text links (Rolle `body`), rechts Taste "−", Wert, Taste "+" mit denselben Quadraten wie `CounterControl`, in `ink`. Gesperrte Taste an der Grenze mit `disabledOpacity`. VoiceOver als einstellbarer Wert (`accessibilityAdjustableAction`). |
 | `SegmentedChoice` | Segmentfeld mit 0,5 pt Rahmen in `ink`, Segmente in Rolle `label`, gewähltes Segment invertiert (Fläche `ink`, Schrift `background`). |
 | `WeekdayPicker` | 7 Quadrate M D M D F S S, gewählt invertiert. |
 | `ColorPicker` (Farbauswahl im Sheet) | 8 Quadrate (28 pt) in Habitfarbe, gewählt mit äußerem Rahmen in `ink`. |
@@ -337,7 +342,15 @@ Unverändert: Tageswechsel, Einsinken beim langen Drücken, Rutschen erledigter 
 2. **Kalender** (Symbol: calendar)
 3. **Einstellungen** (Symbol: gearshape)
 
-Ab Phase 8: Die Tab Bar bleibt die des Systems, getönt in `ink`. Hintergrund der Bildschirme ist `PaperBackground`.
+Ab Phase 8: Die Tab Bar bleibt die des Systems, getönt in `ink`. Hintergrund der Bildschirme ist `PaperBackground`. *(Ab Phase 8.1 ersetzt durch den nächsten Absatz.)*
+
+**Ab Phase 8.1:** Die Tab Bar ist `PaperTabBar` (4.5), die System Tab Bar ist ausgeblendet.
+- Reihenfolge, Namen und Symbole wie oben. Jeder Tab behält beim Wechsel seinen Zustand (Scrollposition, angezeigter Tag, Monat im Kalender), wie bisher mit `TabView`.
+- Der Inhalt jedes Tabs scrollt vollständig über der Leiste, die letzte Zeile wird nicht verdeckt. Sheets liegen über der Leiste.
+- Tippen auf den gerade gewählten Tab scrollt dessen Inhalt nach oben.
+- Die Labels wachsen mit Dynamic Type höchstens bis `Theme.maxCircleTypeSize` und brechen nie um. Bei Barrierefreiheitsgrößen zeigt langes Drücken auf einen Tab das Label groß an (Large Content Viewer), wie bei der System Tab Bar.
+- VoiceOver liest jeden Tab als Tab mit Namen, der gewählte ist als ausgewählt markiert, die Leiste meldet "Tab 1 von 3" usw.
+- Identifier: `tab-today`, `tab-calendar`, `tab-settings`.
 
 ### 5.2 Heute
 
@@ -367,7 +380,7 @@ Felder in dieser Reihenfolge:
 3. Icon (Raster)
 4. Farbe (8 Kreise, ab Phase 8 8 Quadrate in der Reihenfolge des Farbkreises, 4.2)
 5. Rhythmus (Segmente: Täglich, Woche, Monat) und passende Einstellung darunter:
-   - **Täglich:** Anzahl pro Tag als Stepper.
+   - **Täglich:** Anzahl pro Tag als Stepper (ab Phase 8.1 `StepperControl`, ebenso Anzahl bei Woche und Monat und der Monatstag).
    - **Woche:** zweites Segmentfeld "Anzahl" / "Wochentage". Bei Anzahl ein Stepper ("2x pro Woche"), bei Wochentage 7 Kreise M D M D F S S.
    - **Monat:** zweites Segmentfeld "Anzahl" / "Monatstag". Bei Anzahl ein Stepper ("1x pro Monat"), bei Monatstag die Auswahl 1 bis 31.
    - Beim Bearbeiten eines bestehenden Habits sind Rhythmus und Variante passend vorausgewählt (z.B. Wochentage Habit: Woche + Wochentage).
@@ -390,7 +403,7 @@ Speichern nur möglich, wenn Name nicht leer.
   3. Name in Rolle `display`.
   4. Aktueller Streak groß (Rolle `numeral`), daneben "Tage in Folge" (Einzahl "Tag in Folge") in Rolle `meta`.
   
-  Darunter auf `background` ein Raster aus 2 × 2 Kennzahlen (`StatValue`), getrennt durch Haarlinien: **Quote 30 Tage** ("86 %" bzw. "–"), **Längster Streak**, **Erledigungen** (Summe aller Erledigungen, 3.7) und **Pausen** (Anzahl der Pausen, 3.7). Darunter der `MonthCalendar` in Habitfarbe wie bisher. Kein Icon im Detail, kein Titel "Habit Detail" in einer Leiste.
+  Darunter auf `background` ein Raster aus 2 × 2 Kennzahlen (`StatValue`), getrennt durch Haarlinien: **Quote 30 Tage** ("86 %" bzw. "–"), **Längster Streak**, **Erledigungen** (Summe aller Erledigungen, 3.7) und **Pausen** (Anzahl der Pausen, 3.7). Darunter der `MonthCalendar` in Habitfarbe in der kompakten Darstellung (4.5). Kein Icon im Detail und keine Navigationsleiste: "Fertig" und "Bearbeiten" stehen im Band, es gibt also auch keine Liquid Glass Buttons im Detail.
 - *Bis Phase 10:* Habit antippen öffnet als Sheet das **Habit Detail**: Icon, Name, Rhythmus, eigener Monatskalender (nur dieser Habit, Tage mit Erledigung in Habitfarbe, bei Tagesziel größer 1 mit Teilfüllung), aktueller Streak, längster Streak, Quote 30 Tage (3.7). Der Monatskalender ist derselbe wie im Tab (siehe oben).
 - Unter dem Monatskalender im Tab steht die Habit Liste. Der ganze Tab scrollt senkrecht, der Kalender selbst wird nur mit den Pfeilen gewechselt.
 
@@ -796,6 +809,53 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 
 ---
 
+### Phase 8.1: Eigene Tab Bar und Nacharbeiten aus Phase 8
+
+**Ziel:** Außerhalb von Sheets gibt es kein Liquid Glass mehr. Unten steht eine flache Leiste im Hermes Stil, und Plus und Sortieren in Heute haben keine Glasfläche. Dazu werden die Stellen behoben, die bei der Durchsicht der Screenshots nach Phase 8 aufgefallen sind.
+
+**Umfang**
+- **`PaperTabBar`** (4.5, 5.1): eigene flache Tab Bar mit Haarlinie oben und 2 pt Strich über dem gewählten Tab. Die System Tab Bar wird ausgeblendet, `TabView` bleibt für den Zustand der Tabs. Die Auswahl liegt in einem kleinen Enum (z.B. `AppTab`).
+- Inhalt, Sheets, Scrollen nach oben beim erneuten Tippen, Dynamic Type, Large Content Viewer und VoiceOver wie in 5.1.
+- **Plus und Sortieren in Heute:** Die Toolbar Einträge bekommen keine Glasfläche mehr (`sharedBackgroundVisibility(.hidden)`) und nutzen `HermesButtonStyle`:
+  - Sortieren als Text "Sortieren" bzw. im Sortiermodus "Fertig" (Variante `text`, Rolle `label`), ohne Symbol.
+  - Plus als Quadrat (Variante `secondary`, Fläche `ink` mit 14 %, Plus Symbol in `ink`), VoiceOver "Neuer Habit".
+  - Identifier (`sort-toggle` usw.) bleiben gleich.
+  - In Phase 9 ziehen beide in Kopfband und Listenkopf um (5.2). Bis dahin bleiben sie an ihrem Platz in der Leiste.
+- Dasselbe gilt für alle anderen Buttons in der Navigationsleiste eines Tabs, falls vorhanden (Kalender, Einstellungen). Sheets behalten ihre Systemleisten (4.4).
+- **Fehler: Navigationsleiste im falschen Modus.** Nach dem Wechsel zwischen Hell und Dunkel bleibt die Leiste in Heute in der Farbe des Modus beim Start (z.B. hell im dunklen Modus). Ursache ist vermutlich `UIColor(Theme.background)` in `NavigationAppearance`, das die Farbe beim Start fest auflöst. Die Farben für UIKit (Hintergrund, Titel, Tönung) müssen als dynamische `UIColor` aus `Theme` kommen, damit sie dem Modus folgen.
+- **`StepperControl`** (4.5) statt System `Stepper` (Anzahl bei Täglich, Woche, Monat) und statt Menü für den Monatstag im Sheet (5.3). Identifier `target-stepper` und `monthday-picker` bleiben am Baustein, die Tasten bekommen `<Identifier>-minus` und `<Identifier>-plus`.
+- **Kalender im Tab in Blau:** Die Einfärbung der Tage nutzt `progress` (4.2) statt `ink`, damit sie im dunklen Modus blau und nicht grau ist. Die Tageszahl auf kräftiger Fläche steht in `background`.
+
+**Aufräumen (Pflicht, keine Überbleibsel)**
+- Die Tönung der System Tab Bar aus Phase 8 entfernen, falls sie danach nicht mehr wirkt.
+- UI Tests, die den System Stepper oder das Monatstag Menü bedienen, auf die neuen Tasten umstellen.
+- Eine Suche in `Habitus/` nach `Stepper(`, `pickerStyle(.menu)` und `UIColor(Theme.` findet nichts mehr.
+- UI Tests, die Tabs über `app.tabBars` ansteuern, auf die Identifier `tab-today`, `tab-calendar`, `tab-settings` umstellen. Am besten eine gemeinsame Hilfsfunktion in den UI Tests (z.B. `app.openTab(.calendar)`), damit das nur an einer Stelle steht.
+- Abschluss: Eine Suche in `Tests/` nach `tabBars` findet nichts mehr. Eine Suche in `Habitus/` findet keinen Button in einer Tab Navigationsleiste ohne `sharedBackgroundVisibility(.hidden)`.
+
+**Pflicht Testfälle**
+- UI Test: Tippen auf `tab-calendar` zeigt den Kalender, `tab-settings` die Einstellungen, `tab-today` wieder Heute. Der gewählte Tab ist jeweils als ausgewählt markiert (`isSelected`).
+- UI Test: Heute an einem vergangenen Tag öffnen, zum Kalender und zurück wechseln: Heute zeigt noch denselben Tag (Zustand bleibt erhalten).
+- UI Test: Mit Testdaten in Heute ganz nach unten scrollen: die letzte Karte ist vollständig sichtbar und bedienbar, nicht von der Leiste verdeckt.
+- UI Test: Plus öffnet das Sheet "Neuer Habit", "Sortieren" startet den Sortiermodus und heißt dann "Fertig".
+- UI Test: Im Sheet "Neuer Habit" erhöht `target-stepper-plus` die Anzahl, an der oberen Grenze ist die Taste gesperrt. Monat + Monatstag: `monthday-picker-plus` stellt vom 1. auf den 2.
+- Unit Test: Die Farben für die Navigationsleiste ergeben aufgelöst mit hellem bzw. dunklem `UITraitCollection` `paper` bzw. `night`.
+- Alle bestehenden UI Tests sind nach der Umstellung auf die neuen Identifier weiter grün.
+
+**Definition of Done**
+- [ ] Unten steht eine flache Leiste mit Haarlinie, ohne Glas und ohne Schweben. Der gewählte Tab hat oben einen Strich.
+- [ ] Plus und Sortieren in Heute haben keine Glasfläche mehr.
+- [ ] Außerhalb von Sheets ist nirgends Liquid Glass zu sehen.
+- [ ] Wechsel zwischen Hell und Dunkel bei laufender App: Leisten und Hintergründe wechseln sofort mit, nirgends bleibt eine helle Fläche im dunklen Modus.
+- [ ] Im Sheet gibt es keinen System Stepper und kein Menü mehr, Anzahl und Monatstag haben quadratische Tasten.
+- [ ] Der Kalender im Tab ist in Hell und Dunkel blau eingefärbt.
+- [ ] Beim Tabwechsel bleibt der Zustand jedes Tabs erhalten.
+- [ ] Die letzte Zeile jeder Liste ist über der Leiste erreichbar.
+- [ ] Bei größter Schriftgröße bricht kein Tab Label um, mit VoiceOver sind die drei Tabs und der gewählte Tab klar erkennbar.
+- [ ] Die Suche aus "Aufräumen" findet nichts mehr.
+
+---
+
 ### Phase 9: Heute mit Kopfband und Wochenstreifen
 
 **Ziel:** Heute sieht aus wie der erste Mockup: ein blaues Band oben mit großem Titel, großem Fortschritt und Wochenstreifen, darunter die flache Liste. Ich kann einen Tag der Woche direkt antippen.
@@ -809,6 +869,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - **Animation:** Datumszeile, Titel, Fortschritt und Liste gleiten wie bisher (5.2). Der Wochenstreifen gleitet nur, wenn sich die Woche ändert. Sonst wandert nur die Markierung des angezeigten Tags (kurz, bei Reduce Motion sofort).
 - `HabitEngine`: `isoWeek(day)` und `weekStrip(day, today)` (6), ohne SwiftUI, mit Unit Tests.
 - Das Sheet "Tag bearbeiten" behält seinen einfachen Kopf (Navigationstitel mit Datum), zeigt aber dieselbe Liste.
+- **`HabitCard` wie im Mockup:** Die 7 Tage Punkte stehen in derselben Zeile rechts neben der Rhythmus Zeile, bei großer Schrift darunter (4.5). Gilt auch für "Tag bearbeiten".
 
 **Aufräumen (Pflicht, keine Überbleibsel)**
 - Löschen: `ProgressHeader`, die Toolbar Einträge von `TodayView` (Plus, Sortieren, kleiner Titel `barTitle`), die Kapsel neben dem Datum in Heute, den bisherigen Untertitel mit dem Datum.
@@ -829,6 +890,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Definition of Done**
 - [ ] Oben in Heute steht ein blaues Band mit Datum und Kalenderwoche, großem Titel, großem Fortschritt, Balken und Wochenstreifen, in Hell und Dunkel.
 - [ ] Der Fortschritt zählt genau wie vorher (3.4), nur die Darstellung ist neu.
+- [ ] Auf den Karten stehen die 7 Tage Punkte neben der Rhythmus Zeile, bei größter Schrift darunter, nichts ist abgeschnitten.
 - [ ] Ich kann einen Tag der aktuellen Woche antippen und lande dort. Zukünftige Tage lassen sich nicht antippen. Wischen funktioniert weiter, auch über Wochengrenzen.
 - [ ] Beim Scrollen erscheint oben die schmale blaue Leiste mit Titel und Fortschritt, der Plus Button ist immer erreichbar.
 - [ ] Die Statusleiste ist auf dem Band gut lesbar.
@@ -868,6 +930,9 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Umfang**
 - Detail mit Band in Habitfarbe, Kennzahlen Raster und Kalender (5.4). Die Statusleiste ist auf dem Band lesbar.
 - "Bearbeiten" im Band öffnet das Sheet "Habit bearbeiten" über dem Detail, mit den Folgen aus 5.4 (Sichern, Historie behalten, Historie löschen). Bei beendeten Habits kein "Bearbeiten", stattdessen "Beendet am …" in der Meta Zeile.
+- **Keine Navigationsleiste** im Detail, "Fertig" und "Bearbeiten" im Band (5.4).
+- **`StatValue`** zeigt nur die Zahl, die Einheit steht in der Beschriftung (4.5). Gilt auch für `HabitStatRow`.
+- **Kompakter Kalender** im Detail: Quadrate ohne Tageszahl wie im Mockup (4.5). Der Kalender im Tab behält die Tageszahlen.
 - Neue Kennzahlen **Erledigungen** und **Pausen** (3.7): `HabitStatistics` bekommt `totalCompletions` und `pauseCount`, berechnet in der `HabitEngine`, mit Unit Tests.
 
 **Aufräumen (Pflicht, keine Überbleibsel)**
@@ -886,7 +951,8 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 
 **Definition of Done**
 - [ ] Das Detail hat oben ein Band in der Farbe des Habits mit Name und großem Streak, in Hell und Dunkel gut lesbar.
-- [ ] Darunter stehen Quote 30 Tage, Längster Streak, Erledigungen und Pausen, darunter der Kalender wie bisher.
+- [ ] Darunter stehen Quote 30 Tage, Längster Streak, Erledigungen und Pausen als große Zahlen ohne Einheit, darunter der kompakte Kalender in Habitfarbe.
+- [ ] Im Detail gibt es keine Navigationsleiste und keinen Liquid Glass Button.
 - [ ] Ich kann einen aktiven Habit aus dem Detail heraus bearbeiten und beenden. Ein beendeter Habit lässt sich dort nicht bearbeiten.
 - [ ] Die Kennzahlen stimmen mit einem von Hand nachgerechneten Beispiel aus den Testdaten überein.
 
