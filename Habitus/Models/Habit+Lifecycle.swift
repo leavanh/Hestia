@@ -23,13 +23,17 @@ extension Habit {
         try? context.save()
     }
 
-    /// Speichert die Reihenfolge nach dem Verschieben in Heute (`HabitOrder.merged`). Alle Habits bekommen
-    /// danach fortlaufende Plätze.
-    static func saveOrder(all habits: [Habit], open: [Habit], done: [Habit], in context: ModelContext) {
-        let ordered = habits.sorted {
+    /// Die Habits in der gespeicherten Reihenfolge: `sortOrder`, bei Gleichstand `createdAt`.
+    static func inSavedOrder(_ habits: [Habit]) -> [Habit] {
+        habits.sorted {
             $0.sortOrder != $1.sortOrder ? $0.sortOrder < $1.sortOrder : $0.createdAt < $1.createdAt
         }
-        let merged = HabitOrder.merged(all: ordered.map(\.id), open: open.map(\.id), done: done.map(\.id))
+    }
+
+    /// Speichert die Reihenfolge nach dem Verschieben im Sortiermodus (`HabitOrder.reordered`). `shown` sind die
+    /// gezeigten Habits in ihrer neuen Reihenfolge, alle Habits bekommen danach fortlaufende Plätze.
+    static func saveOrder(all habits: [Habit], shown: [Habit], in context: ModelContext) {
+        let merged = HabitOrder.reordered(all: inSavedOrder(habits).map(\.id), shown: shown.map(\.id))
         let byID = Dictionary(uniqueKeysWithValues: habits.map { ($0.id, $0) })
         for (index, id) in merged.enumerated() {
             byID[id]?.sortOrder = index

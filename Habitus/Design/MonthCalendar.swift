@@ -5,7 +5,8 @@ import SwiftUI
 /// Quadrat mit der Tageszahl, heute hat einen äußeren quadratischen Rahmen. Zukünftige Tage sind blass und gesperrt.
 /// Der Monat wechselt mit den Pfeilen zwischen `firstMonth` und `lastMonth` (Spezifikation 5.4).
 /// Im Tab ist es `progress` (Blau) mit antippbaren Tagen, im Habit Detail die Habitfarbe ohne Antippen.
-/// Pausierte Tage sind in blasser `ink` statt eingefärbt.
+/// Pausierte Tage sind in blasser `ink` statt eingefärbt. Als Datumsauswahl (`DateRow`) zeigt `selectedDay` den gewählten
+/// Tag gefüllt, `allowsFuture` erlaubt auch Tage nach heute und `isDisabled` sperrt einzelne Tage.
 struct MonthCalendar: View {
     /// Ein Tag aus dem ersten und einer aus dem letzten Monat, zwischen denen man blättern kann.
     let firstMonth: Date
@@ -16,6 +17,14 @@ struct MonthCalendar: View {
     var isPaused: (Date) -> Bool = { _ in false }
     var tint: Color = Theme.progress
     var identifierPrefix = "calendar"
+    /// Als Datumsauswahl: der gewählte Tag, voll in `tint` gefüllt.
+    var selectedDay: Date?
+    /// Als Datumsauswahl: Tage nach heute sind nicht gesperrt.
+    var allowsFuture = false
+    /// Tage, die sich nicht wählen lassen (blass wie Zukunft).
+    var isDisabled: (Date) -> Bool = { _ in false }
+    /// Der Monat, den der Kalender zuerst zeigt. Standard ist der letzte (`lastMonth`).
+    var initialMonth: Date?
     /// `nil`, wenn die Tage nicht antippbar sind (Habit Detail).
     var onSelect: ((Date) -> Void)?
 
@@ -33,7 +42,7 @@ struct MonthCalendar: View {
 
     /// Gezeigter Monat, immer innerhalb der Grenzen (sie können sich ändern, z.B. um Mitternacht).
     private var shownMonth: Date {
-        engine.steppedMonth(month ?? lastMonth, by: 0, from: firstMonth, through: lastMonth)
+        engine.steppedMonth(month ?? initialMonth ?? lastMonth, by: 0, from: firstMonth, through: lastMonth)
     }
 
     private func step(_ months: Int) {
@@ -78,11 +87,12 @@ struct MonthCalendar: View {
     }
 
     private func dayCell(_ day: Date) -> some View {
-        let isFuture = engine.isFuture(day, today: today)
+        let isFuture = (engine.isFuture(day, today: today) && !allowsFuture) || isDisabled(day)
+        let isSelected = selectedDay.map { engine.startOfDay($0) == engine.startOfDay(day) } ?? false
         let isToday = engine.startOfDay(day) == engine.startOfDay(today)
         let dayProgress = progress(day)
         let isPausedDay = !isFuture && isPaused(day)
-        let opacity = isFuture || isPausedDay ? 0 : Self.fillOpacity(for: dayProgress.fraction)
+        let opacity = isSelected ? 1 : (isFuture || isPausedDay ? 0 : Self.fillOpacity(for: dayProgress.fraction))
 
         let label = Text("\(engine.calendar.component(.day, from: day))")
             .font(isToday ? Theme.Typography.metaMedium : Theme.Typography.meta)
@@ -117,8 +127,14 @@ struct MonthCalendar: View {
         }
         .frame(maxWidth: .infinity)
         .accessibilityLabel(DayText.fullDate(day))
-        .accessibilityValue(isFuture ? "" : (isPausedDay ? "Pausiert" : value(for: dayProgress)))
+        .accessibilityValue(accessibilityValue(isFuture: isFuture, isPausedDay: isPausedDay, isSelected: isSelected, progress: dayProgress))
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
         .accessibilityIdentifier("\(identifierPrefix)-day-\(Self.identifier(for: day, calendar: engine.calendar))")
+    }
+
+    private func accessibilityValue(isFuture: Bool, isPausedDay: Bool, isSelected: Bool, progress: DayProgress) -> String {
+        if selectedDay != nil { return isSelected ? "Ausgewählt" : "" }
+        return isFuture ? "" : (isPausedDay ? "Pausiert" : value(for: progress))
     }
 
     private func value(for progress: DayProgress) -> String {

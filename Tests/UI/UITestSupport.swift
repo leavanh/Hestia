@@ -20,12 +20,9 @@ extension XCUIApplication {
         descendants(matching: .any)[identifier].firstMatch
     }
 
-    /// Stellt den Monatstag im Sheet mit den Tasten von `monthday-picker` auf `day`.
+    /// Wählt den Monatstag im Sheet mit einem Tippen im Raster von `monthday-picker`.
     @MainActor
     func setMonthDay(to day: Int) {
-        let value = control("monthday-picker")
-        while let current = Int((value.value as? String ?? "").dropLast()), current != day {
-            buttons[current < day ? "monthday-picker-plus" : "monthday-picker-minus"].tap()
-        }
+        control("monthday-\(day)").tap()
     }
 }

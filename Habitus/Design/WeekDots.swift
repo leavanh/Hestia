@@ -1,6 +1,7 @@
 import SwiftUI
 
 /// Die 7 kleinen Quadrate unter einem Habit: links der älteste Tag, rechts der angezeigte Tag mit äußerem Rahmen.
+/// Vor dem angezeigten Tag steht mehr Abstand (`Theme.dotRingClearance`), damit sein Rahmen das Nachbarquadrat nicht berührt.
 /// Ein pausierter Tag ist ein kurzer waagrechter Strich statt eines Quadrats.
 struct WeekDots: View {
     let dots: [WeekDot]
@@ -9,8 +10,10 @@ struct WeekDots: View {
     var body: some View {
         HStack(spacing: Theme.dotSpacing) {
             ForEach(Array(dots.enumerated()), id: \.offset) { index, dot in
+                let isShown = index == dots.count - 1
                 dotView(dot)
-                    .overlay { if index == dots.count - 1 { shownDayFrame } }
+                    .overlay { if isShown { shownDayFrame } }
+                    .padding(.leading, isShown && index > 0 ? Theme.dotRingClearance : 0)
             }
         }
         .accessibilityElement(children: .ignore)

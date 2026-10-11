@@ -88,4 +88,45 @@ final class PausesWithSampleDataUITests: XCTestCase {
         XCTAssertEqual(dots.count, 1, "Nur Lesen hat pausierte Tage")
     }
 
+    /// Sheet "Neue Pause": "Alle auswählen" schaltet um, "Von" wählt man im aufklappenden Kalender in Appschrift.
+    @MainActor
+    func testNewPauseSheetSelectsAllAndPicksTheStartInTheCalendar() {
+        let app = launch()
+        app.openTab(.settings)
+        app.buttons["new-pause"].tap()
+
+        let selectAll = app.buttons["pause-select-all"]
+        XCTAssertTrue(selectAll.waitForExistence(timeout: 5))
+        XCTAssertEqual(selectAll.label, "Alle auswählen")
+        XCTAssertTrue(app.datePickers.allElementsBoundByIndex.isEmpty, "Keine System Datumsauswahl")
+
+        selectAll.tap()
+        XCTAssertEqual(selectAll.label, "Alle abwählen")
+        XCTAssertTrue(app.buttons["pause-habit-Lesen"].isSelected)
+        XCTAssertTrue(app.buttons["pause-habit-Sport"].isSelected)
+        selectAll.tap()
+        XCTAssertEqual(selectAll.label, "Alle auswählen")
+        XCTAssertFalse(app.buttons["pause-habit-Lesen"].isSelected)
+        XCTAssertFalse(app.buttons["pause-habit-Sport"].isSelected)
+
+        // "Von" auf gestern setzen.
+        let calendar = Calendar.current
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: .now)!
+        app.control("pause-start").tap()
+        if !calendar.isDate(yesterday, equalTo: .now, toGranularity: .month) {
+            app.buttons["pause-start-calendar-previous"].tap()
+        }
+        let parts = calendar.dateComponents([.year, .month, .day], from: yesterday)
+        let day = String(format: "%04d-%02d-%02d", parts.year!, parts.month!, parts.day!)
+        let dayButton = app.buttons["pause-start-calendar-day-\(day)"]
+        XCTAssertTrue(dayButton.waitForExistence(timeout: 5))
+        dayButton.tap()
+        XCTAssertFalse(dayButton.exists, "Die Wahl eines Tags klappt den Kalender zu")
+
+        let lesen = app.buttons["pause-habit-Lesen"]
+        for _ in 0..<3 where !lesen.isHittable { app.swipeUp() }
+        lesen.tap()
+        app.buttons["pause-save"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["pause-row-Lesen"].waitForExistence(timeout: 5), "Die Pause steht in der Liste")
+    }
 }

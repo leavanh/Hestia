@@ -127,6 +127,13 @@ final class TodayPhase31UITests: XCTestCase {
         openEditor(named: "Miete", rhythm: "Monat", variant: "Monatstag", in: app)
         app.buttons["Speichern"].tap()
         XCTAssertTrue(app.staticTexts["Miete"].waitForExistence(timeout: 5), "Heutiger Tag im Monat ist vorausgewählt")
+        XCTAssertEqual(app.staticTexts["repeat-Miete"].label, "Am \(today). des Monats")
+
+        // Bearbeiten zeigt den gespeicherten Tag im Raster als ausgewählt.
+        app.staticTexts["Miete"].press(forDuration: 1.5)
+        XCTAssertTrue(app.control("monthday-\(today)").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.control("monthday-\(today)").isSelected)
+        XCTAssertFalse(app.control("monthday-\(otherDay)").isSelected)
     }
 
     // MARK: Rhythmus Zeile

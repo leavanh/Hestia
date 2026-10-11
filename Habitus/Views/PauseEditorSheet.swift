@@ -11,6 +11,10 @@ struct PauseEditorSheet: View {
     @State private var selection: Set<UUID> = []
     @State private var startDay = AppClock.now
     @State private var endDay = AppClock.now
+    /// Die aufgeklappte Datumszeile. Es ist höchstens eine offen.
+    @State private var expandedDate: DateField?
+
+    private enum DateField { case start, end }
 
     private let engine = HabitEngine()
 
@@ -53,6 +57,7 @@ struct PauseEditorSheet: View {
                 }
             }
             .onChange(of: startDay) { _, new in
+                // "Bis" liegt nie vor "Von".
                 if engine.startOfDay(endDay) < engine.startOfDay(new) { endDay = new }
             }
         }
@@ -65,7 +70,8 @@ struct PauseEditorSheet: View {
                 .bodyText()
                 .foregroundStyle(Theme.inkSecondary)
         } else {
-            VStack(spacing: Theme.spacing) {
+            VStack(alignment: .leading, spacing: Theme.spacing) {
+                selectAllButton
                 ForEach(choices) { habit in
                     let habitColor = HabitColor(key: habit.colorKey)
                     let pausedText = pausedText(for: habit)
@@ -105,12 +111,26 @@ struct PauseEditorSheet: View {
 
     private var dateRows: some View {
         VStack(spacing: Theme.spacing) {
-            DatePicker("Von", selection: $startDay, displayedComponents: .date)
-                .accessibilityIdentifier("pause-start")
-            DatePicker("Bis", selection: $endDay, in: startDay..., displayedComponents: .date)
-                .accessibilityIdentifier("pause-end")
+            DateRow(title: "Von", date: $startDay, isExpanded: expansion(.start), id: "pause-start")
+            DateRow(title: "Bis", date: $endDay, isExpanded: expansion(.end), earliest: startDay, id: "pause-end")
         }
-        .font(Theme.Typography.body)
+    }
+
+    private func expansion(_ field: DateField) -> Binding<Bool> {
+        Binding(
+            get: { expandedDate == field },
+            set: { expandedDate = $0 ? field : (expandedDate == field ? nil : expandedDate) }
+        )
+    }
+
+    /// "Alle auswählen" bzw. "Alle abwählen" über der Liste der Habits.
+    private var selectAllButton: some View {
+        let allSelected = !choices.isEmpty && choices.allSatisfy { selection.contains($0.id) }
+        return HermesButton(allSelected ? "Alle abwählen" : "Alle auswählen", variant: .text) {
+            selection = allSelected ? [] : Set(choices.map(\.id))
+        }
+        .fixedSize()
+        .accessibilityIdentifier("pause-select-all")
     }
 
     /// Die Zeiträume, in denen der Habit im gewählten Zeitraum schon pausiert ist ("13. Okt. – 15. Okt."), sonst `nil`.

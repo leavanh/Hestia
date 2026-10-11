@@ -145,40 +145,76 @@ struct HabitLifecycleTests {
 
     // MARK: Sortieren
 
-    @Test func savingTheOrderStoresOpenHabitsFirstAndKeepsHiddenOnes() throws {
-        let a = makeHabit("A", sortOrder: 0, createdAt: date(1))
-        let b = makeHabit("B", sortOrder: 1, createdAt: date(2))
-        let c = makeHabit("C", sortOrder: 2, createdAt: date(3))
-        let d = makeHabit("D", sortOrder: 3, createdAt: date(4))
-
-        // B ist heute nicht fällig. Offen C, A (neue Reihenfolge), erledigt D.
-        Habit.saveOrder(all: [a, b, c, d], open: [c, a], done: [d], in: context)
-
-        #expect([c, b, a, d].map(\.sortOrder) == [0, 1, 2, 3])
-        let stored = try context.fetch(FetchDescriptor<Habit>(sortBy: [SortDescriptor(\.sortOrder)]))
-        #expect(stored.map(\.name) == ["C", "B", "A", "D"])
-    }
-
-    @Test func savedOrderShowsUpInTheTodayList() throws {
+    @Test func movingADoneHabitBeforeAnOpenOneStoresItInFront() throws {
         let a = makeHabit("A", sortOrder: 0, createdAt: date(1))
         let b = makeHabit("B", sortOrder: 1, createdAt: date(2))
         let c = makeHabit("C", sortOrder: 2, createdAt: date(3))
         let today = date(12)
-
-        // Alle offen, C wird nach vorn gezogen.
-        Habit.saveOrder(all: [a, b, c], open: [c, a, b], done: [], in: context)
-        #expect(Habit.dueInTodayOrder([a, b, c], on: today, engine: engine).map(\.name) == ["C", "A", "B"])
-
-        // Wird C erledigt, rutscht er nach unten, die Reihenfolge der anderen bleibt.
         c.setCount(1, on: today, engine: engine, in: context)
+
+        // Im Sortiermodus stehen alle in gespeicherter Reihenfolge, der erledigte C wird vor A geschoben.
+        Habit.saveOrder(all: [a, b, c], shown: [c, a, b], in: context)
+
+        #expect([c, a, b].map(\.sortOrder) == [0, 1, 2])
+        // In Heute steht er trotzdem weiter unten, die neue Reihenfolge gilt aber für alle Tage.
         #expect(Habit.dueInTodayOrder([a, b, c], on: today, engine: engine).map(\.name) == ["A", "B", "C"])
+        #expect(Habit.dueInTodayOrder([a, b, c], on: date(11), engine: engine).map(\.name) == ["C", "A", "B"])
+    }
+
+    @Test func pausedAndNotDueHabitsKeepTheirRelativeSlotsWhenNotMoved() throws {
+        let a = makeHabit("A", sortOrder: 0, createdAt: date(1))
+        let paused = makeHabit("Pausiert", sortOrder: 1, createdAt: date(2))
+        let monday = Habit(
+            name: "Montags", iconName: "drop.fill", colorKey: HabitColor.teal.rawValue,
+            rhythm: .weekdays, weekdays: [1], sortOrder: 2, createdAt: date(3)
+        )
+        context.insert(monday)
+        let d = makeHabit("D", sortOrder: 3, createdAt: date(4))
+        try makePause(14, 15, habits: [paused])
+
+        // Nur D wird nach vorn geschoben. Pausiert und Montags behalten ihre Reihenfolge zueinander.
+        Habit.saveOrder(all: [a, paused, monday, d], shown: [d, a, paused, monday], in: context)
+
+        let stored = try context.fetch(FetchDescriptor<Habit>(sortBy: [SortDescriptor(\.sortOrder)]))
+        #expect(stored.map(\.name) == ["D", "A", "Pausiert", "Montags"])
+        #expect(stored.map(\.sortOrder) == [0, 1, 2, 3])
+    }
+
+    @Test func endedHabitsKeepTheirSlotWhenSorting() throws {
+        let a = makeHabit("A", sortOrder: 0, createdAt: date(1))
+        let ended = makeHabit("Beendet", sortOrder: 1, createdAt: date(2))
+        let c = makeHabit("C", sortOrder: 2, createdAt: date(3))
+        ended.end(on: date(12), engine: engine, in: context)
+
+        Habit.saveOrder(all: [a, ended, c], shown: [c, a], in: context)
+
+        #expect([c, ended, a].map(\.sortOrder) == [0, 1, 2])
+    }
+
+    @Test func todayListFollowsTheNewOrderInEveryGroup() throws {
+        let a = makeHabit("A", sortOrder: 0, createdAt: date(1))
+        let b = makeHabit("B", sortOrder: 1, createdAt: date(2))
+        let c = makeHabit("C", sortOrder: 2, createdAt: date(3))
+        let p1 = makeHabit("P1", sortOrder: 3, createdAt: date(4))
+        let p2 = makeHabit("P2", sortOrder: 4, createdAt: date(5))
+        let all = [a, b, c, p1, p2]
+        let today = date(12)
+        try makePause(12, 14, habits: [p1, p2])
+        a.setCount(1, on: today, engine: engine, in: context)
+
+        // Neue Reihenfolge: P2, C, A, P1, B.
+        Habit.saveOrder(all: all, shown: [p2, c, a, p1, b], in: context)
+
+        // Offen, erledigt, pausiert: jede Gruppe folgt der neuen Reihenfolge.
+        #expect(Habit.dueInTodayOrder(all, on: today, engine: engine).map(\.name) == ["C", "B", "A"])
+        #expect(Habit.pausedInTodayOrder(all, on: today, engine: engine).map(\.name) == ["P2", "P1"])
     }
 
     @Test func ordersTiesByCreationDateWhenSavingFromDefaultSortOrders() throws {
         // Frisch angelegte Habits haben alle sortOrder 0.
         let first = makeHabit("Früh", createdAt: date(1))
         let second = makeHabit("Spät", createdAt: date(2))
-        Habit.saveOrder(all: [second, first], open: [second, first], done: [], in: context)
+        Habit.saveOrder(all: [second, first], shown: [second, first], in: context)
         #expect(second.sortOrder == 0)
         #expect(first.sortOrder == 1)
     }

@@ -31,6 +31,17 @@ enum DayText {
         return "\(weekdayNames[engine.weekday(of: day) - 1]) · \(date)"
     }
 
+    /// Datum mit Jahr: "11. Okt 2026".
+    static func dateWithYear(_ day: Date, engine: HabitEngine) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.calendar = engine.calendar
+        formatter.timeZone = engine.calendar.timeZone
+        formatter.dateFormat = "d. LLL"
+        let date = formatter.string(from: day).replacingOccurrences(of: ".", with: "", options: [.anchored, .backwards])
+        return "\(date) \(engine.calendar.component(.year, from: day))"
+    }
+
     /// Kalenderwoche: "KW 41".
     static func weekNumber(_ day: Date, engine: HabitEngine) -> String {
         "KW \(engine.isoWeek(day))"

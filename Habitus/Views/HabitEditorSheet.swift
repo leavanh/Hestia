@@ -169,16 +169,7 @@ struct HabitEditorSheet: View {
                 .bodyText()
                 .foregroundStyle(Theme.inkSecondary)
         case .monthDay:
-            StepperControl(
-                title: "Jeden Monat am",
-                value: $monthDay,
-                range: 1...31,
-                valueText: { "\($0)." },
-                id: "monthday-picker"
-            )
-            Text("Hat ein Monat weniger Tage, ist der letzte Tag des Monats fällig.")
-                .bodyText()
-                .foregroundStyle(Theme.inkSecondary)
+            MonthDayPicker(selection: $monthDay)
         }
     }
 

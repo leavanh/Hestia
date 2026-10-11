@@ -1,9 +1,9 @@
 import SwiftData
 import SwiftUI
 
-/// Sortiermodus von Heute (Spezifikation 5.2): Die offenen Habits des angezeigten Tags lassen sich per Drag and Drop
-/// verschieben, die erledigten stehen darunter und bleiben, wo sie sind. Die neue Reihenfolge wird sofort
-/// gespeichert (`Habit.saveOrder`).
+/// Sortiermodus von Heute (Spezifikation 5.2): alle aktiven Habits in der gespeicherten Reihenfolge, unabhängig davon,
+/// ob sie am angezeigten Tag fällig, erledigt oder pausiert sind. Alle lassen sich per Drag and Drop verschieben, die
+/// neue Reihenfolge wird sofort gespeichert (`Habit.saveOrder`). Erledigt und pausiert sind nur leise markiert.
 struct HabitSortList: View {
     @Environment(\.modelContext) private var context
 
@@ -15,15 +15,12 @@ struct HabitSortList: View {
     private let engine = HabitEngine()
 
     var body: some View {
-        let due = Habit.dueInTodayOrder(habits, on: day, engine: engine)
-        let open = due.filter { !engine.isCompleted($0.snapshot, on: day) }
-        let done = due.filter { engine.isCompleted($0.snapshot, on: day) }
-        let paused = Habit.pausedInTodayOrder(habits, on: day, engine: engine)
+        let shown = Habit.inSavedOrder(habits.filter { $0.isAlive && $0.endedAt == nil })
 
         List {
             Section {
                 HStack {
-                    Text(HabitCountText.text(open.count + done.count + paused.count))
+                    Text(HabitCountText.text(shown.count))
                         .metaText()
                         .foregroundStyle(Theme.inkSecondary)
                         .accessibilityIdentifier("habit-count")
@@ -33,14 +30,14 @@ struct HabitSortList: View {
                         .accessibilityIdentifier("sort-toggle")
                 }
                 .moveDisabled(true)
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Sortieren")
                         .displayText()
                         .foregroundStyle(Theme.ink)
                         .accessibilityAddTraits(.isHeader)
-                    Text("Verschiebe offene Habits am Griff.")
+                    Text("Verschiebe Habits am Griff.")
                         .bodyText()
                         .foregroundStyle(Theme.inkSecondary)
                 }
@@ -49,19 +46,13 @@ struct HabitSortList: View {
                 .listRowBackground(Color.clear)
             }
             Section {
-                ForEach(open) { habit in
+                ForEach(shown) { habit in
                     row(habit)
                 }
                 .onMove { source, destination in
-                    var reordered = open
+                    var reordered = shown
                     reordered.move(fromOffsets: source, toOffset: destination)
-                    Habit.saveOrder(all: habits.filter(\.isAlive), open: reordered, done: done, in: context)
-                }
-            }
-            Section {
-                ForEach(done + paused) { habit in
-                    row(habit)
-                        .moveDisabled(true)
+                    Habit.saveOrder(all: habits.filter(\.isAlive), shown: reordered, in: context)
                 }
             }
         }
@@ -73,12 +64,41 @@ struct HabitSortList: View {
         .accessibilityIdentifier("sort-list")
     }
 
-    /// Dieselbe Zeile wie in Heute, im Sortiermodus nur zum Anschauen.
+    /// Icon, Name und Rhythmus wie in Heute, rechts leise markiert, ob der Habit am Tag erledigt oder pausiert ist.
+    @ViewBuilder
     private func row(_ habit: Habit) -> some View {
-        DayHabitCard(habit: habit, day: day, onEdit: {})
-            .allowsHitTesting(false)
-            .listRowBackground(Color.clear)
-            .listRowSeparator(.hidden)
-            .listRowInsets(EdgeInsets(top: 0, leading: Theme.spacing, bottom: 0, trailing: Theme.spacing))
+        let snapshot = habit.snapshot
+        let isPaused = engine.isShownAsPaused(snapshot, on: day)
+        let isDone = !isPaused && engine.isCompleted(snapshot, on: day)
+
+        HStack(spacing: Theme.spacing) {
+            HabitIconView(habitName: habit.name, iconName: habit.iconName, color: HabitColor(key: habit.colorKey))
+                .opacity(isPaused ? Theme.pausedOpacity : 1)
+            VStack(alignment: .leading, spacing: Theme.textSpacing) {
+                Text(habit.name)
+                    .titleText()
+                    .foregroundStyle(isPaused ? Theme.inkSecondary : Theme.ink)
+                Text(snapshot.rhythmText(window: engine.windowProgress(snapshot, on: day)))
+                    .metaText()
+                    .foregroundStyle(Theme.inkSecondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            if isPaused {
+                Chip(text: "Pausiert")
+                    .opacity(Theme.pausedOpacity)
+            } else if isDone {
+                Image(systemName: "checkmark")
+                    .font(Theme.Typography.symbol)
+                    .foregroundStyle(Theme.inkSecondary)
+                    .accessibilityLabel("Erledigt")
+            }
+        }
+        .padding(.vertical, Theme.cardPadding)
+        .overlay(alignment: .top) { Hairline() }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("sort-row-\(habit.name)")
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+        .listRowInsets(EdgeInsets(top: 0, leading: Theme.spacing, bottom: 0, trailing: Theme.spacing))
     }
 }

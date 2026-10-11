@@ -27,11 +27,14 @@ enum AppTab: String, CaseIterable, Identifiable {
 
 /// Eigene flache Tab Bar statt der des Systems (Spezifikation 4.5 und 5.1): volle Breite, Fläche `background`, oben eine
 /// Haarlinie. Der gewählte Tab steht in `ink` mit einem 2 pt Strich an der Oberkante, die anderen in `inkSecondary`.
+/// Beim Wechsel gleitet der Strich zum neuen Tab.
 /// Kein Glas, kein Schatten.
 struct PaperTabBar: View {
     @Binding var selection: AppTab
     /// Wird mit dem Tab aufgerufen, wenn der gerade gewählte Tab nochmals angetippt wird.
     var onReselect: (AppTab) -> Void = { _ in }
+
+    @Namespace private var indicator
 
     var body: some View {
         HStack(spacing: 0) {
@@ -39,6 +42,8 @@ struct PaperTabBar: View {
                 item(tab)
             }
         }
+        // Der Strich gleitet zum neuen Tab, Symbol und Label wechseln die Farbe weich mit.
+        .animation(.easeInOut(duration: Theme.tabChangeDuration), value: selection)
         .background {
             Theme.background
                 .ignoresSafeArea(edges: .bottom)
@@ -80,6 +85,7 @@ struct PaperTabBar: View {
                     Rectangle()
                         .fill(Theme.ink)
                         .frame(height: Theme.tabIndicatorHeight)
+                        .matchedGeometryEffect(id: "indicator", in: indicator)
                 }
             }
             .contentShape(Rectangle())

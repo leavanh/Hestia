@@ -4,8 +4,9 @@ import SwiftUI
 /// Kalenderwoche und Plus, Titel relativ zu heute mit "Heute ›" an vergangenen Tagen, Fortschritt mit `SegmentBar`
 /// und `WeekStrip`. Die Fläche reicht nach oben unter die Statusleiste.
 ///
-/// Beim Tageswechsel gleiten Datumszeile, Titel und Fortschritt mit `transition` heraus und federn nacheinander
-/// herein (`dayEntrance`). Der Wochenstreifen gleitet nur, wenn sich die Woche ändert, sonst wandert nur seine Markierung.
+/// Beim Tageswechsel gleiten Datumszeile, Titel und Fortschritt mit `transition` heraus und federn herein
+/// (`dayEntrance`). Der Wochenstreifen gleitet nur, wenn sich die Woche ändert, dann gleichzeitig und gleich schnell
+/// wie Datumszeile und Titel (ohne Verzögerung), sonst wandert nur seine Markierung, ebenso sofort.
 struct DayHeader: View {
     let day: Date
     let today: Date
@@ -32,7 +33,7 @@ struct DayHeader: View {
             }
             sliding(id: dayKey, index: 0) { titleRow }
             sliding(id: dayKey, index: 1) { progressBlock }
-            sliding(id: engine.startOfWeek(day), index: 2) {
+            sliding(id: engine.startOfWeek(day), index: 0) {
                 WeekStrip(days: engine.weekStrip(day, today: today), calendar: engine.calendar, onSelect: onSelectDay)
             }
         }

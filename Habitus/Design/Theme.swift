@@ -40,10 +40,12 @@ enum Theme {
     /// Strichstärke und Abstand des äußeren Rahmens um den angezeigten Tag in `WeekDots`.
     static let dotRingWidth: CGFloat = 1
     static let dotRingGap: CGFloat = 1.5
-    /// Höhe der Balken in `SegmentBar`, Abstand dazwischen und die Anzahl Punkte, ab der ein durchgehender Balken folgt.
+    /// Zusätzlicher Abstand vor dem angezeigten Tag in `WeekDots`, damit der Rahmen das Nachbarquadrat nicht berührt:
+    /// zwischen Rahmen und Nachbarquadrat bleibt mindestens `dotSpacing` frei.
+    static let dotRingClearance: CGFloat = dotRingGap + dotRingWidth
+    /// Höhe von `SegmentBar` und Dauer, mit der ihre Füllung wächst oder schrumpft.
     static let segmentBarHeight: CGFloat = 3
-    static let segmentBarSpacing: CGFloat = 3
-    nonisolated static let segmentBarMaxSegments = 12
+    static let segmentBarFillDuration: Double = 0.25
     /// Mindeststrecke, ab der ein Wischen in Heute den Tag wechselt.
     static let swipeDistance: CGFloat = 40
     /// Dauer des Tageswechsels in Heute.
@@ -62,8 +64,9 @@ enum Theme {
     /// Senkrechter Innenabstand eines Tages in `WeekStrip` und Dauer, mit der die Markierung innerhalb der Woche wandert.
     static let weekStripPadding: CGFloat = 7
     static let weekStripMarkerDuration: Double = 0.2
-    /// Senkrechter Innenabstand der kleinen Leiste in Heute und Dauer ihres Ein- und Ausblendens.
-    static let compactBarPadding: CGFloat = 2
+    /// Senkrechter Innenabstand der kleinen Leiste in Heute (der Plus Button steht mit Luft darin) und Dauer ihres Ein-
+    /// und Ausblendens.
+    static let compactBarPadding: CGFloat = 8
     static let compactBarFadeDuration: Double = 0.15
     /// So lange muss eine Karte gedrückt werden, bis das Bearbeiten Sheet öffnet.
     static let editPressDuration: Double = 0.6
@@ -82,6 +85,9 @@ enum Theme {
     static let swipeBounceDistance: CGFloat = 28
     /// Die kleine Leiste in Heute erscheint, sobald vom Kopfband weniger als diese Höhe zu sehen ist.
     static let compactBarScrollOffset: CGFloat = 44
+    /// Beim Wechsel zwischen den Tabs gleitet der neue Inhalt um so viel herein, in dieser Zeit.
+    static let tabSlideOffset: CGFloat = 12
+    static let tabChangeDuration: Double = 0.25
     /// Höhe des Strichs über dem gewählten Tab in `PaperTabBar`.
     static let tabIndicatorHeight: CGFloat = 2
     /// Höhe des Strichs, der in `WeekDots` einen pausierten Tag zeigt.
@@ -153,7 +159,7 @@ enum Theme {
     static let calendarFutureOpacity: Double = 0.35
     /// Deckkraft eines Bedienelements, das gerade nicht benutzbar ist (z.B. Minus bei 0).
     static let disabledOpacity: Double = 0.35
-    /// Deckkraft der offenen Segmente in `SegmentBar`.
+    /// Deckkraft des offenen Teils von `SegmentBar`.
     static let segmentOpenOpacity: Double = 0.25
 
     /// Farbe, die sich mit dem Modus ändert, aus Hex Werten (`0xRRGGBB`).

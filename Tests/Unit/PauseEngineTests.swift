@@ -272,20 +272,14 @@ struct PauseEngineTests {
 
     // MARK: Reihenfolge (5.2)
 
-    @Test func openHabitsTakeTheFrontSlotsAndDoneFollow() {
-        // Alle: A B C D. Heute sichtbar offen in neuer Reihenfolge C, A. Erledigt D. B ist nicht fällig.
-        let merged = HabitOrder.merged(all: ["A", "B", "C", "D"], open: ["C", "A"], done: ["D"])
-        #expect(merged == ["C", "B", "A", "D"])
+    @Test func shownHabitsTakeTheirSlotsInTheNewOrder() {
+        // Alle: A B C D. C wird vor A geschoben, D (z.B. erledigt) wird vor B geschoben.
+        #expect(HabitOrder.reordered(all: ["A", "B", "C", "D"], shown: ["D", "C", "A", "B"]) == ["D", "C", "A", "B"])
+        #expect(HabitOrder.reordered(all: [1, 2, 3], shown: [1, 2, 3]) == [1, 2, 3])
     }
 
-    @Test func orderWithoutHiddenHabitsIsOpenThenDone() {
-        #expect(HabitOrder.merged(all: [1, 2, 3], open: [3, 2], done: [1]) == [3, 2, 1])
-        #expect(HabitOrder.merged(all: [1, 2, 3], open: [1, 2, 3], done: []) == [1, 2, 3])
-    }
-
-    @Test func doneHabitsKeepTheirOrderAfterMoving() {
-        // Visible: 1 (done), 2, 3 offen. Nach dem Tauschen von 2 und 3 bleiben die erledigten dahinter.
-        let merged = HabitOrder.merged(all: [1, 2, 3, 4], open: [3, 2, 4], done: [1])
-        #expect(merged == [3, 2, 4, 1])
+    @Test func hiddenHabitsKeepTheirSlots() {
+        // B ist beendet und wird nicht gezeigt. Die gezeigten tauschen nur untereinander.
+        #expect(HabitOrder.reordered(all: ["A", "B", "C", "D"], shown: ["D", "C", "A"]) == ["D", "B", "C", "A"])
     }
 }

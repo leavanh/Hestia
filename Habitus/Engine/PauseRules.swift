@@ -33,17 +33,15 @@ extension HabitEngine {
 
 /// Reihenfolge aller Habits (`sortOrder`), ohne Oberfläche (Spezifikation 5.2, Sortieren).
 nonisolated enum HabitOrder {
-    /// Die neue Gesamtreihenfolge nach dem Verschieben in Heute.
+    /// Die neue Gesamtreihenfolge nach dem Verschieben im Sortiermodus.
     ///
-    /// Die offenen Habits des Tages bekommen in ihrer neuen Reihenfolge die vorderen Plätze unter allen sichtbaren
-    /// Habits, die erledigten folgen dahinter in ihrer bisherigen Reihenfolge. Habits, die am Tag nicht in der
-    /// Liste stehen (nicht fällig, pausiert, beendet), behalten ihren Platz.
-    static func merged<ID: Hashable>(all: [ID], open: [ID], done: [ID]) -> [ID] {
-        let visible = open + done
-        let visibleSet = Set(visible)
-        var queue = visible[...]
+    /// `shown` sind die Habits, die der Sortiermodus zeigt, in ihrer neuen Reihenfolge. Sie belegen die Plätze, die sie
+    /// vorher in `all` hatten, in dieser Reihenfolge. Habits, die nicht gezeigt werden (beendete), behalten ihren Platz.
+    static func reordered<ID: Hashable>(all: [ID], shown: [ID]) -> [ID] {
+        let shownSet = Set(shown)
+        var queue = shown[...]
         return all.map { id in
-            guard visibleSet.contains(id), let next = queue.popFirst() else { return id }
+            guard shownSet.contains(id), let next = queue.popFirst() else { return id }
             return next
         }
     }
