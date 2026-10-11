@@ -61,8 +61,12 @@ final class Phase9UITests: XCTestCase {
         XCTAssertTrue(mondayButton.exists, "Der Wochenstreifen zeigt die Woche des angezeigten Tags")
         XCTAssertFalse(mondayButton.isSelected)
 
+        let stripX = mondayButton.frame.minX
         mondayButton.tap()
         XCTAssertTrue(waitForShownDay(monday, in: app), "Tippen auf Montag zeigt diesen Tag")
+        // Innerhalb der Woche bleibt der Streifen stehen, nur die Markierung wandert. Er ist nicht versetzt oder ausgeblendet.
+        Thread.sleep(forTimeInterval: 0.3)
+        XCTAssertEqual(app.buttons[identifier(for: monday)].frame.minX, stripX, accuracy: 2, "Der Wochenstreifen bleibt an seinem Platz")
         let daysAgo = calendar.dateComponents([.day], from: monday, to: today).day!
         let expectedTitle = daysAgo == 1 ? "Gestern" : daysAgo == 2 ? "Vorgestern" : "Vor \(daysAgo) Tagen"
         XCTAssertEqual(app.staticTexts["today-title"].label, expectedTitle)

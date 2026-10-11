@@ -19,7 +19,13 @@ private struct DayEntrance: ViewModifier {
             .offset(x: hidden ? (edge == .leading ? -Theme.entranceOffset : Theme.entranceOffset) : 0)
             .opacity(hidden ? 0 : 1)
             .onAppear {
-                guard edge != nil else { return }
+                // Ohne Kante erscheint die Ansicht ganz normal. Sie gilt dann als angekommen, damit sie nicht versetzt und
+                // unsichtbar bleibt, wenn später eine Kante gesetzt wird, ohne dass sie neu erscheint (Wochenstreifen
+                // innerhalb derselben Woche).
+                guard edge != nil else {
+                    arrived = true
+                    return
+                }
                 let delay = Double(min(index, Theme.entranceMaxStaggeredItems)) * Theme.entranceStagger
                 withAnimation(.spring(duration: 0.5, bounce: 0.3).delay(delay)) {
                     arrived = true
