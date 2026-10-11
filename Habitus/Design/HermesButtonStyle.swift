@@ -55,7 +55,7 @@ struct HermesButtonStyle: ButtonStyle {
         switch variant {
         case .primary: Theme.ink
         case .quiet: Theme.ink.opacity(Theme.fillOpacity)
-        case .onBand: Theme.onBand.opacity(Theme.onBandFillOpacity)
+        case .onBand: (foregroundOverride ?? Theme.onBand).opacity(Theme.onBandFillOpacity)
         case .text: nil
         case .destructive: Theme.statusRed.opacity(Theme.fillOpacity)
         }

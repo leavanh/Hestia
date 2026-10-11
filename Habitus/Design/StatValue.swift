@@ -7,17 +7,21 @@ struct StatValue: View {
     let value: String
     let identifier: String
 
+    @Environment(\.inkOverride) private var inkOverride
+
+    private var ink: Color { inkOverride ?? Theme.ink }
+
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.textSpacing) {
             Text(value)
                 .font(Theme.Typography.stat)
-                .foregroundStyle(Theme.ink)
+                .foregroundStyle(ink)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
                 .accessibilityIdentifier(identifier)
             Text(title)
                 .metaText()
-                .foregroundStyle(Theme.inkSecondary)
+                .foregroundStyle(ink.opacity(0.7))
                 .multilineTextAlignment(.leading)
         }
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -32,6 +32,10 @@ struct MonthCalendar: View {
 
     /// Der gezeigte Monat. Beim Start der letzte, also der aktuelle.
     @State private var month: Date?
+    @Environment(\.inkOverride) private var inkOverride
+
+    /// Tinte für Monatsname, Pfeile, Tageszahlen und Pausen: `Theme.ink`, im Habit Detail die Habitfarbe.
+    private var ink: Color { inkOverride ?? Theme.ink }
 
     private let engine = HabitEngine()
 
@@ -58,7 +62,7 @@ struct MonthCalendar: View {
             HStack {
                 Text(grid.firstDay.formatted(.dateTime.month(.wide).year().locale(Locale(identifier: "de_DE"))))
                     .metaText()
-                    .foregroundStyle(Theme.ink)
+                    .foregroundStyle(ink)
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityIdentifier("\(identifierPrefix)-month-\(Self.monthIdentifier(for: grid.firstDay, calendar: engine.calendar))")
                 Spacer()
@@ -72,7 +76,7 @@ struct MonthCalendar: View {
                 }
                 .labelStyle(.iconOnly)
                 .font(Theme.Typography.symbol)
-                .foregroundStyle(Theme.ink)
+                .foregroundStyle(ink)
                 .buttonStyle(.plain)
             }
             CalendarWeekdayHeader(spacing: spacing)
@@ -109,13 +113,13 @@ struct MonthCalendar: View {
         let ringOutset = isCompact ? Theme.calendarCompactRingOutset : Theme.dotRingGap + Theme.strokeWidth
 
         let square = Rectangle()
-            .fill(isPausedDay ? Theme.ink.opacity(Theme.pausedDayOpacity) : tint.opacity(fillOpacity))
+            .fill(isPausedDay ? ink.opacity(Theme.pausedDayOpacity) : tint.opacity(fillOpacity))
             .overlay {
                 if !isCompact {
                     Text("\(engine.calendar.component(.day, from: day))")
                         .font(isToday ? Theme.Typography.metaMedium : Theme.Typography.meta)
                         .fixedControlTypeSize()
-                        .foregroundStyle(opacity >= Theme.calendarOnFillThreshold ? Theme.background : Theme.ink)
+                        .foregroundStyle(opacity >= Theme.calendarOnFillThreshold ? Theme.background : ink)
                 }
             }
         let label = Group {
@@ -178,6 +182,7 @@ struct MonthCalendar: View {
 
 /// Wochentagszeile Mo bis So unter dem Monatsnamen.
 struct CalendarWeekdayHeader: View {
+    @Environment(\.inkOverride) private var inkOverride
     var spacing: CGFloat = Theme.calendarDaySpacing
 
     /// Sieben gleich breite Spalten, auch für die Tage darunter.
@@ -193,7 +198,7 @@ struct CalendarWeekdayHeader: View {
                 Text(weekday)
                     .labelText(small: true)
                     .fixedControlTypeSize()
-                    .foregroundStyle(Theme.inkSecondary)
+                    .foregroundStyle((inkOverride ?? Theme.ink).opacity(0.7))
             }
         }
         .accessibilityHidden(true)

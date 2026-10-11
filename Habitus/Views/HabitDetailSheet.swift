@@ -3,7 +3,7 @@ import SwiftUI
 
 /// Habit Detail (Spezifikation 5.4, ab Phase 11): oben ein randloses Band in Habitfarbe mit "Fertig" und "Bearbeiten",
 /// Rhythmus Zeile (bei einem beendeten Habit "Beendet am …"), Name und aktuellem Streak. Darunter ein Raster aus vier
-/// Kennzahlen und der kompakte Monatskalender in Habitfarbe. Es gibt keine Navigationsleiste und kein Icon.
+/// Kennzahlen und der kompakte Monatskalender, alles in Habitfarbe. Es gibt keine Navigationsleiste und kein Icon.
 struct HabitDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
 
@@ -46,6 +46,8 @@ struct HabitDetailSheet: View {
             }
             .padding(.horizontal, Theme.spacing)
             .padding(.bottom, Theme.spacing)
+            // Unter dem Band stehen Kennzahlen, Linien und Kalender durchgehend in der Habitfarbe.
+            .inkOverride(habitColor.color)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -108,7 +110,7 @@ struct HabitDetailSheet: View {
         Button(action: action) {
             Text(title).labelText()
         }
-        .buttonStyle(.hermes(.text, foreground: habitColor.onColor))
+        .buttonStyle(.hermes(.onBand, foreground: habitColor.onColor))
         .accessibilityIdentifier(identifier)
     }
 
@@ -135,7 +137,7 @@ struct HabitDetailSheet: View {
         HStack(alignment: .top, spacing: 0) {
             first
                 .padding(.vertical, Theme.spacing)
-            Theme.hairline
+            HairlineColor()
                 .frame(width: Theme.hairlineWidth)
                 .accessibilityHidden(true)
             second

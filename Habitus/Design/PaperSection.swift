@@ -26,9 +26,24 @@ struct PaperSection<Content: View>: View {
 /// Haarlinie (0,5 pt) in `hairline`.
 struct Hairline: View {
     var body: some View {
-        Theme.hairline
+        HairlineColor()
             .frame(height: Theme.hairlineWidth)
             .accessibilityHidden(true)
+    }
+}
+
+/// Farbe der Haarlinien: `hairline`, im Bereich einer überschriebenen Tinte (`inkOverride`) diese Tinte mit 25 % (hell)
+/// bzw. 20 % (dunkel).
+struct HairlineColor: View {
+    @Environment(\.inkOverride) private var inkOverride
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        if let inkOverride {
+            inkOverride.opacity(colorScheme == .dark ? 0.2 : 0.25)
+        } else {
+            Theme.hairline
+        }
     }
 }
 
