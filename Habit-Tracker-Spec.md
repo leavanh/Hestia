@@ -421,7 +421,7 @@ Speichern nur möglich, wenn Name nicht leer.
   - **Ab Phase 9.1:** Über der Liste der Habits steht eine Zeile "Alle auswählen" (Variante `text`). Sind schon alle ausgewählt, heißt sie "Alle abwählen" und hebt die Auswahl auf. Einzelne Habits lassen sich danach wie bisher an und abwählen.
 - Beendete Habits haben keinen Platz in den Einstellungen (3.9).
 - **Entwickler** (nur in Debug Builds sichtbar): "Testdaten erzeugen" und "Alle Daten zurücksetzen". Startargumente für Vorschauen und UI Tests: `-HestiaSampleData` und dazu `-HestiaSamplePauses` (Lesen war vorgestern und gestern pausiert, Sport hat eine geplante Pause ab übermorgen).
-- **Fuß (ab Phase 12):** Ganz unten steht zentriert die Wortmarke `HESTIA / HABITS` (zweizeilig, Barlow Condensed Regular, Versalien, Farbe `inkSecondary`) und darunter die Version in Rolle `meta`. Sie ist der einzige Ort der Wortmarke in der App und kein Button.
+- **Fuß (ab Phase 12):** Ganz unten steht linksbündig die Wortmarke `HESTIA / HABITS` (zweizeilig, Barlow Condensed Regular, 56 pt, Versalien, Farbe `inkSecondary`) und darunter die Version in Rolle `meta`. Sie ist der einzige Ort der Wortmarke in der App und kein Button.
 
 ---
 
@@ -1025,10 +1025,11 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
   - Ältere Phasen in dieser Spezifikation nennen weiter `Habitus` (Verlauf), sie werden nicht umgeschrieben.
 - **Bildmarke:** eine Flamme als Linolschnitt, Blau auf Papier. Quelle ist `Branding/flame-linocut-source.webp` (KI erzeugt, keine Lizenz nötig), `Branding/render_flame_icon.py` liest daraus die Maske und baut die drei Icons. Hell ist Blau auf Papier, dunkel Papier auf Nachtblau, getönt Weiß auf Schwarz. Die Flamme füllt etwa 86 % der Höhe (`FLAME_HEIGHT` 880, oben 46 px und unten 96 px Rand) und ist leicht aufgeraut (wellige Kante, kleine Fehlstellen, feste Seed). Das ersetzt die frühere Idee mit Markenblau Fläche, weil die Schnitte als helle Linien auf Blau klein besser lesbar sind. **Größe und Proportionen des Icons bleiben, wie sie sind.**
 - **Wortmarke:** `HESTIA / HABITS`, zweizeilig wie "HERMES / AGENT" bei Hermes, in Barlow Condensed Regular, Versalien. In der App steht sie nur an einer Stelle: ganz unten in den Einstellungen (5.5).
-- **Startbildschirm:** Hintergrund in der Farbe `background`, mittig nur die Flamme (`Branding/flame-mark.png`, Höhe etwa 120 pt), kein Text. Hell Blau auf Papier, dunkel Papier auf Nachtblau, wie das Icon. Das ersetzt den generierten leeren Startbildschirm.
+- **Startbildschirm:** Hintergrund in der Farbe `background`, mittig nur die Flamme (`Branding/flame-mark.png`, fast bildschirmfüllend: 560 pt hoch, etwa 345 pt breit; nach der Sichtung von 120 pt vergrößert), kein Text. Hell Blau auf Papier, dunkel Papier auf Nachtblau, wie das Icon. Das ersetzt den generierten leeren Startbildschirm.
 - **Bildwelt:** zwei gemeinfreie Stiche (Met Open Access, CC0), blau gerastert, je einer in einem Leerzustand:
-  - **Heute ohne Habits:** Fackel zwischen Altar und Statuette (Met 371844).
-  - **Kalender ohne Daten:** Vestalin (Met 402697).
+  - **Heute ohne Habits:** Vestalin (Met 402697).
+  - **Kalender ohne Daten:** Fackel zwischen Altar und Statuette (Met 371844).
+  - *(Nach der Sichtung getauscht, ursprünglich stand die Fackel in Heute.)*
   - Die Leerzustände in Einstellungen ("Keine Pausen") und im Sheet "Tag bearbeiten" bekommen kein Bild. Höchstens ein Bild pro Leerzustand.
   - Das Bild steht über dem Titel, auf Inhaltsbreite im Seitenverhältnis des Stichs, höchstens etwa 200 pt hoch (Startwert, nach der ersten Sichtung anpassen). Es ist dekorativ und für VoiceOver ausgeblendet. *(Umgesetzt: beide Stiche sind hochkant und stehen deshalb 200 pt hoch, linksbündig wie der Text, `Theme.engravingMaxHeight`.)*
   - Quelle sind die Versionen "web-large" der Met (ca. 550 × 625 px), nicht die Originale. Das reicht für 200 pt Höhe.
@@ -1040,7 +1041,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Umfang**
 - **Umbenennung** wie oben (ein Schritt, mechanisch: Ordner und Projekt mit `git mv`, Targets, Scheme, Testpläne, Bundle Identifier, Startargumente, `@testable import Hestia`). `INFOPLIST_KEY_CFBundleDisplayName` bleibt `Hestia`. *(Anzeigename erledigt.)*
 - **App Icon:** Flamme in Markenblau `#0000F2` auf Papier `#F2F2F2`, Varianten hell, dunkel und getönt (`AppIcon-light/-dark/-tinted`). `Branding/render_flame_icon.py` erzeugt alle Varianten, der Pfad zum Asset Katalog dort wird auf `Hestia/` angepasst. *(Icons erledigt.)* `Branding/render_icon.py` und `habitus-mark.svg` gehören zum alten Wochenkreis Icon.
-- **Wortmarke:** Fuß der Einstellungen (5.5) als Text in Barlow Condensed Regular, kein Bild. Eine Vektorvorlage in `Branding/` ist optional. *(Umgesetzt: Schriftrolle `wordmark` in `Theme.Typography`, 28 pt, 6 % Laufweite. Version als "Version 1.0 (1)" aus `CFBundleShortVersionString` und `CFBundleVersion`.)*
+- **Wortmarke:** Fuß der Einstellungen (5.5) als Text in Barlow Condensed Regular, kein Bild. Eine Vektorvorlage in `Branding/` ist optional. *(Umgesetzt: Schriftrolle `wordmark` in `Theme.Typography`, 56 pt, 4 % Laufweite, linksbündig. Version als "Version 1.0 (1)" aus `CFBundleShortVersionString` und `CFBundleVersion`.)*
 - **Startbildschirm:** Eintrag `UILaunchScreen` mit Bild und Hintergrundfarbe aus dem Asset Katalog (je hell und dunkel) statt `INFOPLIST_KEY_UILaunchScreen_Generation`. *(Umgesetzt: `Hestia/Info.plist` enthält nur `UILaunchScreen` und wird mit der erzeugten Info.plist zusammengeführt. Bild `LaunchFlame` und Farbe `LaunchBackground` erzeugt `Branding/render_launch_flame.py` aus `flame-mark.png`.)*
 - **Bildwelt:** Quellen mit Objektnummer, Link und Lizenz in `Branding/QUELLEN.md` (die Lizenz wird vor dem Einsatz auf der Seite der Met geprüft). Rasterung und Einfärbung per Skript `Branding/render_engravings.py`, keine Bilder von Hand bearbeitet. Die fertigen Bilder (hell und dunkel) liegen in `Assets.xcassets`, `EngravingImage` zeigt sie in `EmptyState`.
 
@@ -1051,8 +1052,8 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - [x] Die neue App startet auf einem Gerät ohne die alte App leer und ohne Absturz. Angelegte Habits sind nach einem Neustart noch da.
 - [x] Der Startbildschirm zeigt die Flamme, in Hell und Dunkel, ohne weißen Blitz.
 - [x] Ganz unten in den Einstellungen stehen `HESTIA / HABITS` und die Version, in Hell und Dunkel gut lesbar.
-- [x] Heute ohne Habits zeigt die Fackel, der Kalender ohne Daten die Vestalin, in Hell und Dunkel. Andere Leerzustände haben kein Bild.
+- [x] Heute ohne Habits zeigt die Vestalin, der Kalender ohne Daten die Fackel, in Hell und Dunkel. Andere Leerzustände haben kein Bild.
 - [x] Alle Bildquellen sind mit Lizenz in `Branding/QUELLEN.md` dokumentiert.
 - [x] Unit Tests und die UI Tests aus "Komplett" laufen mit den neuen Startargumenten grün.
 
-*Geprüft im Simulator (iPhone 18 Pro): Homescreen zeigt "Hestia" mit der Flamme, Icons unverändert. Startbildschirm hell Blau auf Papier, dunkel Papier auf Nachtblau, ohne weißen Blitz. Fackel in Heute und Vestalin im Kalender in Hell und Dunkel, "Keine Pausen" und "Nichts fällig" ohne Bild. Wortmarke und "Version 1.0 (1)" unten in den Einstellungen. Alte App und alter UI Test Runner aus beiden Simulatoren gelöscht. Unit Tests (250) grün, Komplett-Lauf grün bis auf `testCreateCheckUncheckAndPersist`, der einzeln wiederholt grün lief (wackelt beim schnellen Abhaken und Aufheben). Auf dem iPhone selbst noch zu prüfen: alte App löschen, neue startet leer.*
+*Geprüft im Simulator (iPhone 18 Pro): Homescreen zeigt "Hestia" mit der Flamme, Icons unverändert. Startbildschirm hell Blau auf Papier, dunkel Papier auf Nachtblau, ohne weißen Blitz. Vestalin in Heute und Fackel im Kalender in Hell und Dunkel (nach der Sichtung getauscht), "Keine Pausen" und "Nichts fällig" ohne Bild. Wortmarke und "Version 1.0 (1)" unten in den Einstellungen. Alte App und alter UI Test Runner aus beiden Simulatoren gelöscht. Unit Tests (250) grün, Komplett-Lauf grün bis auf `testCreateCheckUncheckAndPersist`, der einzeln wiederholt grün lief (wackelt beim schnellen Abhaken und Aufheben). Auf dem iPhone selbst noch zu prüfen: alte App löschen, neue startet leer.*

@@ -18,7 +18,7 @@ extension Theme {
         static var label: Font { custom(FontRegistry.barlowMedium, 14, .subheadline) }
         static var labelSmall: Font { custom(FontRegistry.barlowMedium, 11, .caption) }
         /// Wortmarke "HESTIA / HABITS" im Fuß der Einstellungen (Phase 12).
-        static var wordmark: Font { custom(FontRegistry.barlowRegular, 28, .title2) }
+        static var wordmark: Font { custom(FontRegistry.barlowRegular, 56, .largeTitle) }
         /// Fließtext, Eingabefelder, Erklärungen.
         static var body: Font { custom(FontRegistry.geistMonoRegular, 14, .body) }
         /// Rhythmus Zeile, Datum im Band, Abschnittsüberschriften, Beschriftungen unter Kennzahlen.
@@ -35,7 +35,7 @@ extension Theme {
         static let labelSmallTracking: CGFloat = 11 * 0.10
         static let metaTracking: CGFloat = 11 * 0.04
         static let displayTracking: CGFloat = -58 * 0.02
-        static let wordmarkTracking: CGFloat = 28 * 0.06
+        static let wordmarkTracking: CGFloat = 56 * 0.04
 
         private static func custom(_ name: String, _ size: CGFloat, _ style: Font.TextStyle) -> Font {
             FontRegistry.registerAll()

@@ -4,9 +4,9 @@ import SwiftUI
 /// Dekorativ und für VoiceOver ausgeblendet. Quellen in Branding/QUELLEN.md, erzeugt von Branding/render_engravings.py.
 struct EngravingImage: View {
     enum Motif: String {
-        /// Fackel zwischen Altar und Statuette (Met 371844), Heute ohne Habits.
+        /// Fackel zwischen Altar und Statuette (Met 371844), Kalender ohne Daten.
         case torch = "EngravingTorch"
-        /// Vestalin (Met 402697), Kalender ohne Daten.
+        /// Vestalin (Met 402697), Heute ohne Habits.
         case vestal = "EngravingVestal"
     }
 

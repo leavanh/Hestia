@@ -106,6 +106,9 @@ enum Theme {
     /// wären sie höher, deshalb ist das zugleich die Höchsthöhe.
     static let engravingMaxHeight: CGFloat = 200
 
+    /// Abstand der zwei Zeilen der Wortmarke im Fuß der Einstellungen. Negativ, damit sie eng wie ein Block stehen.
+    static let wordmarkLineSpacing: CGFloat = -16
+
     // MARK: Marke
 
     private static let brandHex: UInt32 = 0x0000F2

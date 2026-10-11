@@ -143,7 +143,7 @@ struct TodayView: View {
         VStack(spacing: Theme.sectionSpacing) {
             if isEmpty {
                 EmptyState(
-                    engraving: .torch,
+                    engraving: .vestal,
                     title: "Noch keine Habits",
                     message: "Hier erscheinen deine Habits an jedem Tag, an dem sie fällig sind.",
                     identifier: "today-empty",

@@ -46,7 +46,7 @@ struct EmptyState: View {
         PaperBackground()
         VStack(spacing: Theme.spacing) {
             EmptyState(
-                engraving: .torch,
+                engraving: .vestal,
                 title: "Noch keine Habits",
                 message: "Lege deinen ersten Habit an.", actionTitle: "Habit anlegen", action: {}
             )

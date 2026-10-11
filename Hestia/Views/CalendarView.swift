@@ -86,7 +86,7 @@ extension CalendarView {
         VStack(spacing: 0) {
             if listedHabits.isEmpty {
                 EmptyState(
-                    engraving: .vestal,
+                    engraving: .torch,
                     title: "Noch keine Daten",
                     message: "Sobald du in Heute Habits anlegst und abhakst, färben sich hier die Tage und deine Streaks erscheinen.",
                     identifier: "calendar-empty"

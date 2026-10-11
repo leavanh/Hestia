@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 MARK = ROOT / "Branding/flame-mark.png"
 ASSETS = ROOT / "Hestia/Assets.xcassets"
 
-FLAME_POINTS = 120
+FLAME_POINTS = 560  # fast bildschirmfüllend: Breite dann etwa 345 pt, passt auch auf 375 pt breite iPhones
 SCALES = (2, 3)
 
 BRAND = (0x00, 0x00, 0xF2)

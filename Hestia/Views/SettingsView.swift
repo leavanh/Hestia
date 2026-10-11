@@ -33,22 +33,25 @@ private struct Footer: View {
     }
 
     var body: some View {
-        VStack(spacing: Theme.inlineSpacing) {
-            Text("Hestia\nHabits")
-                .font(Theme.Typography.wordmark)
-                .textCase(.uppercase)
-                .tracking(Theme.Typography.wordmarkTracking)
-                .lineSpacing(-6)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Theme.inkSecondary)
-                .accessibilityLabel("Hestia Habits")
-                .accessibilityIdentifier("settings-wordmark")
+        VStack(alignment: .leading, spacing: Theme.inlineSpacing) {
+            // Zwei Texte statt Zeilenumbruch: negativer Zeilenabstand greift bei `Text` nicht.
+            VStack(alignment: .leading, spacing: Theme.wordmarkLineSpacing) {
+                Text("Hestia")
+                Text("Habits")
+            }
+            .font(Theme.Typography.wordmark)
+            .textCase(.uppercase)
+            .tracking(Theme.Typography.wordmarkTracking)
+            .foregroundStyle(Theme.inkSecondary)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Hestia Habits")
+            .accessibilityIdentifier("settings-wordmark")
             Text(version)
                 .metaText()
                 .foregroundStyle(Theme.inkSecondary)
                 .accessibilityIdentifier("settings-version")
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, Theme.sectionSpacing)
     }
 }
