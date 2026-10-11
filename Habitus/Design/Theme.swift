@@ -73,6 +73,8 @@ enum Theme {
     static let swipeBounceDistance: CGFloat = 28
     /// Ab dieser Scrolltiefe steht der Titel von Heute klein in der Leiste.
     static let barTitleScrollOffset: CGFloat = 44
+    /// Höhe des Strichs über dem gewählten Tab in `PaperTabBar`.
+    static let tabIndicatorHeight: CGFloat = 2
     /// Höhe des Strichs, der in `WeekDots` einen pausierten Tag zeigt.
     static let pausedDashHeight: CGFloat = 1
     /// Kantenlänge eines Tages in `MonthCalendar` und Abstand zwischen den Tagen.
@@ -97,15 +99,23 @@ enum Theme {
     // MARK: Rollen
 
     /// Fläche aller Bildschirme: hell Papier, dunkel Nachtblau.
-    static let background = dynamic(light: paperHex, dark: nightHex)
+    static let background = Color(uiColor: backgroundUIColor)
     /// Text, Linien und Bedienelemente: hell Markenblau, dunkel Papier.
-    static let ink = dynamic(light: brandHex, dark: paperHex)
+    static let ink = Color(uiColor: inkUIColor)
     static let inkSecondary = ink.opacity(0.7)
     static let hairline = dynamic(light: brandHex, dark: paperHex, lightAlpha: 0.25, darkAlpha: 0.2)
     /// Kopfband in Heute, in Hell und Dunkel gleich.
     static let band = brand
     static let onBand = paper
     static let onBandSecondary = onBand.opacity(0.8)
+
+    /// Einfärbung des Kalenders im Tab: hell Markenblau, dunkel Leuchtfarbe Blau, damit er in beiden Modi blau ist.
+    static let progress = dynamic(light: brandHex, dark: 0x7979F2)
+
+    /// Dieselben Farben für UIKit (Navigationsleiste). Sie bleiben dynamisch und lösen sich erst beim Zeichnen auf,
+    /// damit sie dem Modus folgen und nicht dem beim Start.
+    static let backgroundUIColor = dynamicUIColor(light: paperHex, dark: nightHex)
+    static let inkUIColor = dynamicUIColor(light: brandHex, dark: paperHex)
 
     /// Statusfarben, nur für die Statusmarke am Icon. Für grün gibt es keine Farbe.
     static let statusYellow = dynamic(light: 0xA88000, dark: 0xF2C200)

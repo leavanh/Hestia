@@ -843,16 +843,16 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Alle bestehenden UI Tests sind nach der Umstellung auf die neuen Identifier weiter grün.
 
 **Definition of Done**
-- [ ] Unten steht eine flache Leiste mit Haarlinie, ohne Glas und ohne Schweben. Der gewählte Tab hat oben einen Strich.
-- [ ] Plus und Sortieren in Heute haben keine Glasfläche mehr.
+- [x] Unten steht eine flache Leiste mit Haarlinie, ohne Glas und ohne Schweben. Der gewählte Tab hat oben einen Strich.
+- [x] Plus und Sortieren in Heute haben keine Glasfläche mehr.
 - [ ] Außerhalb von Sheets ist nirgends Liquid Glass zu sehen.
 - [ ] Wechsel zwischen Hell und Dunkel bei laufender App: Leisten und Hintergründe wechseln sofort mit, nirgends bleibt eine helle Fläche im dunklen Modus.
-- [ ] Im Sheet gibt es keinen System Stepper und kein Menü mehr, Anzahl und Monatstag haben quadratische Tasten.
+- [x] Im Sheet gibt es keinen System Stepper und kein Menü mehr, Anzahl und Monatstag haben quadratische Tasten.
 - [ ] Der Kalender im Tab ist in Hell und Dunkel blau eingefärbt.
-- [ ] Beim Tabwechsel bleibt der Zustand jedes Tabs erhalten.
-- [ ] Die letzte Zeile jeder Liste ist über der Leiste erreichbar.
+- [x] Beim Tabwechsel bleibt der Zustand jedes Tabs erhalten.
+- [x] Die letzte Zeile jeder Liste ist über der Leiste erreichbar.
 - [ ] Bei größter Schriftgröße bricht kein Tab Label um, mit VoiceOver sind die drei Tabs und der gewählte Tab klar erkennbar.
-- [ ] Die Suche aus "Aufräumen" findet nichts mehr.
+- [x] Die Suche aus "Aufräumen" findet nichts mehr.
 
 ---
 

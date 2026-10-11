@@ -20,14 +20,16 @@ struct HermesButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
 
     let variant: Variant
+    /// Quadrat in Mindesthöhe ohne seitlichen Abstand, für Buttons mit nur einem Symbol (z.B. Plus in der Leiste).
+    var isSquare = false
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .foregroundStyle(foreground)
             .multilineTextAlignment(.center)
-            .padding(.horizontal, variant == .text ? 0 : Theme.buttonPaddingHorizontal)
-            .padding(.vertical, Theme.buttonPaddingVertical)
-            .frame(minHeight: Theme.buttonMinHeight)
+            .padding(.horizontal, variant == .text || isSquare ? 0 : Theme.buttonPaddingHorizontal)
+            .padding(.vertical, isSquare ? 0 : Theme.buttonPaddingVertical)
+            .frame(minWidth: isSquare ? Theme.buttonMinHeight : nil, minHeight: Theme.buttonMinHeight)
             .background {
                 if let fill {
                     RoundedRectangle(cornerRadius: Theme.cornerRadius).fill(fill)
@@ -80,8 +82,8 @@ struct HermesButton: View {
 }
 
 extension ButtonStyle where Self == HermesButtonStyle {
-    static func hermes(_ variant: HermesButtonStyle.Variant) -> HermesButtonStyle {
-        HermesButtonStyle(variant: variant)
+    static func hermes(_ variant: HermesButtonStyle.Variant, isSquare: Bool = false) -> HermesButtonStyle {
+        HermesButtonStyle(variant: variant, isSquare: isSquare)
     }
 }
 

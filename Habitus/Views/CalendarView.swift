@@ -59,6 +59,7 @@ struct CalendarView: View {
                 .padding(Theme.spacing)
             }
             .accessibilityIdentifier("calendar-scroll")
+            .scrollsToTopOnTabReselect()
             .background { PaperBackground() }
             .toolbarVisibility(.hidden, for: .navigationBar)
             .sheet(item: $selectedDay) { selected in

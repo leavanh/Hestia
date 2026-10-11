@@ -19,7 +19,7 @@ final class CalendarPhase51UITests: XCTestCase {
         app.launchArguments = ["-HabitusResetData", "-HabitusSampleData"]
         app.launch()
         XCTAssertTrue(app.staticTexts["Lesen"].waitForExistence(timeout: 5))
-        app.tabBars.buttons["Kalender"].tap()
+        app.openTab(.calendar)
         XCTAssertTrue(app.staticTexts[monthIdentifier(prefix: "calendar", plus: 0)].waitForExistence(timeout: 5))
         return app
     }

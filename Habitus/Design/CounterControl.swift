@@ -15,7 +15,7 @@ struct CounterControl: View {
 
     var body: some View {
         HStack(spacing: Theme.controlSpacing) {
-            StepButton(systemImage: "minus", habitColor: habitColor, action: onDecrement)
+            StepButton(systemImage: "minus", color: habitColor.color, action: onDecrement)
                 .disabled(count <= 0)
                 .accessibilityLabel("Weniger")
                 .accessibilityHint("Zählt eins zurück.")
@@ -40,7 +40,7 @@ struct CounterControl: View {
                 }
                 .accessibilityIdentifier("\(id)-value")
 
-            StepButton(systemImage: "plus", habitColor: habitColor, action: onIncrement)
+            StepButton(systemImage: "plus", color: habitColor.color, action: onIncrement)
                 .disabled(count >= target)
                 .accessibilityLabel("Mehr")
                 .accessibilityHint("Zählt eins dazu.")
@@ -50,21 +50,21 @@ struct CounterControl: View {
     }
 }
 
-/// Quadrat mit 1 pt Rand in Habitfarbe und Symbol, gedimmt wenn nicht benutzbar.
-private struct StepButton: View {
+/// Quadrat mit 1 pt Rand in `color` und Symbol, gedimmt wenn nicht benutzbar. Auch für `StepperControl`.
+struct StepButton: View {
     @Environment(\.isEnabled) private var isEnabled
 
     let systemImage: String
-    let habitColor: HabitColor
+    let color: Color
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             ZStack {
-                Rectangle().strokeBorder(habitColor.color, lineWidth: Theme.strokeWidth)
+                Rectangle().strokeBorder(color, lineWidth: Theme.strokeWidth)
                 Image(systemName: systemImage)
                     .font(Theme.Typography.symbolSmall)
-                    .foregroundStyle(habitColor.color)
+                    .foregroundStyle(color)
                     .fixedControlTypeSize()
             }
             .frame(width: Theme.counterKeySize, height: Theme.counterKeySize)

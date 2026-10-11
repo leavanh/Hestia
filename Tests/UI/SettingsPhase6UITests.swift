@@ -28,13 +28,13 @@ final class SettingsPhase6UITests: XCTestCase {
 
     @MainActor
     private func openSettings(in app: XCUIApplication) {
-        app.tabBars.buttons["Einstellungen"].tap()
+        app.openTab(.settings)
         XCTAssertTrue(app.buttons["new-pause"].waitForExistence(timeout: 5))
     }
 
     @MainActor
     private func openToday(in app: XCUIApplication) {
-        app.tabBars.buttons["Heute"].tap()
+        app.openTab(.today)
         XCTAssertTrue(app.scrollViews["today-list"].waitForExistence(timeout: 5))
     }
 
@@ -144,7 +144,7 @@ final class SettingsPhase6UITests: XCTestCase {
         XCTAssertFalse(app.staticTexts["Lesen"].exists, "Beendet: weg aus Heute")
         XCTAssertTrue(app.staticTexts["Sport"].exists)
 
-        app.tabBars.buttons["Kalender"].tap()
+        app.openTab(.calendar)
         XCTAssertTrue(app.buttons["calendar-previous"].waitForExistence(timeout: 5))
         XCTAssertTrue(scrollToExist(app.buttons["habit-row-Lesen"], in: app), "Die Historie bleibt im Kalender")
     }
@@ -159,7 +159,7 @@ final class SettingsPhase6UITests: XCTestCase {
         XCTAssertFalse(app.staticTexts["Lesen"].exists, "Gelöscht: weg aus Heute")
         XCTAssertTrue(app.staticTexts["Sport"].exists)
 
-        app.tabBars.buttons["Kalender"].tap()
+        app.openTab(.calendar)
         XCTAssertTrue(app.buttons["calendar-previous"].waitForExistence(timeout: 5))
         XCTAssertTrue(scrollToExist(app.buttons["habit-row-Sport"], in: app))
         XCTAssertFalse(app.buttons["habit-row-Lesen"].exists, "Auch im Kalender ist er weg")
@@ -269,7 +269,7 @@ final class PausesWithSampleDataUITests: XCTestCase {
     @MainActor
     func testSettingsListOnlyTheUpcomingPauseNotThePastOne() {
         let app = launch()
-        app.tabBars.buttons["Einstellungen"].tap()
+        app.openTab(.settings)
         XCTAssertTrue(app.otherElements["pause-row-Sport"].waitForExistence(timeout: 5), "Geplante Pause")
         XCTAssertTrue(app.staticTexts["Geplant"].exists)
         XCTAssertFalse(app.otherElements["pause-row-Lesen"].exists, "Vergangene Pausen stehen nicht in der Liste")
@@ -283,7 +283,7 @@ final class PausesWithSampleDataUITests: XCTestCase {
     @MainActor
     func testPausedDayIsGreyInTheHabitDetailCalendar() {
         let app = launch()
-        app.tabBars.buttons["Kalender"].tap()
+        app.openTab(.calendar)
         let row = app.buttons["habit-row-Lesen"]
         for _ in 0..<12 where !row.exists || !row.isHittable {
             app.scrollViews["calendar-scroll"].swipeUp()

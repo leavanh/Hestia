@@ -156,11 +156,12 @@ struct HabitEditorSheet: View {
         switch rhythm {
         case .daily, .weekly, .monthly:
             if let range = rhythm.targetRange {
-                Stepper(value: $targetCount, in: range) {
-                    Text(rhythm.targetText(targetCount))
-                        .bodyText()
-                }
-                .accessibilityIdentifier("target-stepper")
+                StepperControl(
+                    title: rhythm.targetText(targetCount),
+                    value: $targetCount,
+                    range: range,
+                    id: "target-stepper"
+                )
             }
         case .weekdays:
             WeekdayPicker(selection: $weekdays, habitColor: habitColor)
@@ -168,19 +169,13 @@ struct HabitEditorSheet: View {
                 .bodyText()
                 .foregroundStyle(Theme.inkSecondary)
         case .monthDay:
-            HStack {
-                Text("Jeden Monat am")
-                    .bodyText()
-                Spacer()
-                Picker("Tag im Monat", selection: $monthDay) {
-                    ForEach(1...31, id: \.self) { day in
-                        Text("\(day).").tag(day)
-                    }
-                }
-                .pickerStyle(.menu)
-                .labelsHidden()
-                .accessibilityIdentifier("monthday-picker")
-            }
+            StepperControl(
+                title: "Jeden Monat am",
+                value: $monthDay,
+                range: 1...31,
+                valueText: { "\($0)." },
+                id: "monthday-picker"
+            )
             Text("Hat ein Monat weniger Tage, ist der letzte Tag des Monats fällig.")
                 .bodyText()
                 .foregroundStyle(Theme.inkSecondary)

@@ -26,7 +26,7 @@ final class TodayPhase2UITests: XCTestCase {
         field.typeText(name + "\n")
 
         if target > 1 {
-            let increment = app.buttons["target-stepper-Increment"]
+            let increment = app.buttons["target-stepper-plus"]
             XCTAssertTrue(increment.waitForExistence(timeout: 5))
             for _ in 1..<target { increment.tap() }
         }
@@ -88,7 +88,7 @@ final class TodayPhase2UITests: XCTestCase {
         let field = app.textFields["name-field"]
         XCTAssertEqual(field.value as? String, "Lesen", "Das Sheet zeigt die bisherigen Werte")
 
-        let increment = app.buttons["target-stepper-Increment"]
+        let increment = app.buttons["target-stepper-plus"]
         increment.tap()
         increment.tap()
         app.buttons["Speichern"].tap()

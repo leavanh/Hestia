@@ -22,8 +22,9 @@ final class TodayPhase3UITests: XCTestCase {
     }
 
     /// Beschriftung des Anzahl Steppers, z.B. "3x pro Woche".
+    @MainActor
     private func stepperText(in app: XCUIApplication) -> String {
-        app.steppers["target-stepper"].label
+        app.control("target-stepper").label
     }
 
     private func status(of name: String, in app: XCUIApplication) -> String? {
@@ -83,7 +84,7 @@ final class TodayPhase3UITests: XCTestCase {
         for number in 1...7 {
             XCTAssertTrue(app.buttons["weekday-\(number)"].exists, "Wochentag \(number)")
         }
-        XCTAssertFalse(app.steppers["target-stepper"].exists)
+        XCTAssertFalse(app.control("target-stepper").exists)
 
         picker.buttons["Monat"].tap()
         XCTAssertEqual(variants.buttons.count, 2)
@@ -93,8 +94,8 @@ final class TodayPhase3UITests: XCTestCase {
         XCTAssertFalse(app.buttons["weekday-1"].exists)
 
         variants.buttons["Monatstag"].tap()
-        XCTAssertTrue(app.buttons["monthday-picker"].exists)
-        XCTAssertFalse(app.steppers["target-stepper"].exists)
+        XCTAssertTrue(app.control("monthday-picker").exists)
+        XCTAssertFalse(app.control("target-stepper").exists)
 
         picker.buttons["Täglich"].tap()
         XCTAssertFalse(variants.exists)
@@ -110,7 +111,7 @@ final class TodayPhase3UITests: XCTestCase {
 
         // Pro Woche höchstens 7: weiteres Tippen ändert nichts.
         picker.buttons["Woche"].tap()
-        let increment = app.buttons["target-stepper-Increment"]
+        let increment = app.buttons["target-stepper-plus"]
         for _ in 0..<10 { increment.tap() }
         XCTAssertEqual(stepperText(in: app), "7x pro Woche")
 
@@ -157,8 +158,8 @@ final class TodayPhase3UITests: XCTestCase {
     func testWeeklyHabitCountsInProgress() {
         let app = launchFresh()
         openEditor(named: "Sport", rhythm: "Woche", in: app)
-        app.buttons["target-stepper-Increment"].tap()
-        app.buttons["target-stepper-Increment"].tap()
+        app.buttons["target-stepper-plus"].tap()
+        app.buttons["target-stepper-plus"].tap()
         XCTAssertEqual(stepperText(in: app), "3x pro Woche")
         save("Sport", in: app)
 
@@ -243,8 +244,7 @@ final class TodayPhase3UITests: XCTestCase {
 
         // Anderer Tag im Monat: heute nicht fällig.
         openEditor(named: "Rechnungen", rhythm: "Monat", variant: "Monatstag", in: app)
-        app.buttons["monthday-picker"].tap()
-        app.buttons["\(other)."].tap()
+        app.setMonthDay(to: other)
         save("Rechnungen", in: app)
         XCTAssertTrue(app.staticTexts["progress-text"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.staticTexts["Rechnungen"].exists)
@@ -270,7 +270,7 @@ final class TodayPhase3UITests: XCTestCase {
         let picker = app.otherElements["rhythm-picker"]
         XCTAssertTrue(picker.buttons["Täglich"].isSelected, "Das Sheet zeigt den bisherigen Rhythmus")
         picker.buttons["Woche"].tap()
-        app.buttons["target-stepper-Increment"].tap()
+        app.buttons["target-stepper-plus"].tap()
         save("Lesen", in: app)
 
         XCTAssertTrue(app.buttons["check-Lesen"].waitForExistence(timeout: 5))
@@ -290,7 +290,7 @@ final class TodayPhase3UITests: XCTestCase {
     func testRhythmSurvivesRestart() {
         let app = launchFresh()
         openEditor(named: "Sport", rhythm: "Woche", in: app)
-        app.buttons["target-stepper-Increment"].tap()
+        app.buttons["target-stepper-plus"].tap()
         save("Sport", in: app)
         app.buttons["check-Sport"].tap()
         XCTAssertEqual(app.staticTexts["progress-text"].label, "1 von 1 · 100\u{00A0}%")
@@ -311,7 +311,7 @@ final class TodayPhase3UITests: XCTestCase {
 
     @MainActor
     private func openDeveloperSettings(in app: XCUIApplication) {
-        app.tabBars.buttons["Einstellungen"].tap()
+        app.openTab(.settings)
         XCTAssertTrue(app.buttons["create-sample-data"].waitForExistence(timeout: 5))
     }
 
@@ -322,7 +322,7 @@ final class TodayPhase3UITests: XCTestCase {
         app.buttons["create-sample-data"].tap()
         XCTAssertTrue(app.staticTexts["developer-message"].waitForExistence(timeout: 5))
 
-        app.tabBars.buttons["Heute"].tap()
+        app.openTab(.today)
         XCTAssertTrue(app.staticTexts["Lesen"].waitForExistence(timeout: 5))
 
         // Entwurf der Testdaten, siehe `DebugData`: grün, gelb und rot an jedem Wochentag.
@@ -351,15 +351,15 @@ final class TodayPhase3UITests: XCTestCase {
         app.buttons["reset-all-data"].tap()
         XCTAssertTrue(app.alerts["Alle Daten zurücksetzen?"].waitForExistence(timeout: 5))
         app.alerts.buttons["Abbrechen"].tap()
-        app.tabBars.buttons["Heute"].tap()
+        app.openTab(.today)
         XCTAssertTrue(app.staticTexts["Lesen"].waitForExistence(timeout: 5))
 
         // Zurücksetzen löscht alles.
-        app.tabBars.buttons["Einstellungen"].tap()
+        app.openTab(.settings)
         app.buttons["reset-all-data"].tap()
         XCTAssertTrue(app.alerts["Alle Daten zurücksetzen?"].waitForExistence(timeout: 5))
         app.alerts.buttons["Zurücksetzen"].tap()
-        app.tabBars.buttons["Heute"].tap()
+        app.openTab(.today)
         XCTAssertTrue(app.staticTexts["progress-text"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.staticTexts["progress-text"].label, "Heute nichts fällig")
         XCTAssertFalse(app.staticTexts["Lesen"].exists)

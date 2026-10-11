@@ -14,7 +14,7 @@ final class CalendarPhase4UITests: XCTestCase {
         app.launchArguments = ["-HabitusResetData", "-HabitusSampleData"]
         app.launch()
         XCTAssertTrue(app.staticTexts["Lesen"].waitForExistence(timeout: 5))
-        app.tabBars.buttons["Kalender"].tap()
+        app.openTab(.calendar)
         XCTAssertTrue(app.buttons[identifier(plus: 0)].waitForExistence(timeout: 5), "Der Kalender beginnt beim aktuellen Monat")
         return app
     }
@@ -172,7 +172,7 @@ final class CalendarPhase4UITests: XCTestCase {
         check.tap()
         closeSheet(in: app)
 
-        app.tabBars.buttons["Heute"].tap()
+        app.openTab(.today)
         let status = app.descendants(matching: .any)["status-Meditieren"].firstMatch
         XCTAssertTrue(status.waitForExistence(timeout: 5))
         XCTAssertEqual(status.value as? String, "Grün", "Gestern nachgetragen: Meditieren ist heute nicht mehr rot")

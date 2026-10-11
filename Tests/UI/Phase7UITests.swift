@@ -22,10 +22,10 @@ final class Phase7UITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["today-empty"].waitForExistence(timeout: 5), "Heute ohne Habits")
         XCTAssertFalse(app.buttons["sort-toggle"].isEnabled, "Ohne Habits gibt es nichts zu sortieren")
 
-        app.tabBars.buttons["Kalender"].tap()
+        app.openTab(.calendar)
         XCTAssertTrue(app.staticTexts["calendar-empty"].waitForExistence(timeout: 5), "Kalender ohne Daten")
 
-        app.tabBars.buttons["Einstellungen"].tap()
+        app.openTab(.settings)
         XCTAssertTrue(app.staticTexts["no-pauses"].waitForExistence(timeout: 5), "Keine Pausen")
     }
 

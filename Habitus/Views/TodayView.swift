@@ -59,21 +59,27 @@ struct TodayView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(
-                        isSorting ? "Fertig" : "Sortieren",
-                        systemImage: isSorting ? "checkmark" : "arrow.up.arrow.down"
-                    ) {
+                    HermesButton(isSorting ? "Fertig" : "Sortieren", variant: .text) {
                         isSorting.toggle()
                     }
+                    .fixedSize()
                     .disabled(hasNoActiveHabits && !isSorting)
                     .accessibilityIdentifier("sort-toggle")
                 }
+                .sharedBackgroundVisibility(.hidden)
                 if !isSorting {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button("Neuer Habit", systemImage: "plus") {
+                        Button {
                             isCreating = true
+                        } label: {
+                            Image(systemName: "plus")
+                                .font(Theme.Typography.symbol)
+                                .fixedControlTypeSize()
                         }
+                        .buttonStyle(.hermes(.quiet, isSquare: true))
+                        .accessibilityLabel("Neuer Habit")
                     }
+                    .sharedBackgroundVisibility(.hidden)
                 }
             }
             .sheet(isPresented: $isCreating) {
@@ -125,6 +131,7 @@ struct TodayView: View {
             .transition(dayTransition)
         }
         .accessibilityIdentifier("today-list")
+        .scrollsToTopOnTabReselect()
         .simultaneousGesture(
             DragGesture(minimumDistance: Theme.swipeDistance)
                 .onEnded { swipe(by: $0.translation) }

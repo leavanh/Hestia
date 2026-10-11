@@ -15,6 +15,7 @@ struct SettingsView: View {
                 }
                 .padding(Theme.spacing)
             }
+            .scrollsToTopOnTabReselect()
             .background { PaperBackground() }
             .toolbarVisibility(.hidden, for: .navigationBar)
         }

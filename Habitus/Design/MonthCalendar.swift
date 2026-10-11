@@ -4,7 +4,7 @@ import SwiftUI
 /// dem Tagesfortschritt in `tint` eingefärbt: keine Farbe bei 0 %, dann zunehmend kräftiger bis 100 %. Jeder Tag ist ein
 /// Quadrat mit der Tageszahl, heute hat einen äußeren quadratischen Rahmen. Zukünftige Tage sind blass und gesperrt.
 /// Der Monat wechselt mit den Pfeilen zwischen `firstMonth` und `lastMonth` (Spezifikation 5.4).
-/// Im Tab ist es `ink` mit antippbaren Tagen, im Habit Detail die Habitfarbe ohne Antippen.
+/// Im Tab ist es `progress` (Blau) mit antippbaren Tagen, im Habit Detail die Habitfarbe ohne Antippen.
 /// Pausierte Tage sind in blasser `ink` statt eingefärbt.
 struct MonthCalendar: View {
     /// Ein Tag aus dem ersten und einer aus dem letzten Monat, zwischen denen man blättern kann.
@@ -14,7 +14,7 @@ struct MonthCalendar: View {
     let progress: (Date) -> DayProgress
     /// Ob der Tag pausiert ist. Solche Tage sind grau und haben keine Einfärbung.
     var isPaused: (Date) -> Bool = { _ in false }
-    var tint: Color = Theme.ink
+    var tint: Color = Theme.progress
     var identifierPrefix = "calendar"
     /// `nil`, wenn die Tage nicht antippbar sind (Habit Detail).
     var onSelect: ((Date) -> Void)?

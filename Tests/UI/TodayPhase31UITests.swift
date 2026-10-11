@@ -141,8 +141,7 @@ final class TodayPhase31UITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Yoga"].waitForExistence(timeout: 5), "Heutiger Wochentag ist vorausgewählt")
 
         openEditor(named: "Rechnungen", rhythm: "Monat", variant: "Monatstag", in: app)
-        app.buttons["monthday-picker"].tap()
-        app.buttons["\(otherDay)."].tap()
+        app.setMonthDay(to: otherDay)
         app.buttons["Speichern"].tap()
         XCTAssertTrue(app.staticTexts["progress-text"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.staticTexts["Rechnungen"].exists, "Anderer Tag im Monat: heute nicht fällig")
@@ -174,14 +173,14 @@ final class TodayPhase31UITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.otherElements["rhythm-picker"].buttons["Monat"].isSelected)
         XCTAssertTrue(app.otherElements["variant-picker"].buttons["Monatstag"].isSelected)
-        XCTAssertTrue(app.buttons["monthday-picker"].exists)
+        XCTAssertTrue(app.control("monthday-picker").exists)
         app.buttons["Abbrechen"].tap()
 
         app.staticTexts["Sport"].press(forDuration: 1.5)
         XCTAssertTrue(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.otherElements["rhythm-picker"].buttons["Woche"].isSelected)
         XCTAssertTrue(app.otherElements["variant-picker"].buttons["Anzahl"].isSelected)
-        XCTAssertTrue(app.steppers["target-stepper"].exists)
+        XCTAssertTrue(app.control("target-stepper").exists)
     }
 
     // MARK: Rhythmus Zeile
@@ -190,7 +189,7 @@ final class TodayPhase31UITests: XCTestCase {
     func testCardsShowTheRhythmLine() {
         let app = launchFresh()
         openEditor(named: "Sport", rhythm: "Woche", variant: "Anzahl", in: app)
-        app.buttons["target-stepper-Increment"].tap()
+        app.buttons["target-stepper-plus"].tap()
         app.buttons["Speichern"].tap()
         XCTAssertTrue(app.staticTexts["Sport"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.staticTexts["repeat-Sport"].label, "0 von 2 diese Woche")
@@ -207,7 +206,7 @@ final class TodayPhase31UITests: XCTestCase {
         XCTAssertTrue(field.waitForExistence(timeout: 5))
         field.tap()
         field.typeText("Wasser\n")
-        app.buttons["target-stepper-Increment"].tap()
+        app.buttons["target-stepper-plus"].tap()
         app.buttons["Speichern"].tap()
         XCTAssertEqual(app.staticTexts["repeat-Wasser"].label, "2 pro Tag")
 

@@ -10,10 +10,10 @@ enum NavigationAppearance {
 
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(Theme.background)
+        appearance.backgroundColor = Theme.backgroundUIColor
         appearance.shadowColor = nil
 
-        let ink = UIColor(Theme.ink)
+        let ink = Theme.inkUIColor
         appearance.titleTextAttributes = [
             .font: scaled(FontRegistry.barlowMedium, size: 14, style: .subheadline),
             .foregroundColor: ink,
