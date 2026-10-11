@@ -1,18 +1,23 @@
 import SwiftUI
 
-/// Fortschrittsring und Text "5 von 16 · 31 %".
+/// Text "5 von 16 · 31 %" in Rolle `meta` und darunter die `SegmentBar`. Bis Phase 9 der Fortschritt in Heute und im
+/// Sheet "Tag bearbeiten".
 struct ProgressHeader: View {
     let progress: DayProgress
 
     var body: some View {
-        HStack(spacing: Theme.spacing) {
-            ProgressRing(fraction: progress.fraction, color: Theme.accent)
-                .frame(width: Theme.progressRingSize, height: Theme.progressRingSize)
+        VStack(alignment: .leading, spacing: Theme.inlineSpacing) {
             Text(text)
-                .font(.headline)
-                .accessibilityIdentifier("progress-text")
+                .metaText()
+                .foregroundStyle(Theme.ink)
+            SegmentBar(done: progress.done, total: progress.total)
+                .foregroundStyle(Theme.ink)
         }
-        .accessibilityElement(children: .combine)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(text)
+        .accessibilityIdentifier("progress-text")
+        .accessibilityAddTraits(.isStaticText)
     }
 
     /// Zwischen Zahl und Prozentzeichen ein geschütztes Leerzeichen, damit "%" bei großer Schrift nicht allein umbricht.
@@ -25,8 +30,10 @@ struct ProgressHeader: View {
 
 #Preview {
     VStack(alignment: .leading, spacing: Theme.spacing) {
+        ProgressHeader(progress: DayProgress(done: 4, total: 6))
         ProgressHeader(progress: DayProgress(done: 5, total: 16))
         ProgressHeader(progress: DayProgress(done: 0, total: 0))
     }
     .padding()
+    .background { PaperBackground() }
 }

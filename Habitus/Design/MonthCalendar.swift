@@ -1,10 +1,11 @@
 import SwiftUI
 
 /// Monatskalender: Monatsname mit Pfeil links und rechts, Wochentagszeile und die Tage des Monats. Jeder Tag ist nach
-/// dem Tagesfortschritt in `tint` eingefärbt: keine Farbe bei 0 %, dann zunehmend kräftiger bis 100 %. Zukünftige Tage
-/// sind blass und gesperrt. Der Monat wechselt mit den Pfeilen zwischen `firstMonth` und `lastMonth` (Spezifikation 5.4).
-/// Im Tab ist es die Akzentfarbe mit antippbaren Tagen, im Habit Detail die Habitfarbe ohne Antippen.
-/// Pausierte Tage sind grau statt eingefärbt.
+/// dem Tagesfortschritt in `tint` eingefärbt: keine Farbe bei 0 %, dann zunehmend kräftiger bis 100 %. Jeder Tag ist ein
+/// Quadrat mit der Tageszahl, heute hat einen äußeren quadratischen Rahmen. Zukünftige Tage sind blass und gesperrt.
+/// Der Monat wechselt mit den Pfeilen zwischen `firstMonth` und `lastMonth` (Spezifikation 5.4).
+/// Im Tab ist es `ink` mit antippbaren Tagen, im Habit Detail die Habitfarbe ohne Antippen.
+/// Pausierte Tage sind in blasser `ink` statt eingefärbt.
 struct MonthCalendar: View {
     /// Ein Tag aus dem ersten und einer aus dem letzten Monat, zwischen denen man blättern kann.
     let firstMonth: Date
@@ -13,7 +14,7 @@ struct MonthCalendar: View {
     let progress: (Date) -> DayProgress
     /// Ob der Tag pausiert ist. Solche Tage sind grau und haben keine Einfärbung.
     var isPaused: (Date) -> Bool = { _ in false }
-    var tint: Color = Theme.accent
+    var tint: Color = Theme.ink
     var identifierPrefix = "calendar"
     /// `nil`, wenn die Tage nicht antippbar sind (Habit Detail).
     var onSelect: ((Date) -> Void)?
@@ -23,7 +24,7 @@ struct MonthCalendar: View {
 
     private let engine = HabitEngine()
 
-    /// Deckkraft der Akzentfarbe für einen Anteil von 0 bis 1. Bei 0 gibt es keine Farbe.
+    /// Deckkraft der Tinte für einen Anteil von 0 bis 1. Bei 0 gibt es keine Farbe.
     static func fillOpacity(for fraction: Double) -> Double {
         guard fraction > 0 else { return 0 }
         let range = Theme.calendarFillOpacity
@@ -45,7 +46,8 @@ struct MonthCalendar: View {
         VStack(alignment: .leading, spacing: Theme.spacing) {
             HStack {
                 Text(grid.firstDay.formatted(.dateTime.month(.wide).year().locale(Locale(identifier: "de_DE"))))
-                    .font(.title3.weight(.semibold))
+                    .metaText()
+                    .foregroundStyle(Theme.ink)
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityIdentifier("\(identifierPrefix)-month-\(Self.monthIdentifier(for: grid.firstDay, calendar: engine.calendar))")
                 Spacer()
@@ -58,7 +60,8 @@ struct MonthCalendar: View {
                         .accessibilityIdentifier("\(identifierPrefix)-next")
                 }
                 .labelStyle(.iconOnly)
-                .font(.body.weight(.semibold))
+                .font(Theme.Typography.symbol)
+                .foregroundStyle(Theme.ink)
                 .buttonStyle(.plain)
             }
             CalendarWeekdayHeader()
@@ -82,19 +85,21 @@ struct MonthCalendar: View {
         let opacity = isFuture || isPausedDay ? 0 : Self.fillOpacity(for: dayProgress.fraction)
 
         let label = Text("\(engine.calendar.component(.day, from: day))")
-            .font(.subheadline.weight(isToday ? .bold : .regular))
-            .fixedCircleTypeSize()
-            .foregroundStyle(opacity >= Theme.calendarOnAccentThreshold ? Theme.onAccent : Color.primary)
+            .font(isToday ? Theme.Typography.metaMedium : Theme.Typography.meta)
+            .fixedControlTypeSize()
+            .foregroundStyle(opacity >= Theme.calendarOnFillThreshold ? Theme.background : Theme.ink)
             .frame(width: Theme.calendarDaySize, height: Theme.calendarDaySize)
             .background {
-                Circle().fill(isPausedDay ? Theme.paused.opacity(Theme.pausedDayOpacity) : tint.opacity(opacity))
+                Rectangle().fill(isPausedDay ? Theme.ink.opacity(Theme.pausedDayOpacity) : tint.opacity(opacity))
             }
             .overlay {
                 if isToday {
-                    Circle().strokeBorder(tint, lineWidth: Theme.strokeWidth)
+                    Rectangle()
+                        .strokeBorder(tint, lineWidth: Theme.strokeWidth)
+                        .padding(-(Theme.dotRingGap + Theme.strokeWidth))
                 }
             }
-            .contentShape(Circle())
+            .contentShape(Rectangle())
             .opacity(isFuture ? Theme.calendarFutureOpacity : 1)
 
         return Group {
@@ -145,9 +150,9 @@ struct CalendarWeekdayHeader: View {
         LazyVGrid(columns: Self.columns, spacing: 0) {
             ForEach(Self.weekdays, id: \.self) { weekday in
                 Text(weekday)
-                    .font(.caption.weight(.semibold))
-                    .fixedCircleTypeSize()
-                    .foregroundStyle(.secondary)
+                    .labelText(small: true)
+                    .fixedControlTypeSize()
+                    .foregroundStyle(Theme.inkSecondary)
             }
         }
         .accessibilityHidden(true)
@@ -157,7 +162,7 @@ struct CalendarWeekdayHeader: View {
 #Preview {
     let engine = HabitEngine()
     ZStack {
-        GlassBackground()
+        PaperBackground()
         MonthCalendar(
             firstMonth: engine.calendar.date(byAdding: .month, value: -3, to: .now) ?? .now,
             lastMonth: .now,

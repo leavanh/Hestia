@@ -19,6 +19,6 @@ struct AccessibilityTextTests {
     @Test func colorNamesAreDistinct() {
         let titles = HabitColor.allCases.map(\.title)
         #expect(Set(titles).count == HabitColor.allCases.count)
-        #expect(HabitColor.teal.title == "Türkis")
+        #expect(HabitColor.teal.title == "Cyan")
     }
 }

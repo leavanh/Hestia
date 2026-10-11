@@ -26,16 +26,16 @@ struct PauseEditorSheet: View {
             ScrollView {
                 VStack(spacing: Theme.sectionSpacing) {
                     // Der kurze Zeitraum zuerst, damit er auch bei vielen Habits nicht ganz unten steht.
-                    GlassSection(title: "Zeitraum") {
+                    PaperSection(title: "Zeitraum") {
                         dateRows
                     }
-                    GlassSection(title: "Habits") {
+                    PaperSection(title: "Habits") {
                         habitChoices
                     }
                 }
                 .padding(Theme.spacing)
             }
-            .background { GlassBackground() }
+            .background { PaperBackground() }
             .navigationTitle("Neue Pause")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -62,8 +62,8 @@ struct PauseEditorSheet: View {
     private var habitChoices: some View {
         if choices.isEmpty {
             Text("Es gibt keine aktiven Habits. Lege zuerst in Heute einen Habit an.")
-                .font(.body)
-                .foregroundStyle(.secondary)
+                .bodyText()
+                .foregroundStyle(Theme.inkSecondary)
         } else {
             VStack(spacing: Theme.spacing) {
                 ForEach(choices) { habit in
@@ -75,23 +75,23 @@ struct PauseEditorSheet: View {
                         VStack(alignment: .leading, spacing: Theme.textSpacing) {
                             AdaptiveStack(spacing: Theme.inlineSpacing) {
                                 Text(habit.name)
-                                    .font(.body)
-                                    .foregroundStyle(pausedText == nil ? Color.primary : Color.secondary)
+                                    .titleText()
+                                    .foregroundStyle(pausedText == nil ? Theme.ink : Theme.inkSecondary)
                                 if pausedText != nil {
-                                    DayBadge(text: "Pausiert", isToday: false)
+                                    Chip(text: "Pausiert")
                                 }
                             }
                             if let pausedText {
                                 Text(pausedText)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .metaText()
+                                    .foregroundStyle(Theme.inkSecondary)
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .accessibilityElement(children: .combine)
                         .accessibilityIdentifier("pause-state-\(habit.name)")
-                        CheckCircle(
-                            isChecked: selection.contains(habit.id), color: habitColor.color, label: habit.name,
+                        CheckBox(
+                            isChecked: selection.contains(habit.id), habitColor: habitColor, label: habit.name,
                             checkedText: "Ausgewählt", uncheckedText: "Nicht ausgewählt"
                         ) {
                             toggle(habit)
@@ -110,7 +110,7 @@ struct PauseEditorSheet: View {
             DatePicker("Bis", selection: $endDay, in: startDay..., displayedComponents: .date)
                 .accessibilityIdentifier("pause-end")
         }
-        .font(.body)
+        .font(Theme.Typography.body)
     }
 
     /// Die Zeiträume, in denen der Habit im gewählten Zeitraum schon pausiert ist ("13. Okt. – 15. Okt."), sonst `nil`.

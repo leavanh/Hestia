@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Zeile in der Habit Liste unter dem Kalender: Icon, Name, Rhythmus Zeile und rechts der aktuelle Streak.
-/// Antippen öffnet das Habit Detail.
+/// Flache Zeile in der Habit Liste unter dem Kalender, oben eine Haarlinie: Icon, Name, Rhythmus Zeile und rechts der
+/// aktuelle Streak als Zahl mit "Tage" darunter. Antippen öffnet das Habit Detail.
 struct HabitStatRow: View {
     let name: String
     let iconName: String
@@ -17,20 +17,28 @@ struct HabitStatRow: View {
                 HabitIconView(habitName: name, iconName: iconName, color: habitColor)
                 VStack(alignment: .leading, spacing: Theme.textSpacing) {
                     Text(name)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
+                        .titleText()
+                        .foregroundStyle(Theme.ink)
                     Text(rhythmText)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .metaText()
+                        .foregroundStyle(Theme.inkSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                Label(StatValue.daysText(streak), systemImage: "flame.fill")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(streak > 0 ? Color.primary : Color.secondary)
-                    .accessibilityLabel("Aktueller Streak: \(StatValue.daysText(streak))")
-                    .accessibilityIdentifier("streak-\(name)")
+                VStack(alignment: .trailing, spacing: 0) {
+                    Text("\(streak)")
+                        .font(Theme.Typography.statSmall)
+                        .foregroundStyle(streak > 0 ? Theme.ink : Theme.inkSecondary)
+                        .accessibilityLabel("Aktueller Streak: \(StatValue.daysText(streak))")
+                        .accessibilityIdentifier("streak-\(name)")
+                    Text(streak == 1 ? "Tag" : "Tage")
+                        .metaText()
+                        .foregroundStyle(Theme.inkSecondary)
+                        .accessibilityHidden(true)
+                }
             }
-            .glassCard()
+            .padding(.vertical, Theme.cardPadding)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(alignment: .top) { Hairline() }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -40,12 +48,12 @@ struct HabitStatRow: View {
 
 #Preview {
     ZStack {
-        GlassBackground()
-        VStack(spacing: Theme.spacing) {
+        PaperBackground()
+        VStack(spacing: 0) {
             HabitStatRow(name: "Lesen", iconName: "book.fill", habitColor: .violet, rhythmText: "Täglich", streak: 12) {}
             HabitStatRow(name: "Sport", iconName: "dumbbell.fill", habitColor: .orange, rhythmText: "1 von 2 diese Woche", streak: 1) {}
-            HabitStatRow(name: "Yoga", iconName: "figure.yoga", habitColor: .teal, rhythmText: "Mo, Do", streak: 0) {}
+            HabitStatRow(name: "Yoga", iconName: "figure.yoga", habitColor: .teal, rhythmText: "Mo · Do", streak: 0) {}
         }
-        .padding()
+        .padding(.horizontal)
     }
 }

@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "B01A6A5B-E9E5-41E5-A3DF-868A999AEDC9",
+      "name" : "Standard",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Habitus.xcodeproj",
+        "identifier" : "A10000000000000000000011",
+        "name" : "HabitusTests"
+      }
+    }
+  ],
+  "version" : 1
+}

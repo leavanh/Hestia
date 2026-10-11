@@ -61,7 +61,7 @@ nonisolated struct DayProgress: Equatable, Sendable {
         return Int((Double(done) * 100 / Double(total)).rounded())
     }
 
-    /// Anteil von 0 bis 1 für den Fortschrittsring.
+    /// Anteil von 0 bis 1.
     var fraction: Double {
         guard total > 0 else { return 0 }
         return Double(done) / Double(total)
@@ -95,7 +95,7 @@ nonisolated struct HabitEngine: Sendable {
         current > 0 ? 0 : 1
     }
 
-    /// Täglich mit Anzahl größer 1 zeigt einen Counter, alle anderen einen Kreis.
+    /// Täglich mit Anzahl größer 1 zeigt einen Counter, alle anderen ein Quadrat zum Abhaken.
     func usesCounter(_ habit: HabitSnapshot) -> Bool {
         habit.rhythm == .daily && habit.targetCount > 1
     }
@@ -226,7 +226,7 @@ nonisolated struct HabitEngine: Sendable {
         habit.rhythm == .daily ? max(habit.targetCount, 1) : 1
     }
 
-    /// Erledigt heißt: das Tagesziel ist am Tag erreicht (Kreis abgehakt, Counter voll). Ein Wochen
+    /// Erledigt heißt: das Tagesziel ist am Tag erreicht (Häkchen gesetzt, Counter voll). Ein Wochen
     /// oder Monats Habit mit erfülltem Fenster, der am Tag nicht abgehakt ist, bleibt offen.
     func isCompleted(_ habit: HabitSnapshot, on day: Date) -> Bool {
         count(on: day, in: habit.counts) >= dailyTarget(habit)

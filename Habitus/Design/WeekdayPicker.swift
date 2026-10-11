@@ -1,9 +1,9 @@
 import SwiftUI
 
-/// Sieben Kreise M D M D F S S zur Auswahl von Wochentagen (1 = Montag bis 7 = Sonntag).
+/// Sieben Quadrate M D M D F S S zur Auswahl von Wochentagen (1 = Montag bis 7 = Sonntag).
 struct WeekdayPicker: View {
     @Binding var selection: Set<Int>
-    let color: Color
+    let habitColor: HabitColor
 
     private static let days: [(number: Int, initial: String, name: String)] = [
         (1, "M", "Montag"), (2, "D", "Dienstag"), (3, "M", "Mittwoch"), (4, "D", "Donnerstag"),
@@ -18,18 +18,18 @@ struct WeekdayPicker: View {
                     toggle(day.number)
                 } label: {
                     Text(day.initial)
-                        .font(.subheadline.weight(.semibold))
-                        .fixedCircleTypeSize()
-                        .foregroundStyle(isSelected ? Theme.onHabitColor : color)
+                        .labelText()
+                        .fixedControlTypeSize()
+                        .foregroundStyle(isSelected ? habitColor.onColor : habitColor.color)
                         .frame(width: Theme.controlSize, height: Theme.controlSize)
                         .background {
                             if isSelected {
-                                Circle().fill(color)
+                                Rectangle().fill(habitColor.color)
                             } else {
-                                Circle().strokeBorder(color, lineWidth: Theme.strokeWidth)
+                                Rectangle().strokeBorder(habitColor.color, lineWidth: Theme.strokeWidth)
                             }
                         }
-                        .contentShape(Circle())
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
@@ -53,6 +53,7 @@ struct WeekdayPicker: View {
 
 #Preview {
     @Previewable @State var selection: Set<Int> = [1, 4]
-    WeekdayPicker(selection: $selection, color: HabitColor.violet.color)
+    WeekdayPicker(selection: $selection, habitColor: .violet)
         .padding()
+        .background { PaperBackground() }
 }

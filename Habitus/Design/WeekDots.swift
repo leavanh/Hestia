@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Die 7 kleinen Punkte unter einem Habit: links der älteste Tag, rechts der angezeigte Tag mit äußerem Ring.
-/// Ein pausierter Tag ist ein kleiner grauer Strich statt eines Punkts.
+/// Die 7 kleinen Quadrate unter einem Habit: links der älteste Tag, rechts der angezeigte Tag mit äußerem Rahmen.
+/// Ein pausierter Tag ist ein kurzer waagrechter Strich statt eines Quadrats.
 struct WeekDots: View {
     let dots: [WeekDot]
     let color: Color
@@ -10,7 +10,7 @@ struct WeekDots: View {
         HStack(spacing: Theme.dotSpacing) {
             ForEach(Array(dots.enumerated()), id: \.offset) { index, dot in
                 dotView(dot)
-                    .overlay { if index == dots.count - 1 { shownDayRing } }
+                    .overlay { if index == dots.count - 1 { shownDayFrame } }
             }
         }
         .accessibilityElement(children: .ignore)
@@ -28,10 +28,10 @@ struct WeekDots: View {
         }
     }
 
-    /// Der Ring liegt nur als Überlagerung um den Punkt und verändert Abstände und Ausrichtung nicht.
-    private var shownDayRing: some View {
+    /// Der Rahmen liegt nur als Überlagerung um das Quadrat und verändert Abstände und Ausrichtung nicht.
+    private var shownDayFrame: some View {
         let size = Theme.dotSize + 2 * Theme.dotRingGap + Theme.dotRingWidth
-        return Circle()
+        return Rectangle()
             .stroke(color.opacity(Theme.dotRingOpacity), lineWidth: Theme.dotRingWidth)
             .frame(width: size, height: size)
     }
@@ -40,21 +40,20 @@ struct WeekDots: View {
     private func dotView(_ dot: WeekDot) -> some View {
         switch dot {
         case .fill(let value):
-            Circle()
+            Rectangle()
                 .fill(color.opacity(opacity(for: value)))
-                .overlay { Circle().strokeBorder(color, lineWidth: 1) }
                 .frame(width: Theme.dotSize, height: Theme.dotSize)
         case .paused:
-            Capsule()
-                .fill(Theme.paused)
+            Rectangle()
+                .fill(Theme.ink.opacity(Theme.pausedOpacity))
                 .frame(width: Theme.dotSize, height: Theme.pausedDashHeight)
                 .frame(width: Theme.dotSize, height: Theme.dotSize)
         }
     }
 
-    /// 0 = nur Umriss, 1 = voll gefüllt, dazwischen steigende Deckkraft.
+    /// 0 = Habitfarbe mit 22 %, 1 = voll gefüllt, dazwischen steigende Deckkraft.
     private func opacity(for value: Double) -> Double {
-        if value <= 0 { return 0 }
+        if value <= 0 { return Theme.dotEmptyOpacity }
         if value >= 1 { return 1 }
         let range = Theme.dotPartialOpacity
         return range.lowerBound + (range.upperBound - range.lowerBound) * value
@@ -73,4 +72,5 @@ struct WeekDots: View {
         )
     }
     .padding()
+    .background { PaperBackground() }
 }

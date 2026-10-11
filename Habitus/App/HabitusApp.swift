@@ -3,6 +3,11 @@ import SwiftUI
 
 @main
 struct HabitusApp: App {
+    init() {
+        FontRegistry.registerAll()
+        NavigationAppearance.apply()
+    }
+
     private let container: ModelContainer = {
         do {
             let container = try ModelContainer(for: Habit.self, Completion.self, Pause.self)

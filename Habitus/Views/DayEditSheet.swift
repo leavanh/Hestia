@@ -23,13 +23,12 @@ struct DayEditSheet: View {
                     ProgressHeader(progress: engine.dayProgress(due.map(\.snapshot), on: day))
                     if due.isEmpty && paused.isEmpty {
                         EmptyState(
-                            systemImage: "calendar",
                             title: "Nichts fällig",
                             message: "An diesem Tag gab es keinen fälligen Habit.",
                             identifier: "day-empty"
                         )
                     }
-                    VStack(spacing: Theme.spacing) {
+                    VStack(spacing: 0) {
                         ForEach(due + paused) { habit in
                             DayHabitCard(habit: habit, day: day) { editingHabit = habit }
                         }
@@ -40,7 +39,7 @@ struct DayEditSheet: View {
                 .padding(Theme.spacing)
             }
             .accessibilityIdentifier("day-edit-list")
-            .background { GlassBackground() }
+            .background { PaperBackground() }
             .navigationTitle(day.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "de_DE"))))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

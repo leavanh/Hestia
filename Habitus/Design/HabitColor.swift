@@ -1,9 +1,11 @@
 import SwiftUI
 import UIKit
 
-/// Feste Palette mit 8 Habitfarben. Gespeichert wird der `rawValue` in `Habit.colorKey`.
+/// Feste Palette mit 8 Habitfarben (Spezifikation 4.2). Gespeichert wird der `rawValue` in `Habit.colorKey`.
+/// Im hellen Modus ist jede Farbe eine dunkle Tinte auf Papier, im dunklen eine helle Leuchtfarbe auf Nachtblau.
+/// Die Reihenfolge folgt dem Farbkreis.
 enum HabitColor: String, CaseIterable, Identifiable {
-    case blue, teal, green, yellow, orange, red, pink, violet
+    case blue, violet, pink, red, orange, yellow, green, teal
 
     var id: String { rawValue }
 
@@ -11,56 +13,44 @@ enum HabitColor: String, CaseIterable, Identifiable {
         self = HabitColor(rawValue: key) ?? .blue
     }
 
+    /// Tinte bzw. Leuchtfarbe, je nach Modus.
     var color: Color { Color(uiColor: uiColor) }
+
+    /// `color` mit 14 % Deckkraft, für die Fläche von `HabitIconView`.
+    var tint: Color { color.opacity(Theme.fillOpacity) }
+
+    /// Vordergrund auf voller Habitfarbe (Häkchen, Text im Band des Details).
+    var onColor: Color { Theme.background }
 
     /// Deutscher Name für VoiceOver in der Farbauswahl.
     var title: String {
         switch self {
         case .blue: "Blau"
-        case .teal: "Türkis"
-        case .green: "Grün"
-        case .yellow: "Gelb"
-        case .orange: "Orange"
-        case .red: "Rot"
+        case .violet: "Indigo"
         case .pink: "Pink"
-        case .violet: "Violett"
+        case .red: "Rot"
+        case .orange: "Orange"
+        case .yellow: "Ocker"
+        case .green: "Grün"
+        case .teal: "Cyan"
         }
-    }
-
-    /// Gedämpfte Variante für Symbol und Kreisfläche von `HabitIconView`: weniger Sättigung, in Hell etwas
-    /// dunkler, in Dunkel etwas heller, damit sie auf dem Verlauf lesbar bleibt. Der Farbton bleibt erhalten.
-    var mutedColor: Color {
-        Color(uiColor: Self.muted(uiColor))
     }
 
     var uiColor: UIColor {
-        switch self {
-        case .blue: .systemBlue
-        case .teal: .systemTeal
-        case .green: .systemGreen
-        case .yellow: .systemYellow
-        case .orange: .systemOrange
-        case .red: .systemRed
-        case .pink: .systemPink
-        case .violet: .systemPurple
-        }
+        Theme.dynamicUIColor(light: hex.ink, dark: hex.glow)
     }
 
-    private static let mutedSaturation: CGFloat = 0.6
-    private static let mutedBrightnessLight: CGFloat = 0.9
-    private static let mutedBrightnessDark: CGFloat = 0.95
-
-    private static func muted(_ base: UIColor) -> UIColor {
-        UIColor { traits in
-            var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
-            base.resolvedColor(with: traits).getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
-            let isDark = traits.userInterfaceStyle == .dark
-            return UIColor(
-                hue: hue,
-                saturation: saturation * mutedSaturation,
-                brightness: brightness * (isDark ? mutedBrightnessDark : mutedBrightnessLight),
-                alpha: alpha
-            )
+    /// Hex Werte (`0xRRGGBB`) der Tinte (hell) und der Leuchtfarbe (dunkel).
+    var hex: (ink: UInt32, glow: UInt32) {
+        switch self {
+        case .blue: (0x0000F2, 0x7979F2)
+        case .violet: (0x5C00D6, 0xB079F2)
+        case .pink: (0xD1005F, 0xF279B5)
+        case .red: (0xD10000, 0xF27979)
+        case .orange: (0xB35500, 0xF2B579)
+        case .yellow: (0x806B00, 0xF2F279)
+        case .green: (0x00804C, 0x79F2B5)
+        case .teal: (0x007A80, 0x79F2F2)
         }
     }
 }

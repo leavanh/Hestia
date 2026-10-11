@@ -14,6 +14,7 @@ struct RootView: View {
                 SettingsView()
             }
         }
+        .tint(Theme.ink)
     }
 }
 

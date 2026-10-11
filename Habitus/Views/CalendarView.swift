@@ -45,6 +45,7 @@ struct CalendarView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: Theme.sectionSpacing) {
+                    ScreenTitle("Kalender")
                     MonthCalendar(
                         firstMonth: firstMonth(for: snapshots),
                         lastMonth: today,
@@ -58,8 +59,8 @@ struct CalendarView: View {
                 .padding(Theme.spacing)
             }
             .accessibilityIdentifier("calendar-scroll")
-            .background { GlassBackground() }
-            .navigationTitle("Kalender")
+            .background { PaperBackground() }
+            .toolbarVisibility(.hidden, for: .navigationBar)
             .sheet(item: $selectedDay) { selected in
                 DayEditSheet(day: selected.day)
             }
@@ -81,10 +82,9 @@ struct CalendarView: View {
 extension CalendarView {
     /// Alle Habits mit aktuellem Streak, aktive zuerst, dann beendete. Ohne Habits ein Leerzustand.
     private var habitList: some View {
-        VStack(spacing: Theme.spacing) {
+        VStack(spacing: 0) {
             if listedHabits.isEmpty {
                 EmptyState(
-                    systemImage: "calendar",
                     title: "Noch keine Daten",
                     message: "Sobald du in Heute Habits anlegst und abhakst, färben sich hier die Tage und deine Streaks erscheinen.",
                     identifier: "calendar-empty"

@@ -1,7 +1,7 @@
 import Foundation
 
 extension HabitSnapshot {
-    /// Rhythmus Zeile auf der `HabitCard` (Spezifikation 4.3.1). Bei Woche und Monat steht davor
+    /// Rhythmus Zeile auf der `HabitCard` (Spezifikation 4.5.1). Bei Woche und Monat steht davor
     /// der Stand im Fenster, `window` kommt aus `HabitEngine.windowProgress`.
     func rhythmText(window: WindowProgress?) -> String {
         switch rhythm {
@@ -14,7 +14,7 @@ extension HabitSnapshot {
         case .weekdays:
             let names = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
             return Set(weekdays).sorted().compactMap { (1...7).contains($0) ? names[$0 - 1] : nil }
-                .joined(separator: ", ")
+                .joined(separator: " · ")
         case .monthDay:
             return "Am \(monthDay ?? 1). des Monats"
         }

@@ -22,11 +22,12 @@ struct HabitSortList: View {
             Section {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Sortieren")
-                        .font(.largeTitle.bold())
+                        .displayText()
+                        .foregroundStyle(Theme.ink)
                         .accessibilityAddTraits(.isHeader)
                     Text("Verschiebe offene Habits am Griff.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .bodyText()
+                        .foregroundStyle(Theme.inkSecondary)
                 }
                 .moveDisabled(true)
                 .listRowSeparator(.hidden)
@@ -51,17 +52,18 @@ struct HabitSortList: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+        .background { PaperBackground() }
         .listSectionSpacing(0)
         .environment(\.editMode, .constant(.active))
         .accessibilityIdentifier("sort-list")
     }
 
-    /// Dieselbe Karte wie in Heute, im Sortiermodus nur zum Anschauen.
+    /// Dieselbe Zeile wie in Heute, im Sortiermodus nur zum Anschauen.
     private func row(_ habit: Habit) -> some View {
         DayHabitCard(habit: habit, day: day, onEdit: {})
             .allowsHitTesting(false)
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
-            .listRowInsets(EdgeInsets(top: Theme.spacing / 2, leading: Theme.spacing, bottom: Theme.spacing / 2, trailing: Theme.spacing))
+            .listRowInsets(EdgeInsets(top: 0, leading: Theme.spacing, bottom: 0, trailing: Theme.spacing))
     }
 }

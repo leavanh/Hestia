@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Icon in gedämpfter Habitfarbe auf zarter Kreisfläche derselben Farbe. Bei Status gelb oder rot sitzt oben rechts
-/// eine kleine runde Statusmarke, die den Kreis leicht überlappt und durch einen freien Rand von ihm abgesetzt ist.
+/// Quadratische Kachel (36 pt) mit Fläche `tint` und Symbol in `color`. Bei Status gelb oder rot sitzt oben rechts
+/// eine quadratische Statusmarke, die die Kachel leicht überlappt und durch einen freien Rand von ihr abgesetzt ist.
 /// Bei grün gibt es keine Marke, der Status bleibt für VoiceOver und Tests trotzdem als Wert verfügbar.
 /// Ohne `status` (Habit Liste, Detail, Sheet "Neue Pause") ist das Icon reine Zierde und für VoiceOver ausgeblendet.
 struct HabitIconView: View {
@@ -12,11 +12,11 @@ struct HabitIconView: View {
 
     var body: some View {
         Image(systemName: iconName)
-            .font(.title3)
-            .fixedCircleTypeSize()
-            .foregroundStyle(color.mutedColor)
+            .font(Theme.Typography.icon)
+            .fixedControlTypeSize()
+            .foregroundStyle(color.color)
             .frame(width: Theme.iconSize, height: Theme.iconSize)
-            .background(color.mutedColor.opacity(Theme.iconBackgroundOpacity), in: Circle())
+            .background(color.tint)
             .mask {
                 if badgeColor != nil {
                     badgeCutout
@@ -33,19 +33,18 @@ struct HabitIconView: View {
             .accessibilityHidden(status == nil)
     }
 
-    /// Mittelpunkt der Marke: auf dem Rand der Kreisfläche, oben rechts im Winkel von 45 Grad.
+    /// Mittelpunkt der Marke: auf der oberen rechten Ecke der Kachel.
     private var badgeCenter: CGPoint {
-        let radius = Theme.iconSize / 2
-        let offset = radius / 2.0.squareRoot()
-        return CGPoint(x: radius + offset, y: radius - offset)
+        CGPoint(x: Theme.iconSize, y: 0)
     }
 
-    /// Schneidet rund um die Marke den freien Rand aus der Kreisfläche.
+    /// Schneidet rund um die Marke den freien Rand aus der Kachel.
     private var badgeCutout: some View {
         Rectangle()
             .overlay {
-                Circle()
+                Rectangle()
                     .frame(width: Theme.statusBadgeSize + 2 * Theme.statusBadgeGap)
+                    .frame(height: Theme.statusBadgeSize + 2 * Theme.statusBadgeGap)
                     .position(badgeCenter)
                     .blendMode(.destinationOut)
             }
@@ -55,7 +54,7 @@ struct HabitIconView: View {
     @ViewBuilder
     private var badge: some View {
         if let badgeColor {
-            Circle()
+            Rectangle()
                 .fill(badgeColor)
                 .frame(width: Theme.statusBadgeSize, height: Theme.statusBadgeSize)
                 .position(badgeCenter)
@@ -98,4 +97,5 @@ struct HabitIconView: View {
         HabitIconView(habitName: "Lesen", iconName: "book.fill", color: .violet, status: .red)
     }
     .padding()
+    .background { PaperBackground() }
 }

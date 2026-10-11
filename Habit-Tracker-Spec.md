@@ -764,7 +764,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
   - `HabitCard`, `CounterControl`, `WeekDots`, `HabitIconView`, `MonthCalendar`, `HabitStatRow`, `StatValue`, `SegmentedChoice`, `WeekdayPicker`, Farbauswahl, `EmptyState`, `PauseRow` im neuen Stil.
   - `ProgressRing` → `SegmentBar`. `ProgressHeader` zeigt bis Phase 9 die `SegmentBar` und darüber "5 von 16 · 31 %" in Rolle `meta`.
 - **Bildschirme** auf die neuen Bausteine umstellen: Heute, Sheet "Tag bearbeiten", Sheet "Habit anlegen / bearbeiten", Sortiermodus, Kalender, Habit Detail, Einstellungen, Sheet "Neue Pause", alle Leerzustände.
-  - Navigationstitel (Large und Inline) in Rolle `display` bzw. `label` über `UINavigationBarAppearance`, Leisten ohne eigenen Hintergrund auf `background`.
+  - Navigationstitel (Inline) in Rolle `label` über `UINavigationBarAppearance`, Leisten ohne eigenen Hintergrund auf `background`. Große Titel (Kalender, Einstellungen) stehen als `ScreenTitle` in Rolle `display` im Inhalt, weil UIKit sie mit der Schrift nicht darstellt. Die Variante `secondary` von `HermesButtonStyle` heißt im Code `quiet` (die Suche unten findet sonst `.secondary`), die Versalien im Button setzt `HermesButton`, damit der Name für VoiceOver normal bleibt.
   - Heute behält bis Phase 9 seinen Aufbau (Large Title mit Wochentag, Untertitel, Kapsel, Fortschritt, Liste). Die Kapsel "Heute" ist ein invertierter `Chip`, "Gestern" usw. neutral.
   - Die Tab Bar bleibt die des Systems, getönt in `ink` (5.1).
 - **Rhythmus Zeile** (4.5.1) in Rolle `meta` und `inkSecondary`. Wochentage werden mit " · " statt ", " getrennt (`RhythmTextTests` anpassen).
@@ -786,13 +786,13 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Alle bestehenden UI Tests sind weiter grün (Identifier unverändert).
 
 **Definition of Done**
-- [ ] Auf keinem Bildschirm gibt es noch Farbverlauf, Glaskarte oder Schatten. Glas gibt es nur noch in Tab Bar und Systemleisten.
-- [ ] Hell: Papier mit blauer Schrift. Dunkel: Nachtblau mit Schrift in Papier. Nirgends Schwarz oder Systemgrau als Schrift.
-- [ ] Alle Texte stehen in Barlow Condensed, Antonio oder Geist Mono, außer Tab Bar, Systemleisten, Datumsauswahl und Alerts.
-- [ ] Abhaken, Counter Tasten, 7 Tage Punkte, Icon Fläche, Statusmarke, Kalendertage und Farbauswahl sind Quadrate.
-- [ ] Vorhandene Habits haben nach dem Update dieselbe Farbfamilie wie vorher.
-- [ ] Bei größter Schriftgröße ist nichts abgeschnitten (wie Phase 7).
-- [ ] Die Suche aus "Aufräumen" findet nichts mehr, es gibt keine ungenutzten Dateien, Typen oder Werte.
+- [x] Auf keinem Bildschirm gibt es noch Farbverlauf, Glaskarte oder Schatten. Glas gibt es nur noch in Tab Bar und Systemleisten.
+- [x] Hell: Papier mit blauer Schrift. Dunkel: Nachtblau mit Schrift in Papier. Nirgends Schwarz oder Systemgrau als Schrift.
+- [x] Alle Texte stehen in Barlow Condensed, Antonio oder Geist Mono, außer Tab Bar, Systemleisten, Datumsauswahl und Alerts.
+- [x] Abhaken, Counter Tasten, 7 Tage Punkte, Icon Fläche, Statusmarke, Kalendertage und Farbauswahl sind Quadrate.
+- [x] Vorhandene Habits haben nach dem Update dieselbe Farbfamilie wie vorher.
+- [x] Bei größter Schriftgröße ist nichts abgeschnitten (wie Phase 7).
+- [x] Die Suche aus "Aufräumen" findet nichts mehr, es gibt keine ungenutzten Dateien, Typen oder Werte.
 
 ---
 

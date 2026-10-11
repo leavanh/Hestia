@@ -7,6 +7,7 @@ struct SettingsView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: Theme.sectionSpacing) {
+                    ScreenTitle("Einstellungen")
                     PausesSection()
                     #if DEBUG
                     DeveloperSection()
@@ -14,8 +15,8 @@ struct SettingsView: View {
                 }
                 .padding(Theme.spacing)
             }
-            .background { GlassBackground() }
-            .navigationTitle("Einstellungen")
+            .background { PaperBackground() }
+            .toolbarVisibility(.hidden, for: .navigationBar)
         }
     }
 }
@@ -38,14 +39,13 @@ private struct PausesSection: View {
         let today = AppClock.now
         let listed = listedPauses(today: today)
 
-        VStack(alignment: .leading, spacing: Theme.inlineSpacing) {
-            SectionTitle("Pausen")
+        PaperSection(title: "Pausen") {
             if listed.isEmpty {
                 EmptyState(
-                    systemImage: "pause.circle",
                     title: "Keine Pausen",
                     message: "Es gibt keine laufenden oder geplanten Pausen. Mit einer Pause zählen Tage, an denen du einen Habit nicht machen kannst, nicht mit.",
-                    identifier: "no-pauses"
+                    identifier: "no-pauses",
+                    showsHairline: false
                 )
             }
             ForEach(listed) { pause in
@@ -57,15 +57,10 @@ private struct PausesSection: View {
                     pause.endEarly(today: today, engine: engine, in: context)
                 }
             }
-            Button {
+            HermesButton("Neue Pause") {
                 isCreating = true
-            } label: {
-                Label("Neue Pause", systemImage: "pause.circle")
-                    .font(.body)
-                    .glassCard()
-                    .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .padding(.top, Theme.inlineSpacing)
             .accessibilityIdentifier("new-pause")
         }
         .sheet(isPresented: $isCreating) {
@@ -83,23 +78,23 @@ private struct DeveloperSection: View {
     @State private var message: String?
 
     var body: some View {
-        GlassSection(title: "Entwickler") {
+        PaperSection(title: "Entwickler") {
             VStack(alignment: .leading, spacing: Theme.spacing) {
-                Button("Testdaten erzeugen") {
+                HermesButton("Testdaten erzeugen", variant: .quiet) {
                     let habits = DebugData.insertSampleHabits(into: context)
                     message = "\(habits.count) Beispielhabits mit \(DebugData.historyDays) Tagen Historie angelegt."
                 }
                 .accessibilityIdentifier("create-sample-data")
 
-                Button("Alle Daten zurücksetzen", role: .destructive) {
+                HermesButton("Alle Daten zurücksetzen", variant: .destructive, role: .destructive) {
                     isConfirmingReset = true
                 }
                 .accessibilityIdentifier("reset-all-data")
 
                 if let message {
                     Text(message)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .bodyText()
+                        .foregroundStyle(Theme.inkSecondary)
                         .accessibilityIdentifier("developer-message")
                 }
             }

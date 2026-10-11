@@ -18,16 +18,17 @@ struct AdaptiveStack<Content: View>: View {
 }
 
 extension View {
-    /// Für Symbole und Zahlen in Kreisen fester Größe: wachsen mit der Schrift nur so weit, wie der Kreis Platz hat.
-    func fixedCircleTypeSize() -> some View {
-        dynamicTypeSize(...Theme.maxCircleTypeSize)
+    /// Für Symbole und Zahlen in Quadraten fester Größe: wachsen mit der Schrift nur so weit, wie das Quadrat Platz hat.
+    func fixedControlTypeSize() -> some View {
+        dynamicTypeSize(...Theme.maxControlTypeSize)
     }
 }
 
 #Preview {
     AdaptiveStack {
         Text("Sport")
-        DayBadge(text: "Pausiert", isToday: false)
+        Chip(text: "Pausiert")
     }
     .padding()
+    .background { PaperBackground() }
 }

@@ -1,12 +1,12 @@
 import SwiftUI
 
-/// Minus im Kreis, Ring mit Zahl in der Mitte, Plus im Kreis. Kreise wie bei `CheckCircle`.
-/// Für VoiceOver ist der Ring ein einstellbares Element ("Sport, 2 von 3"), Wischen nach oben oder unten zählt.
+/// Taste "−", Wert als "5/8", Taste "+". Die Tasten sind Quadrate wie bei `CheckBox`, die Gesamthöhe ist dieselbe.
+/// Für VoiceOver ist der Wert ein einstellbares Element ("Sport, 2 von 3"), Wischen nach oben oder unten zählt.
 struct CounterControl: View {
     let count: Int
     let target: Int
-    let color: Color
-    /// Was VoiceOver für den Ring liest, z.B. der Habit Name.
+    let habitColor: HabitColor
+    /// Was VoiceOver für den Wert liest, z.B. der Habit Name.
     var label = "Erledigt"
     /// Grundlage für die Bezeichner der drei Teile ("<id>-minus", "<id>-value", "<id>-plus").
     let id: String
@@ -15,63 +15,61 @@ struct CounterControl: View {
 
     var body: some View {
         HStack(spacing: Theme.controlSpacing) {
-            StepButton(systemImage: "minus", color: color, action: onDecrement)
+            StepButton(systemImage: "minus", habitColor: habitColor, action: onDecrement)
                 .disabled(count <= 0)
                 .accessibilityLabel("Weniger")
                 .accessibilityHint("Zählt eins zurück.")
                 .accessibilityIdentifier("\(id)-minus")
 
-            ZStack {
-                ProgressRing(fraction: target > 0 ? Double(count) / Double(target) : 0, color: color)
-                Text("\(count)")
-                    .font(.subheadline.weight(.semibold))
-                    .monospacedDigit()
-                    .minimumScaleFactor(0.6)
-                    .lineLimit(1)
-                    .padding(Theme.ringWidth + 1)
-                    .fixedCircleTypeSize()
-            }
-            .frame(width: Theme.controlSize, height: Theme.controlSize)
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(label)
-            .accessibilityValue("\(count) von \(target)")
-            .accessibilityAdjustableAction { direction in
-                switch direction {
-                case .increment: if count < target { onIncrement() }
-                case .decrement: if count > 0 { onDecrement() }
-                @unknown default: break
+            Text("\(count)/\(target)")
+                .font(Theme.Typography.metaMedium)
+                .foregroundStyle(Theme.ink)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+                .fixedControlTypeSize()
+                .frame(minWidth: Theme.counterKeySize, minHeight: Theme.controlSize)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(label)
+                .accessibilityValue("\(count) von \(target)")
+                .accessibilityAdjustableAction { direction in
+                    switch direction {
+                    case .increment: if count < target { onIncrement() }
+                    case .decrement: if count > 0 { onDecrement() }
+                    @unknown default: break
+                    }
                 }
-            }
-            .accessibilityIdentifier("\(id)-value")
+                .accessibilityIdentifier("\(id)-value")
 
-            StepButton(systemImage: "plus", color: color, action: onIncrement)
+            StepButton(systemImage: "plus", habitColor: habitColor, action: onIncrement)
                 .disabled(count >= target)
                 .accessibilityLabel("Mehr")
                 .accessibilityHint("Zählt eins dazu.")
                 .accessibilityIdentifier("\(id)-plus")
         }
+        .frame(height: Theme.controlSize)
     }
 }
 
-/// Kreis mit Umriss in Habitfarbe und Symbol, gedimmt wenn nicht benutzbar.
+/// Quadrat mit 1 pt Rand in Habitfarbe und Symbol, gedimmt wenn nicht benutzbar.
 private struct StepButton: View {
     @Environment(\.isEnabled) private var isEnabled
 
     let systemImage: String
-    let color: Color
+    let habitColor: HabitColor
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             ZStack {
-                Circle().strokeBorder(color, lineWidth: Theme.strokeWidth)
+                Rectangle().strokeBorder(habitColor.color, lineWidth: Theme.strokeWidth)
                 Image(systemName: systemImage)
-                    .font(.body.weight(.bold))
-                    .foregroundStyle(color)
-                    .fixedCircleTypeSize()
+                    .font(Theme.Typography.symbolSmall)
+                    .foregroundStyle(habitColor.color)
+                    .fixedControlTypeSize()
             }
-            .frame(width: Theme.controlSize, height: Theme.controlSize)
-            .contentShape(Circle())
+            .frame(width: Theme.counterKeySize, height: Theme.counterKeySize)
+            .frame(minHeight: Theme.controlSize)
+            .contentShape(Rectangle())
             .opacity(isEnabled ? 1 : Theme.disabledOpacity)
         }
         .buttonStyle(.plain)
@@ -80,9 +78,10 @@ private struct StepButton: View {
 
 #Preview {
     VStack(spacing: Theme.spacing) {
-        CounterControl(count: 0, target: 3, color: HabitColor.teal.color, id: "a", onDecrement: {}, onIncrement: {})
-        CounterControl(count: 2, target: 3, color: HabitColor.teal.color, id: "b", onDecrement: {}, onIncrement: {})
-        CounterControl(count: 10, target: 10, color: HabitColor.pink.color, id: "c", onDecrement: {}, onIncrement: {})
+        CounterControl(count: 0, target: 3, habitColor: .teal, id: "a", onDecrement: {}, onIncrement: {})
+        CounterControl(count: 2, target: 3, habitColor: .teal, id: "b", onDecrement: {}, onIncrement: {})
+        CounterControl(count: 10, target: 10, habitColor: .pink, id: "c", onDecrement: {}, onIncrement: {})
     }
     .padding()
+    .background { PaperBackground() }
 }

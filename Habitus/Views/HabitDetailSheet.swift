@@ -1,8 +1,8 @@
 import SwiftData
 import SwiftUI
 
-/// Habit Detail (Spezifikation 5.4): Icon, Name, Rhythmus, eigener Monatskalender mit den Tagen der Erledigung in
-/// Habitfarbe, aktueller Streak, längster Streak und Quote 30 Tage.
+/// Habit Detail (Spezifikation 5.4, Stand Phase 8): Icon, Name, Rhythmus, eigener Monatskalender mit den Tagen der
+/// Erledigung in Habitfarbe, aktueller Streak, längster Streak und Quote 30 Tage.
 struct HabitDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
 
@@ -20,7 +20,7 @@ struct HabitDetailSheet: View {
                 }
             }
             .accessibilityIdentifier("habit-detail")
-            .background { GlassBackground() }
+            .background { PaperBackground() }
             .navigationTitle("Habit Detail")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -41,8 +41,8 @@ struct HabitDetailSheet: View {
         return VStack(alignment: .leading, spacing: Theme.sectionSpacing) {
             header(snapshot: snapshot, habitColor: habitColor)
             calendar(snapshot: snapshot, habitColor: habitColor)
-            GlassSection(title: "Statistik") {
-                AdaptiveStack(verticalAlignment: .top) {
+            PaperSection(title: "Statistik") {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), alignment: .topLeading)], alignment: .leading, spacing: Theme.sectionSpacing) {
                     StatValue(title: "Aktueller Streak", value: StatValue.daysText(stats.currentStreak), identifier: "stat-current-streak")
                     StatValue(title: "Längster Streak", value: StatValue.daysText(stats.longestStreak), identifier: "stat-longest-streak")
                     StatValue(title: "Quote 30 Tage", value: StatValue.rateText(stats.ratePercent), identifier: "stat-rate-30")
@@ -58,11 +58,12 @@ struct HabitDetailSheet: View {
             HabitIconView(habitName: habit.name, iconName: habit.iconName, color: habitColor)
             VStack(alignment: .leading, spacing: Theme.textSpacing) {
                 Text(habit.name)
-                    .font(.title2.weight(.semibold))
+                    .titleText()
+                    .foregroundStyle(Theme.ink)
                     .accessibilityIdentifier("detail-name")
                 Text(snapshot.rhythmText(window: engine.windowProgress(snapshot, on: today)))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .metaText()
+                    .foregroundStyle(Theme.inkSecondary)
                     .accessibilityIdentifier("detail-rhythm")
             }
         }

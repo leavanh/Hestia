@@ -36,7 +36,7 @@ struct RhythmTextTests {
     }
 
     @Test func weekdaysListShortNamesInOrder() {
-        #expect(snapshot(.weekdays, weekdays: [4, 1]).rhythmText(window: nil) == "Mo, Do")
+        #expect(snapshot(.weekdays, weekdays: [4, 1]).rhythmText(window: nil) == "Mo · Do")
         #expect(snapshot(.weekdays, weekdays: [7]).rhythmText(window: nil) == "So")
     }
 

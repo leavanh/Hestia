@@ -154,8 +154,8 @@ final class TodayPhase32UITests: XCTestCase {
             let status = app.descendants(matching: .any)["status-\(name)"].firstMatch
             XCTAssertTrue(status.exists, name)
             XCTAssertEqual(status.value as? String, value, name)
-            // Das Icon misst 44 pt, ein Punkt neben dem Namen wäre viel kleiner.
-            XCTAssertGreaterThanOrEqual(status.frame.width, 44, "\(name): am Icon")
+            // Die Kachel misst 36 pt, ein Punkt neben dem Namen wäre viel kleiner.
+            XCTAssertGreaterThanOrEqual(status.frame.width, 36, "\(name): am Icon")
             XCTAssertLessThanOrEqual(status.frame.maxX, app.staticTexts[name].frame.minX, "\(name): links vom Namen")
         }
     }

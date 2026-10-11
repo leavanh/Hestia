@@ -50,7 +50,7 @@ struct TodayView: View {
                     dayScroll(for: due, paused: pausedHabits)
                 }
             }
-            .background { GlassBackground() }
+            .background { PaperBackground() }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
@@ -101,7 +101,6 @@ struct TodayView: View {
                     .dayEntrance(from: entranceEdge, index: 0)
                 if hasNoActiveHabits && due.isEmpty && paused.isEmpty {
                     EmptyState(
-                        systemImage: "checkmark.circle",
                         title: "Noch keine Habits",
                         message: "Hier erscheinen deine Habits an jedem Tag, an dem sie fällig sind.",
                         identifier: "today-empty",
@@ -110,7 +109,7 @@ struct TodayView: View {
                     )
                     .dayEntrance(from: entranceEdge, index: 1)
                 }
-                VStack(spacing: Theme.spacing) {
+                VStack(spacing: 0) {
                     ForEach(Array((due + paused).enumerated()), id: \.element.id) { index, habit in
                         DayHabitCard(habit: habit, day: shownDay) { editingHabit = habit }
                             .dayEntrance(from: entranceEdge, index: index + 1)
@@ -224,12 +223,12 @@ struct TodayView: View {
             show(today, enteringFrom: .trailing)
         } label: {
             HStack(spacing: 2) {
-                Text("Heute")
+                Text("Heute").labelText()
                 Image(systemName: "chevron.right")
-                    .font(.caption.weight(.bold))
+                    .font(Theme.Typography.symbolSmall)
             }
-            .font(.subheadline.weight(.semibold))
         }
+        .buttonStyle(.hermes(.text))
         .accessibilityIdentifier("back-to-today")
     }
 
@@ -238,17 +237,18 @@ struct TodayView: View {
         VStack(alignment: .leading, spacing: Theme.spacing) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(weekdayText)
-                    .font(.largeTitle.bold())
+                    .displayText()
+                    .foregroundStyle(Theme.ink)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityIdentifier("today-title")
                 AdaptiveStack(spacing: Theme.inlineSpacing) {
                     Text(dateText)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .metaText()
+                        .foregroundStyle(Theme.inkSecondary)
                         .accessibilityIdentifier("today-subtitle")
-                    DayBadge(text: dayLabel, isToday: daysAgo == 0)
+                    Chip(text: dayLabel, isInverted: daysAgo == 0)
                         .accessibilityIdentifier("today-badge")
                     if !dynamicTypeSize.isAccessibilitySize {
                         Spacer(minLength: 0)
@@ -269,10 +269,11 @@ struct TodayView: View {
     private var barTitle: some View {
         VStack(spacing: 0) {
             Text(weekdayText)
-                .font(.headline)
+                .labelText()
+                .foregroundStyle(Theme.ink)
             Text("\(dateText) · \(dayLabel)")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .metaText()
+                .foregroundStyle(Theme.inkSecondary)
         }
         .opacity(showsBarTitle ? 1 : 0)
         .animation(.easeInOut(duration: 0.2), value: showsBarTitle)

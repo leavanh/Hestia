@@ -39,20 +39,20 @@ struct HabitEditorSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: Theme.sectionSpacing) {
-                    GlassSection(title: "Name") {
+                    PaperSection(title: "Name") {
                         TextField("z.B. Sport", text: $name)
-                            .font(.body)
+                            .bodyText()
                             .focused($isNameFocused)
                             .accessibilityIdentifier("name-field")
                             .submitLabel(.done)
                     }
-                    GlassSection(title: "Icon") {
+                    PaperSection(title: "Icon") {
                         iconGrid
                     }
-                    GlassSection(title: "Farbe") {
+                    PaperSection(title: "Farbe") {
                         colorRow
                     }
-                    GlassSection(title: "Rhythmus") {
+                    PaperSection(title: "Rhythmus") {
                         rhythmSection
                     }
                     if let habit, habit.isAlive, habit.endedAt == nil {
@@ -61,7 +61,7 @@ struct HabitEditorSheet: View {
                 }
                 .padding(Theme.spacing)
             }
-            .background { GlassBackground() }
+            .background { PaperBackground() }
             .navigationTitle(habit == nil ? "Neuer Habit" : "Habit bearbeiten")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -96,16 +96,10 @@ struct HabitEditorSheet: View {
 
     /// "Habit beenden", ganz unten und nur beim Bearbeiten (Spezifikation 5.3). Beendet wird erst nach Bestätigung.
     private var endButton: some View {
-        Button(role: .destructive) {
+        HermesButton("Habit beenden", variant: .destructive, role: .destructive) {
             isConfirmingEnd = true
-        } label: {
-            Text("Habit beenden")
-                .font(.body)
-                .frame(maxWidth: .infinity)
-                .glassCard()
-                .contentShape(Rectangle())
         }
-        .buttonStyle(.borderless)
+        .frame(maxWidth: .infinity)
         .accessibilityIdentifier("end-habit")
     }
 
@@ -164,18 +158,19 @@ struct HabitEditorSheet: View {
             if let range = rhythm.targetRange {
                 Stepper(value: $targetCount, in: range) {
                     Text(rhythm.targetText(targetCount))
+                        .bodyText()
                 }
                 .accessibilityIdentifier("target-stepper")
             }
         case .weekdays:
-            WeekdayPicker(selection: $weekdays, color: habitColor.color)
+            WeekdayPicker(selection: $weekdays, habitColor: habitColor)
             Text("Mindestens einen Wochentag auswählen.")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+                .bodyText()
+                .foregroundStyle(Theme.inkSecondary)
         case .monthDay:
             HStack {
                 Text("Jeden Monat am")
-                    .font(.body)
+                    .bodyText()
                 Spacer()
                 Picker("Tag im Monat", selection: $monthDay) {
                     ForEach(1...31, id: \.self) { day in
@@ -187,8 +182,8 @@ struct HabitEditorSheet: View {
                 .accessibilityIdentifier("monthday-picker")
             }
             Text("Hat ein Monat weniger Tage, ist der letzte Tag des Monats fällig.")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+                .bodyText()
+                .foregroundStyle(Theme.inkSecondary)
         }
     }
 
@@ -199,15 +194,12 @@ struct HabitEditorSheet: View {
                     iconName = icon
                 } label: {
                     Image(systemName: icon)
-                        .font(.title3)
-                        .fixedCircleTypeSize()
-                        .foregroundStyle(icon == iconName ? habitColor.mutedColor : .secondary)
+                        .font(Theme.Typography.icon)
+                        .fixedControlTypeSize()
+                        .foregroundStyle(icon == iconName ? habitColor.color : Theme.inkSecondary)
                         .frame(width: Theme.iconSize, height: Theme.iconSize)
-                        .background(
-                            habitColor.mutedColor.opacity(icon == iconName ? Theme.iconBackgroundOpacity : 0),
-                            in: Circle()
-                        )
-                        .contentShape(Circle())
+                        .background(icon == iconName ? habitColor.tint : Color.clear)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(HabitIcons.title(for: icon))
@@ -218,29 +210,7 @@ struct HabitEditorSheet: View {
     }
 
     private var colorRow: some View {
-        HStack {
-            ForEach(HabitColor.allCases) { option in
-                Button {
-                    habitColor = option
-                } label: {
-                    Circle()
-                        .fill(option.color)
-                        .frame(width: Theme.swatchSize, height: Theme.swatchSize)
-                        .padding(4)
-                        .overlay {
-                            if option == habitColor {
-                                Circle().strokeBorder(option.color, lineWidth: Theme.strokeWidth)
-                            }
-                        }
-                        .contentShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(option.title)
-                .accessibilityAddTraits(option == habitColor ? .isSelected : [])
-                .accessibilityIdentifier("color-\(option.rawValue)")
-                .frame(maxWidth: .infinity)
-            }
-        }
+        HabitColorPicker(selection: $habitColor)
     }
 
     private func save() {

@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Zeile einer laufenden oder geplanten Pause in den Einstellungen: betroffene Habits, Zeitraum, ein Kapsel-Hinweis
-/// "Läuft" bzw. "Geplant" und der Button zum Beenden (laufend) bzw. Entfernen (geplant).
+/// Flache Zeile einer laufenden oder geplanten Pause in den Einstellungen, oben eine Haarlinie: Zeitraum in `title`,
+/// betroffene Habits in `meta`, ein Chip "Läuft" bzw. "Geplant" und der Button zum Beenden (laufend) bzw. Entfernen (geplant).
 struct PauseRow: View {
     let habitNames: String
     let rangeText: String
@@ -11,21 +11,21 @@ struct PauseRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.inlineSpacing) {
             AdaptiveStack(verticalAlignment: .firstTextBaseline, spacing: Theme.inlineSpacing) {
-                Text(habitNames)
-                    .font(.headline)
+                Text(rangeText)
+                    .titleText()
+                    .foregroundStyle(Theme.ink)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                DayBadge(text: phase == .running ? "Läuft" : "Geplant", isToday: phase == .running)
+                Chip(text: phase == .running ? "Läuft" : "Geplant", isInverted: phase == .running)
             }
-            Text(rangeText)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            Button(phase == .running ? "Pause beenden" : "Pause entfernen", action: onEnd)
-                .font(.subheadline.weight(.semibold))
-                .multilineTextAlignment(.leading)
-                .buttonStyle(.borderless)
+            Text(habitNames)
+                .metaText()
+                .foregroundStyle(Theme.inkSecondary)
+            HermesButton(phase == .running ? "Pause beenden" : "Pause entfernen", variant: .quiet, action: onEnd)
                 .accessibilityIdentifier("end-pause-\(habitNames)")
         }
-        .glassCard()
+        .padding(.vertical, Theme.cardPadding)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .top) { Hairline() }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("pause-row-\(habitNames)")
     }
@@ -33,8 +33,8 @@ struct PauseRow: View {
 
 #Preview {
     ZStack {
-        GlassBackground()
-        VStack(spacing: Theme.spacing) {
+        PaperBackground()
+        VStack(spacing: 0) {
             PauseRow(habitNames: "Sport, Lesen", rangeText: "8. Okt. – 10. Okt.", phase: .running) {}
             PauseRow(habitNames: "Yoga", rangeText: "20. Okt. – 25. Okt.", phase: .upcoming) {}
         }

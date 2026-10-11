@@ -1,9 +1,10 @@
 import SwiftUI
 
-/// Karte eines Habits: links Icon mit Statusmarke, Name, Rhythmus Zeile und 7 Tage Punkte, rechts Abhakkreis oder Counter.
+/// Flache Zeile eines Habits mit Haarlinie oben: links Icon mit Statusmarke, Name, Rhythmus Zeile und 7 Tage Punkte,
+/// rechts `CheckBox` oder `CounterControl`.
 /// Festes Drücken (`Theme.editPressDuration`) auf die linke Seite ruft `onEdit` auf (auch als VoiceOver Aktion "Bearbeiten"),
-/// die rechte Seite bedient sich selbst. Ein pausierter Habit ist ausgegraut, trägt die Kapsel "Pausiert" neben dem Namen
-/// und lässt sich nicht abhaken. Dabei sinkt die Karte kurz ein und gibt einen leichten, beim Auslösen einen festen Impuls.
+/// die rechte Seite bedient sich selbst. Ein pausierter Habit ist ausgegraut, trägt den Chip "Pausiert" neben dem Namen
+/// und lässt sich nicht abhaken. Dabei sinkt die Zeile kurz ein und gibt einen leichten, beim Auslösen einen festen Impuls.
 struct HabitCard<Control: View>: View {
     let name: String
     let iconName: String
@@ -29,16 +30,16 @@ struct HabitCard<Control: View>: View {
                 VStack(alignment: .leading, spacing: Theme.textSpacing) {
                     AdaptiveStack(spacing: Theme.inlineSpacing) {
                         Text(name)
-                            .font(.headline)
-                            .foregroundStyle(isPaused ? Color.secondary : Color.primary)
+                            .titleText()
+                            .foregroundStyle(isPaused ? Theme.inkSecondary : Theme.ink)
                         if isPaused {
-                            DayBadge(text: "Pausiert", isToday: false)
+                            Chip(text: "Pausiert")
                                 .accessibilityIdentifier("paused-\(name)")
                         }
                     }
                     Text(rhythmText)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .metaText()
+                        .foregroundStyle(Theme.inkSecondary)
                         .accessibilityIdentifier("repeat-\(name)")
                     WeekDots(dots: dots, color: habitColor.color)
                 }
@@ -68,7 +69,9 @@ struct HabitCard<Control: View>: View {
                 .disabled(isPaused)
                 .opacity(isPaused ? Theme.pausedOpacity : 1)
         }
-        .glassCard()
+        .padding(.vertical, Theme.cardPadding)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .top) { Hairline() }
         .scaleEffect(isPreviewing ? Theme.pressedCardScale : 1)
         .animation(.spring(duration: 0.25, bounce: 0.3), value: isPreviewing)
     }
@@ -76,37 +79,37 @@ struct HabitCard<Control: View>: View {
 
 #Preview {
     ZStack {
-        GlassBackground()
-        VStack(spacing: Theme.spacing) {
+        PaperBackground()
+        VStack(spacing: 0) {
             HabitCard(
                 name: "Sport", iconName: "figure.run", habitColor: .orange, status: .yellow,
                 rhythmText: "1 von 3 diese Woche",
                 dots: [.fill(0), .fill(0), .fill(1), .fill(1), .fill(0), .fill(1), .fill(0)], onEdit: {}
             ) {
-                CheckCircle(isChecked: false, color: HabitColor.orange.color) {}
+                CheckBox(isChecked: false, habitColor: .orange) {}
             }
             HabitCard(
                 name: "Wasser trinken", iconName: "drop.fill", habitColor: .teal, status: .green,
                 rhythmText: "3 pro Tag",
                 dots: [.fill(1), .fill(0.66), .fill(0.33), .fill(1), .fill(0), .fill(1), .fill(0.66)], onEdit: {}
             ) {
-                CounterControl(count: 2, target: 3, color: HabitColor.teal.color, id: "p", onDecrement: {}, onIncrement: {})
+                CounterControl(count: 2, target: 3, habitColor: .teal, id: "p", onDecrement: {}, onIncrement: {})
             }
             HabitCard(
                 name: "Yoga", iconName: "figure.walk", habitColor: .violet, status: .red,
-                rhythmText: "Mo, Do",
+                rhythmText: "Mo · Do",
                 dots: [.fill(0), .fill(1), .fill(0), .fill(0), .fill(1), .fill(0), .fill(0)], onEdit: {}
             ) {
-                CheckCircle(isChecked: false, color: HabitColor.violet.color) {}
+                CheckBox(isChecked: true, habitColor: .violet) {}
             }
             HabitCard(
                 name: "Lesen", iconName: "book.fill", habitColor: .pink, status: .green,
                 rhythmText: "Täglich",
                 dots: [.fill(1), .fill(1), .paused, .paused, .paused, .paused, .paused], isPaused: true, onEdit: {}
             ) {
-                CheckCircle(isChecked: false, color: HabitColor.pink.color) {}
+                CheckBox(isChecked: false, habitColor: .pink) {}
             }
         }
-        .padding()
+        .padding(.horizontal)
     }
 }

@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Auswahl aus wenigen Optionen in einer Zeile, wie ein Segmentfeld. Lange Beschriftungen werden
-/// kleiner statt abgeschnitten.
+/// Auswahl aus wenigen Optionen in einer Zeile, wie ein Segmentfeld: 0,5 pt Rahmen in `ink`, Segmente in Rolle `label`,
+/// das gewählte Segment invertiert (Fläche `ink`, Schrift `background`). Lange Beschriftungen werden kleiner statt
+/// abgeschnitten.
 struct SegmentedChoice<Value: Hashable>: View {
     let options: [Value]
     @Binding var selection: Value
@@ -16,26 +17,28 @@ struct SegmentedChoice<Value: Hashable>: View {
                     selection = option
                 } label: {
                     Text(title(option))
-                        .font(.footnote.weight(isSelected ? .semibold : .regular))
-                        .foregroundStyle(.primary)
+                        .labelText()
+                        .foregroundStyle(isSelected ? Theme.background : Theme.ink)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                         .padding(.horizontal, 4)
                         .frame(maxWidth: .infinity, minHeight: Theme.segmentHeight)
                         .background {
                             if isSelected {
-                                Capsule().fill(Theme.segmentSelected)
+                                RoundedRectangle(cornerRadius: Theme.cornerRadius).fill(Theme.ink)
                             }
                         }
-                        .contentShape(Capsule())
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityAddTraits(isSelected ? .isSelected : [])
                 .accessibilityIdentifier(id(option))
             }
         }
-        .padding(2)
-        .background(Theme.segmentTrack, in: Capsule())
+        .overlay {
+            RoundedRectangle(cornerRadius: Theme.cornerRadius)
+                .strokeBorder(Theme.ink, lineWidth: Theme.hairlineWidth)
+        }
         .accessibilityElement(children: .contain)
     }
 }
@@ -44,4 +47,5 @@ struct SegmentedChoice<Value: Hashable>: View {
     @Previewable @State var group = RhythmGroup.week
     SegmentedChoice(options: RhythmGroup.allCases, selection: $group, title: \.title, id: { "\($0)" })
         .padding()
+        .background { PaperBackground() }
 }
