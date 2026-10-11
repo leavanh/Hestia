@@ -24,7 +24,8 @@ extension Habit {
             createdAt: createdAt,
             counts: dayCounts,
             pauses: pauses.map(\.range),
-            endedAt: endedAt
+            endedAt: endedAt,
+            detail: detail
         )
     }
 

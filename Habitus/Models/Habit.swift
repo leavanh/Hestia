@@ -14,6 +14,8 @@ final class Habit {
     /// 1 = Montag bis 7 = Sonntag.
     var weekdays: [Int]
     var monthDay: Int?
+    /// Kurzer Zusatz zum Namen, z.B. "20 Min". Leer bedeutet keiner (Spezifikation 5.3, höchstens 24 Zeichen).
+    var detail: String = ""
     /// Reihenfolge in der Heute Ansicht, bei Gleichstand gilt `createdAt`.
     var sortOrder: Int = 0
     var createdAt: Date
@@ -34,6 +36,7 @@ final class Habit {
         targetCount: Int = 1,
         weekdays: [Int] = [],
         monthDay: Int? = nil,
+        detail: String = "",
         sortOrder: Int = 0,
         createdAt: Date = .now,
         endedAt: Date? = nil
@@ -46,6 +49,7 @@ final class Habit {
         self.targetCount = targetCount
         self.weekdays = weekdays
         self.monthDay = monthDay
+        self.detail = HabitDetail.normalized(detail)
         self.sortOrder = sortOrder
         self.createdAt = createdAt
         self.endedAt = endedAt

@@ -968,10 +968,12 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - UI Test: Habit mit Zusatz "20 Min" anlegen: `repeat-<Name>` enthält "20 Min" (Groß und Kleinschreibung beim Vergleich ignorieren, weil die Anzeige in Versalien ist). Bearbeiten zeigt den Zusatz im Feld.
 
 **Definition of Done**
-- [ ] Ich kann einen Zusatz eingeben, ändern und löschen. Mehr als 24 Zeichen gehen nicht.
-- [ ] Der Zusatz steht vorne in der Rhythmus Zeile in Heute, im Kalender und im Detail.
-- [ ] Habits ohne Zusatz sehen aus wie vorher.
-- [ ] Nach dem Update sind alle Habits und Erledigungen noch da.
+- [x] Ich kann einen Zusatz eingeben, ändern und löschen. Mehr als 24 Zeichen gehen nicht.
+- [x] Der Zusatz steht vorne in der Rhythmus Zeile in Heute, im Kalender und im Detail.
+- [x] Habits ohne Zusatz sehen aus wie vorher.
+- [x] Nach dem Update sind alle Habits und Erledigungen noch da.
+
+*Geprüft im Simulator: Eine Version vor Phase 10 legte die Testdaten an, die neue Version darüber installiert zeigt dieselben 13 Habits und 6/15 erledigt, Habits ohne Zusatz unverändert. Zusatz in Hell und Dunkel im Screenshot gesehen. Anlegen, Bearbeiten und Löschen prüft der UI Test.*
 
 ---
 

@@ -20,9 +20,22 @@ extension XCUIApplication {
         descendants(matching: .any)[identifier].firstMatch
     }
 
+    /// Scrollt im Sheet, bis das Feld `monthday-<day>` im Bild ist, und gibt es zurück.
+    @MainActor
+    func revealMonthDay(_ day: Int) -> XCUIElement {
+        let field = control("monthday-\(day)")
+        _ = field.waitForExistence(timeout: 5)
+        var attempts = 0
+        while !field.isHittable && attempts < 5 {
+            swipeUp()
+            attempts += 1
+        }
+        return field
+    }
+
     /// Wählt den Monatstag im Sheet mit einem Tippen im Raster von `monthday-picker`.
     @MainActor
     func setMonthDay(to day: Int) {
-        control("monthday-\(day)").tap()
+        revealMonthDay(day).tap()
     }
 }

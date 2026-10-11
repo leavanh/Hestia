@@ -27,6 +27,8 @@ nonisolated struct HabitSnapshot: Equatable, Sendable {
     var pauses: [PauseRange] = []
     /// Tag, an dem der Habit beendet wurde. Ab diesem Tag ist er nicht mehr fällig (Spezifikation 3.9).
     var endedAt: Date? = nil
+    /// Zusatz zum Namen, z.B. "20 Min" (Spezifikation 4.5.1). Leer, wenn keiner gesetzt ist.
+    var detail: String = ""
 }
 
 /// Ampelstatus eines Habits (Spezifikation 3.5).

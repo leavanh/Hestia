@@ -53,4 +53,38 @@ final class TodayUITests: XCTestCase {
         XCTAssertTrue(app.buttons["check-\(name)"].isSelected)
     }
 
+    @MainActor
+    func testDetailShowsInRhythmLineAndEditor() {
+        let name = "Lauf \(UUID().uuidString.prefix(4))"
+        let app = XCUIApplication()
+        app.launch()
+
+        app.buttons["Neuer Habit"].tap()
+        let nameField = app.textFields["name-field"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.tap()
+        nameField.typeText(name + "\n")
+        let detailField = app.textFields["detail-field"]
+        detailField.tap()
+        detailField.typeText("20 Min\n")
+        app.buttons["Speichern"].tap()
+
+        let rhythm = app.staticTexts["repeat-\(name)"]
+        XCTAssertTrue(rhythm.waitForExistence(timeout: 5))
+        XCTAssertTrue(rhythm.label.localizedCaseInsensitiveContains("20 Min"), "Rhythmus Zeile zeigt den Zusatz: \(rhythm.label)")
+
+        app.staticTexts[name].press(forDuration: 1.5)
+        XCTAssertTrue(app.textFields["detail-field"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.textFields["detail-field"].value as? String, "20 Min", "Bearbeiten zeigt den Zusatz im Feld")
+
+        // Zusatz löschen und sichern: die Rhythmus Zeile zeigt ihn nicht mehr.
+        let field = app.textFields["detail-field"]
+        field.tap()
+        field.press(forDuration: 1.2)
+        if app.menuItems["Select All"].waitForExistence(timeout: 2) { app.menuItems["Select All"].tap() }
+        field.typeText(XCUIKeyboardKey.delete.rawValue)
+        app.buttons["Speichern"].tap()
+        XCTAssertTrue(rhythm.waitForExistence(timeout: 5))
+        XCTAssertFalse(rhythm.label.localizedCaseInsensitiveContains("20 Min"), "Gelöschter Zusatz verschwindet: \(rhythm.label)")
+    }
 }

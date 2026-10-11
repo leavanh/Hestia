@@ -52,7 +52,7 @@ final class CalendarPhase5UITests: XCTestCase {
         openDetail(of: "Lesen", in: app)
 
         XCTAssertEqual(app.staticTexts["detail-name"].label, "Lesen")
-        XCTAssertEqual(app.staticTexts["detail-rhythm"].label, "Täglich")
+        XCTAssertEqual(app.staticTexts["detail-rhythm"].label, "20 Min · Täglich")
         XCTAssertEqual(app.staticTexts["stat-current-streak"].label, "1 Tag")
         XCTAssertEqual(app.staticTexts["stat-longest-streak"].label, "4 Tage")
         XCTAssertEqual(app.staticTexts["stat-rate-30"].label, "79 %")

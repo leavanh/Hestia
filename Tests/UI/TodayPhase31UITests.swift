@@ -131,8 +131,7 @@ final class TodayPhase31UITests: XCTestCase {
 
         // Bearbeiten zeigt den gespeicherten Tag im Raster als ausgewählt.
         app.staticTexts["Miete"].press(forDuration: 1.5)
-        XCTAssertTrue(app.control("monthday-\(today)").waitForExistence(timeout: 5))
-        XCTAssertTrue(app.control("monthday-\(today)").isSelected)
+        XCTAssertTrue(app.revealMonthDay(today).isSelected)
         XCTAssertFalse(app.control("monthday-\(otherDay)").isSelected)
     }
 

@@ -9,6 +9,7 @@ struct HabitEditorSheet: View {
     private let habit: Habit?
 
     @State private var name: String
+    @State private var detail: String
     @State private var iconName: String
     @State private var habitColor: HabitColor
     @State private var rhythm: Rhythm
@@ -21,6 +22,7 @@ struct HabitEditorSheet: View {
     init(habit: Habit? = nil) {
         self.habit = habit
         _name = State(initialValue: habit?.name ?? "")
+        _detail = State(initialValue: habit?.detail ?? "")
         _iconName = State(initialValue: habit?.iconName ?? HabitIcons.default)
         _habitColor = State(initialValue: habit.map { HabitColor(key: $0.colorKey) } ?? .blue)
         _rhythm = State(initialValue: habit?.rhythm ?? .daily)
@@ -45,6 +47,15 @@ struct HabitEditorSheet: View {
                             .focused($isNameFocused)
                             .accessibilityIdentifier("name-field")
                             .submitLabel(.done)
+                    }
+                    PaperSection(title: "Zusatz") {
+                        TextField("z.B. 20 Min", text: $detail)
+                            .bodyText()
+                            .accessibilityIdentifier("detail-field")
+                            .submitLabel(.done)
+                            .onChange(of: detail) { _, new in
+                                if new.count > HabitDetail.maxLength { detail = String(new.prefix(HabitDetail.maxLength)) }
+                            }
                     }
                     PaperSection(title: "Icon") {
                         iconGrid
@@ -214,6 +225,7 @@ struct HabitEditorSheet: View {
             habit.targetCount = target
             habit.weekdays = days
             habit.monthDay = dayOfMonth
+            habit.detail = HabitDetail.normalized(detail)
         } else {
             context.insert(Habit(
                 name: trimmedName,
@@ -223,6 +235,7 @@ struct HabitEditorSheet: View {
                 targetCount: target,
                 weekdays: days,
                 monthDay: dayOfMonth,
+                detail: detail,
                 createdAt: AppClock.now
             ))
         }

@@ -5,10 +5,10 @@ import Testing
 /// Rhythmus Zeile auf der `HabitCard` (Spezifikation 4.3.1).
 struct RhythmTextTests {
     func snapshot(
-        _ rhythm: Rhythm, target: Int = 1, weekdays: [Int] = [], monthDay: Int? = nil
+        _ rhythm: Rhythm, target: Int = 1, weekdays: [Int] = [], monthDay: Int? = nil, detail: String = ""
     ) -> HabitSnapshot {
         HabitSnapshot(rhythm: rhythm, targetCount: target, weekdays: weekdays, monthDay: monthDay,
-                      createdAt: Date(timeIntervalSince1970: 0), counts: [])
+                      createdAt: Date(timeIntervalSince1970: 0), counts: [], detail: detail)
     }
 
     @Test func dailyOnceSaysDaily() {
@@ -42,5 +42,29 @@ struct RhythmTextTests {
 
     @Test func monthDayNamesTheDay() {
         #expect(snapshot(.monthDay, monthDay: 15).rhythmText(window: nil) == "Am 15. des Monats")
+    }
+
+    // MARK: Zusatz (Phase 10)
+
+    @Test func detailStandsInFrontOfTheRhythm() {
+        #expect(snapshot(.daily, detail: "20 Min").rhythmText(window: nil) == "20 Min · Täglich")
+        #expect(snapshot(.weekdays, weekdays: [1, 4], detail: "Yoga").rhythmText(window: nil) == "Yoga · Mo · Do")
+    }
+
+    @Test func blankDetailIsNotShown() {
+        #expect(snapshot(.daily, detail: "   ").rhythmText(window: nil) == "Täglich")
+    }
+
+    @Test func detailIsTrimmedAndLimitedTo24Characters() {
+        #expect(HabitDetail.normalized("  20 Min  ") == "20 Min")
+        #expect(HabitDetail.normalized(String(repeating: "a", count: 40)).count == 24)
+        let habit = Habit(name: "Lesen", iconName: "book.fill", colorKey: "blue", detail: "  " + String(repeating: "b", count: 30))
+        #expect(habit.detail == String(repeating: "b", count: 24))
+    }
+
+    @Test func habitWithoutDetailKeepsTheOldLine() {
+        let habit = Habit(name: "Lesen", iconName: "book.fill", colorKey: "blue")
+        #expect(habit.detail == "")
+        #expect(habit.snapshot.rhythmText(window: nil) == "Täglich")
     }
 }

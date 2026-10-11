@@ -44,6 +44,7 @@ enum DebugData {
                 targetCount: sample.target,
                 weekdays: sample.weekdays,
                 monthDay: sample.monthDay,
+                detail: sample.detail,
                 // Eine Sekunde Abstand, damit die Reihenfolge in "Heute" fest ist.
                 createdAt: created.addingTimeInterval(TimeInterval(index))
             )
@@ -94,6 +95,7 @@ enum DebugData {
         var target = 1
         var weekdays: [Int] = []
         var monthDay: Int? = nil
+        var detail = ""
         /// Erledigungen als (Tage zurück, Wert).
         var history: [Entry]
     }
@@ -123,14 +125,14 @@ enum DebugData {
             // Täglich
             Sample(name: "Wasser trinken", iconName: "drop.fill", color: .teal, rhythm: .daily, target: 3,
                    history: dailyHistory(target: 3, seed: 1, yesterday: 3, today: 1)),
-            Sample(name: "Lesen", iconName: "book.fill", color: .violet, rhythm: .daily,
+            Sample(name: "Lesen", iconName: "book.fill", color: .violet, rhythm: .daily, detail: "20 Min",
                    history: dailyHistory(target: 1, seed: 2, yesterday: 1, today: 0)),
             Sample(name: "Meditieren", iconName: "brain.head.profile", color: .pink, rhythm: .daily,
                    history: dailyHistory(target: 1, seed: 3, yesterday: 0, today: 0)),
             Sample(name: "Vitamine", iconName: "pills.fill", color: .orange, rhythm: .daily,
                    history: dailyHistory(target: 1, seed: 4, yesterday: 1, today: 1)),
             // Pro Woche
-            Sample(name: "Sport", iconName: "dumbbell.fill", color: .orange, rhythm: .weekly, target: 2,
+            Sample(name: "Sport", iconName: "dumbbell.fill", color: .orange, rhythm: .weekly, target: 2, detail: "Gym",
                    history: once(every(3, from: 1))),
             Sample(name: "Joggen", iconName: "figure.run", color: .green, rhythm: .weekly,
                    history: once(every(7, from: 5))),
