@@ -42,4 +42,15 @@ extension HabitEngine {
     func isFuture(_ day: Date, today: Date) -> Bool {
         startOfDay(day) > startOfDay(today)
     }
+
+    /// Der Monat `months` Monate nach `month` (negativ: davor), begrenzt auf den Bereich vom Monat, der `first`
+    /// enthält, bis zu dem, der `last` enthält. Gibt den Anfang des Monats zurück (Spezifikation 5.4).
+    func steppedMonth(_ month: Date, by months: Int, from first: Date, through last: Date) -> Date {
+        let lower = firstOfMonth(containing: first)
+        let upper = max(firstOfMonth(containing: last), lower)
+        guard let moved = calendar.date(byAdding: .month, value: months, to: firstOfMonth(containing: month)) else {
+            return min(max(firstOfMonth(containing: month), lower), upper)
+        }
+        return min(max(firstOfMonth(containing: moved), lower), upper)
+    }
 }

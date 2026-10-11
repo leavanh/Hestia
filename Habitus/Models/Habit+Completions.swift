@@ -46,3 +46,12 @@ extension Habit {
         try? context.save()
     }
 }
+
+extension Habit {
+    /// Tag, bis zu dem Streaks und Quote gerechnet werden: heute, bei einem beendeten Habit sein letzter Tag.
+    func statisticsDay(today: Date, engine: HabitEngine) -> Date {
+        let today = engine.startOfDay(today)
+        guard let endedAt else { return today }
+        return min(today, engine.startOfDay(endedAt))
+    }
+}

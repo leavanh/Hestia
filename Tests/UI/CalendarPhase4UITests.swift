@@ -1,6 +1,6 @@
 import XCTest
 
-/// Prüft die Definition of Done von Phase 4 direkt in der Oberfläche: durchgehender Kalender mit Einfärbung,
+/// Prüft die Definition of Done von Phase 4 direkt in der Oberfläche: Kalender mit Einfärbung (seit Phase 5.1 ein Monat mit Pfeilen),
 /// Nachtragen über das Sheet "Tag bearbeiten" und gesperrte Zukunft.
 /// Jeder Test startet mit leerem Datenbestand (`-HabitusResetData`) und den Testdaten (`-HabitusSampleData`).
 final class CalendarPhase4UITests: XCTestCase {
@@ -31,21 +31,30 @@ final class CalendarPhase4UITests: XCTestCase {
         return String(format: "calendar-month-%04d-%02d", parts.year!, parts.month!)
     }
 
-    /// Scrollt nach oben (in die Vergangenheit), bis das Element im Bild ist.
+    /// Blättert mit den Pfeilen zum Monat `offset` Monate nach dem aktuellen.
     @MainActor
-    private func scrollUp(to element: XCUIElement, in app: XCUIApplication) {
-        let scroll = app.scrollViews["calendar-scroll"]
-        for _ in 0..<8 where !element.exists || !element.isHittable {
-            scroll.swipeDown()
+    private func show(month offset: Int, in app: XCUIApplication) {
+        let title = app.staticTexts[monthIdentifier(plus: offset)]
+        let arrow = app.buttons[offset < 0 ? "calendar-previous" : "calendar-next"]
+        for _ in 0..<12 where !title.exists && arrow.isEnabled {
+            arrow.tap()
         }
-        XCTAssertTrue(element.exists && element.isHittable, "Element nicht gefunden: \(element)")
+        XCTAssertTrue(title.exists, "Monat nicht gefunden: \(offset)")
     }
 
-    /// Der Button des Tages `offset` Tage nach heute, nach oben gescrollt, falls er in einem früheren Monat liegt.
+    /// Der Button des Tages `offset` Tage nach heute, nach Blättern in den Monat des Tages.
     @MainActor
     private func dayButton(plus offset: Int, in app: XCUIApplication) -> XCUIElement {
+        let calendar = Calendar.current
+        let day = calendar.date(byAdding: .day, value: offset, to: .now)!
+        let months = calendar.dateComponents(
+            [.month],
+            from: calendar.date(from: calendar.dateComponents([.year, .month], from: .now))!,
+            to: calendar.date(from: calendar.dateComponents([.year, .month], from: day))!
+        ).month!
+        show(month: months, in: app)
         let button = app.buttons[identifier(plus: offset)]
-        scrollUp(to: button, in: app)
+        XCTAssertTrue(button.exists && button.isHittable, "Tag nicht gefunden: \(offset)")
         return button
     }
 
@@ -55,23 +64,23 @@ final class CalendarPhase4UITests: XCTestCase {
         XCTAssertTrue(app.scrollViews["calendar-scroll"].waitForExistence(timeout: 5))
     }
 
-    // MARK: Durchgehender Kalender
+    // MARK: Monatskalender
 
     @MainActor
-    func testStartsAtCurrentMonthAndScrollsBackIntoThePast() {
+    func testStartsAtCurrentMonthAndPagesBackIntoThePast() {
         let app = launchCalendar()
-        XCTAssertTrue(app.staticTexts[monthIdentifier(plus: 0)].isHittable, "Aktueller Monat ist im Bild")
-        XCTAssertFalse(app.staticTexts[monthIdentifier(plus: -3)].isHittable, "Ältere Monate liegen weiter oben")
+        XCTAssertTrue(app.staticTexts[monthIdentifier(plus: 0)].exists, "Aktueller Monat ist im Bild")
+        XCTAssertFalse(app.staticTexts[monthIdentifier(plus: -1)].exists, "Es ist immer nur ein Monat zu sehen")
 
-        // Der Kalender reicht mindestens 3 Monate zurück.
-        scrollUp(to: app.staticTexts[monthIdentifier(plus: -3)], in: app)
+        // Der Kalender reicht mindestens 3 Monate zurück, nicht weiter als der älteste Habit.
+        show(month: -3, in: app)
+        XCTAssertFalse(app.buttons["calendar-previous"].isEnabled, "Weiter zurück als der erste Monat geht es nicht")
     }
 
     @MainActor
     func testThereIsNoMonthAfterTheCurrentOne() {
         let app = launchCalendar()
-        XCTAssertFalse(app.staticTexts[monthIdentifier(plus: 1)].exists)
-        app.scrollViews["calendar-scroll"].swipeUp()
+        XCTAssertFalse(app.buttons["calendar-next"].isEnabled)
         XCTAssertFalse(app.staticTexts[monthIdentifier(plus: 1)].exists)
     }
 
@@ -80,7 +89,7 @@ final class CalendarPhase4UITests: XCTestCase {
     @MainActor
     func testDaysAreColoredByDifferentProgress() {
         let app = launchCalendar()
-        scrollUp(to: app.staticTexts[monthIdentifier(plus: -1)], in: app)
+        show(month: -1, in: app)
         let days = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'calendar-day-' AND isEnabled == true"))
         XCTAssertGreaterThanOrEqual(days.count, 20)
 
@@ -119,11 +128,13 @@ final class CalendarPhase4UITests: XCTestCase {
         dayButton(plus: -7, in: app).tap()
         XCTAssertTrue(app.buttons["Fertig"].waitForExistence(timeout: 5))
 
+        // Nur die Liste im Sheet zählt, die Habit Liste unter dem Kalender dahinter nennt alle Habits.
+        let list = app.scrollViews["day-edit-list"]
         // Tagebuch und Yoga sind am heutigen Wochentag fällig, also auch vor genau 7 Tagen.
-        XCTAssertTrue(app.staticTexts["Tagebuch"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Yoga"].exists)
+        XCTAssertTrue(list.staticTexts["Tagebuch"].waitForExistence(timeout: 5))
+        XCTAssertTrue(list.staticTexts["Yoga"].exists)
         // Wäsche waschen ist erst morgen fällig, damit auch nicht vor 7 Tagen.
-        XCTAssertFalse(app.staticTexts["Wäsche waschen"].exists)
+        XCTAssertFalse(list.staticTexts["Wäsche waschen"].exists)
         XCTAssertTrue(app.staticTexts["progress-text"].exists)
     }
 
@@ -146,10 +157,8 @@ final class CalendarPhase4UITests: XCTestCase {
         closeSheet(in: app)
         let after = dayButton(plus: -7, in: app).value as? String
         XCTAssertNotEqual(after, before, "Kalenderfarbe der Woche zuvor ändert sich")
+        show(month: 0, in: app)
         let today = app.buttons[identifier(plus: 0)]
-        for _ in 0..<8 where !today.exists || !today.isHittable {
-            app.scrollViews["calendar-scroll"].swipeUp()
-        }
         XCTAssertEqual(today.value as? String, todayBefore, "Heute bleibt unverändert")
     }
 

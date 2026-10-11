@@ -1,15 +1,16 @@
 import SwiftData
 import SwiftUI
 
-/// Tab "Kalender": durchgehender Kalender, in dem die Monate untereinander stehen und der beim aktuellen
-/// Monat beginnt (Spezifikation 5.4). Jeder Tag ist nach Tagesfortschritt eingefärbt. Ein Tag antippen öffnet
-/// das Sheet "Tag bearbeiten", zukünftige Tage sind gesperrt.
+/// Tab "Kalender": Monatskalender mit Pfeilen, der beim aktuellen Monat beginnt (Spezifikation 5.4). Jeder Tag ist
+/// nach Tagesfortschritt eingefärbt. Ein Tag antippen öffnet das Sheet "Tag bearbeiten", zukünftige Tage sind
+/// gesperrt. Darunter stehen alle Habits mit ihrem aktuellen Streak, ein Habit antippen öffnet sein Detail.
 struct CalendarView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Query(sort: \Habit.createdAt) private var habits: [Habit]
 
     @State private var today = AppClock.now
     @State private var selectedDay: SelectedDay?
+    @State private var detailHabit: Habit?
 
     private let engine = HabitEngine()
 
@@ -22,11 +23,19 @@ struct CalendarView: View {
         var id: Date { day }
     }
 
-    /// Vom Monat des ältesten Habits (mindestens `minimumMonthsBack` zurück) bis zum aktuellen Monat.
-    private func months(for snapshots: [HabitSnapshot]) -> [MonthGrid] {
+    /// Erster Monat, zu dem man blättern kann: der des ältesten Habits, mindestens `minimumMonthsBack` zurück.
+    private func firstMonth(for snapshots: [HabitSnapshot]) -> Date {
         let fallback = engine.calendar.date(byAdding: .month, value: -Self.minimumMonthsBack, to: today) ?? today
-        let first = min(snapshots.map(\.createdAt).min() ?? fallback, fallback)
-        return engine.monthStarts(from: first, through: today).map { engine.monthGrid(containing: $0) }
+        return engine.firstOfMonth(containing: min(snapshots.map(\.createdAt).min() ?? fallback, fallback))
+    }
+
+    /// Aktive Habits zuerst, dann die beendeten, jeweils in der Reihenfolge von Heute.
+    private var listedHabits: [Habit] {
+        let alive = habits.filter(\.isAlive)
+        let order = { (habit: Habit) in (habit.sortOrder, habit.createdAt) }
+        let active = alive.filter { $0.endedAt == nil }.sorted { order($0) < order($1) }
+        let ended = alive.filter { $0.endedAt != nil }.sorted { order($0) < order($1) }
+        return active + ended
     }
 
     var body: some View {
@@ -35,31 +44,27 @@ struct CalendarView: View {
 
         NavigationStack {
             ScrollView {
-                LazyVStack(spacing: Theme.sectionSpacing) {
-                    ForEach(months(for: snapshots), id: \.firstDay) { grid in
-                        MonthCalendar(
-                            grid: grid,
-                            today: today,
-                            progress: { engine.dayProgress(snapshots, on: $0) },
-                            onSelect: { selectedDay = SelectedDay(day: $0) }
-                        )
-                    }
+                VStack(spacing: Theme.sectionSpacing) {
+                    MonthCalendar(
+                        firstMonth: firstMonth(for: snapshots),
+                        lastMonth: today,
+                        today: today,
+                        progress: { engine.dayProgress(snapshots, on: $0) },
+                        onSelect: { selectedDay = SelectedDay(day: $0) }
+                    )
+                    habitList
                 }
-                .padding(.horizontal, Theme.spacing)
-                .padding(.vertical, Theme.spacing)
+                .padding(Theme.spacing)
             }
-            // Beginnt unten, also beim aktuellen Monat. Nach oben geht es in die Vergangenheit.
-            .defaultScrollAnchor(.bottom)
             .accessibilityIdentifier("calendar-scroll")
             .background { GlassBackground() }
-            .safeAreaInset(edge: .top, spacing: 0) {
-                CalendarWeekdayHeader()
-                    .background(.bar)
-            }
             .navigationTitle("Kalender")
             .navigationBarTitleDisplayMode(.inline)
             .sheet(item: $selectedDay) { selected in
                 DayEditSheet(day: selected.day)
+            }
+            .sheet(item: $detailHabit) { habit in
+                HabitDetailSheet(habit: habit, today: today)
             }
         }
         .onChange(of: scenePhase) { _, phase in
@@ -70,6 +75,27 @@ struct CalendarView: View {
                 today = AppClock.now
             }
         }
+    }
+}
+
+extension CalendarView {
+    /// Alle Habits mit aktuellem Streak, aktive zuerst, dann beendete.
+    private var habitList: some View {
+        VStack(spacing: Theme.spacing) {
+            ForEach(listedHabits) { habit in
+                let snapshot = habit.snapshot
+                HabitStatRow(
+                    name: habit.name,
+                    iconName: habit.iconName,
+                    habitColor: HabitColor(key: habit.colorKey),
+                    rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: today)),
+                    streak: engine.currentStreak(snapshot, on: habit.statisticsDay(today: today, engine: engine))
+                ) {
+                    detailHabit = habit
+                }
+            }
+        }
+        .padding(.top, Theme.spacing)
     }
 }
 

@@ -143,7 +143,7 @@ nonisolated struct HabitEngine: Sendable {
     }
 
     /// Wert pro Tag, höchstens Tagesziel (bei nicht täglichen Habits also 0 oder 1).
-    private func cappedValues(_ habit: HabitSnapshot) -> [Date: Int] {
+    func cappedValues(_ habit: HabitSnapshot) -> [Date: Int] {
         let target = dailyTarget(habit)
         return habit.counts.reduce(into: [:]) { values, entry in
             values[startOfDay(entry.day), default: 0] += min(max(entry.count, 0), target)
@@ -151,7 +151,7 @@ nonisolated struct HabitEngine: Sendable {
     }
 
     /// Summe der Erledigungen in den letzten `length` Tagen, die an `day` enden.
-    private func windowSum(_ values: [Date: Int], endingOn day: Date, length: Int) -> Int {
+    func windowSum(_ values: [Date: Int], endingOn day: Date, length: Int) -> Int {
         (0..<max(length, 0)).reduce(0) { sum, offset in
             guard let date = calendar.date(byAdding: .day, value: -offset, to: day) else { return sum }
             return sum + (values[startOfDay(date)] ?? 0)

@@ -1,12 +1,22 @@
 import SwiftUI
 
-/// Ein Monat im durchgehenden Kalender: Monatsname und seine Tage. Jeder Tag ist nach dem Tagesfortschritt in der
-/// Akzentfarbe eingefärbt: keine Farbe bei 0 %, dann zunehmend kräftiger bis 100 %. Zukünftige Tage sind blass und gesperrt.
+/// Monatskalender: Monatsname mit Pfeil links und rechts, Wochentagszeile und die Tage des Monats. Jeder Tag ist nach
+/// dem Tagesfortschritt in `tint` eingefärbt: keine Farbe bei 0 %, dann zunehmend kräftiger bis 100 %. Zukünftige Tage
+/// sind blass und gesperrt. Der Monat wechselt mit den Pfeilen zwischen `firstMonth` und `lastMonth` (Spezifikation 5.4).
+/// Im Tab ist es die Akzentfarbe mit antippbaren Tagen, im Habit Detail die Habitfarbe ohne Antippen.
 struct MonthCalendar: View {
-    let grid: MonthGrid
+    /// Ein Tag aus dem ersten und einer aus dem letzten Monat, zwischen denen man blättern kann.
+    let firstMonth: Date
+    let lastMonth: Date
     let today: Date
     let progress: (Date) -> DayProgress
-    let onSelect: (Date) -> Void
+    var tint: Color = Theme.accent
+    var identifierPrefix = "calendar"
+    /// `nil`, wenn die Tage nicht antippbar sind (Habit Detail).
+    var onSelect: ((Date) -> Void)?
+
+    /// Der gezeigte Monat. Beim Start der letzte, also der aktuelle.
+    @State private var month: Date?
 
     private let engine = HabitEngine()
 
@@ -17,12 +27,38 @@ struct MonthCalendar: View {
         return range.lowerBound + (range.upperBound - range.lowerBound) * min(fraction, 1)
     }
 
+    /// Gezeigter Monat, immer innerhalb der Grenzen (sie können sich ändern, z.B. um Mitternacht).
+    private var shownMonth: Date {
+        engine.steppedMonth(month ?? lastMonth, by: 0, from: firstMonth, through: lastMonth)
+    }
+
+    private func step(_ months: Int) {
+        month = engine.steppedMonth(shownMonth, by: months, from: firstMonth, through: lastMonth)
+    }
+
     var body: some View {
+        let grid = engine.monthGrid(containing: shownMonth)
+
         VStack(alignment: .leading, spacing: Theme.spacing) {
-            Text(grid.firstDay.formatted(.dateTime.month(.wide).year().locale(Locale(identifier: "de_DE"))))
-                .font(.title3.weight(.semibold))
-                .accessibilityAddTraits(.isHeader)
-                .accessibilityIdentifier("calendar-month-\(Self.monthIdentifier(for: grid.firstDay, calendar: engine.calendar))")
+            HStack {
+                Text(grid.firstDay.formatted(.dateTime.month(.wide).year().locale(Locale(identifier: "de_DE"))))
+                    .font(.title3.weight(.semibold))
+                    .accessibilityAddTraits(.isHeader)
+                    .accessibilityIdentifier("\(identifierPrefix)-month-\(Self.monthIdentifier(for: grid.firstDay, calendar: engine.calendar))")
+                Spacer()
+                HStack(spacing: Theme.spacing) {
+                    Button("Voriger Monat", systemImage: "chevron.left") { step(-1) }
+                        .disabled(shownMonth <= engine.firstOfMonth(containing: firstMonth))
+                        .accessibilityIdentifier("\(identifierPrefix)-previous")
+                    Button("Nächster Monat", systemImage: "chevron.right") { step(1) }
+                        .disabled(shownMonth >= engine.firstOfMonth(containing: lastMonth))
+                        .accessibilityIdentifier("\(identifierPrefix)-next")
+                }
+                .labelStyle(.iconOnly)
+                .font(.body.weight(.semibold))
+                .buttonStyle(.plain)
+            }
+            CalendarWeekdayHeader()
             LazyVGrid(columns: CalendarWeekdayHeader.columns, spacing: Theme.calendarDaySpacing) {
                 ForEach(0..<grid.leadingBlanks, id: \.self) { _ in
                     Color.clear.frame(height: Theme.calendarDaySize)
@@ -41,30 +77,38 @@ struct MonthCalendar: View {
         let dayProgress = progress(day)
         let opacity = isFuture ? 0 : Self.fillOpacity(for: dayProgress.fraction)
 
-        return Button {
-            onSelect(day)
-        } label: {
-            Text("\(engine.calendar.component(.day, from: day))")
-                .font(.subheadline.weight(isToday ? .bold : .regular))
-                .foregroundStyle(opacity >= Theme.calendarOnAccentThreshold ? Theme.onAccent : Color.primary)
-                .frame(width: Theme.calendarDaySize, height: Theme.calendarDaySize)
-                .background {
-                    Circle().fill(Theme.accent.opacity(opacity))
+        let label = Text("\(engine.calendar.component(.day, from: day))")
+            .font(.subheadline.weight(isToday ? .bold : .regular))
+            .foregroundStyle(opacity >= Theme.calendarOnAccentThreshold ? Theme.onAccent : Color.primary)
+            .frame(width: Theme.calendarDaySize, height: Theme.calendarDaySize)
+            .background {
+                Circle().fill(tint.opacity(opacity))
+            }
+            .overlay {
+                if isToday {
+                    Circle().strokeBorder(tint, lineWidth: Theme.strokeWidth)
                 }
-                .overlay {
-                    if isToday {
-                        Circle().strokeBorder(Theme.accent, lineWidth: Theme.strokeWidth)
-                    }
+            }
+            .contentShape(Circle())
+            .opacity(isFuture ? Theme.calendarFutureOpacity : 1)
+
+        return Group {
+            if let onSelect {
+                Button {
+                    onSelect(day)
+                } label: {
+                    label
                 }
-                .contentShape(Circle())
-                .opacity(isFuture ? Theme.calendarFutureOpacity : 1)
+                .buttonStyle(.plain)
+                .disabled(isFuture)
+            } else {
+                label.accessibilityElement(children: .ignore)
+            }
         }
-        .buttonStyle(.plain)
-        .disabled(isFuture)
         .frame(maxWidth: .infinity)
         .accessibilityLabel(day.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "de_DE"))))
         .accessibilityValue(isFuture ? "" : value(for: dayProgress))
-        .accessibilityIdentifier("calendar-day-\(Self.identifier(for: day, calendar: engine.calendar))")
+        .accessibilityIdentifier("\(identifierPrefix)-day-\(Self.identifier(for: day, calendar: engine.calendar))")
     }
 
     private func value(for progress: DayProgress) -> String {
@@ -83,7 +127,7 @@ struct MonthCalendar: View {
     }
 }
 
-/// Wochentagszeile Mo bis So über dem durchgehenden Kalender. Sie bleibt beim Scrollen stehen.
+/// Wochentagszeile Mo bis So unter dem Monatsnamen.
 struct CalendarWeekdayHeader: View {
     private static let weekdays = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
 
@@ -100,8 +144,6 @@ struct CalendarWeekdayHeader: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, Theme.spacing)
         .accessibilityHidden(true)
     }
 }
@@ -110,15 +152,13 @@ struct CalendarWeekdayHeader: View {
     let engine = HabitEngine()
     ZStack {
         GlassBackground()
-        VStack {
-            CalendarWeekdayHeader()
-            MonthCalendar(
-                grid: engine.monthGrid(containing: .now),
-                today: .now,
-                progress: { day in DayProgress(done: min(engine.calendar.component(.day, from: day) % 5, 4), total: 4) },
-                onSelect: { _ in }
-            )
-            .padding(.horizontal, Theme.spacing)
-        }
+        MonthCalendar(
+            firstMonth: engine.calendar.date(byAdding: .month, value: -3, to: .now) ?? .now,
+            lastMonth: .now,
+            today: .now,
+            progress: { day in DayProgress(done: min(engine.calendar.component(.day, from: day) % 5, 4), total: 4) },
+            onSelect: { _ in }
+        )
+        .padding(.horizontal, Theme.spacing)
     }
 }

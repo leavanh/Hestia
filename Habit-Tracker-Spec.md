@@ -115,6 +115,17 @@ Prozent = erledigte Punkte geteilt durch Punkte, gerundet auf ganze Zahl. Bei 0 
 - **Quote 30 Tage:** Anteil der letzten 30 Tage (ohne Pausen, ab Erstellung), an denen der Status grün oder gelb war. Bei festen Tagen nur fällige Tage.
 - Alle Werte werden aus den Erledigungen berechnet, nicht gespeichert.
 
+Präzisierung (Phase 5), wann ein Tag als erfüllt oder verpasst zählt:
+
+- **Täglich:** erfüllt, wenn das Tagesziel erreicht ist. Sonst verpasst.
+- **Pro Woche / pro Monat:** erfüllt, wenn das Fenster des Tages das Ziel erreicht (Status grün oder gelb). Im ersten Fenster nach der Erstellung ist ein unerfülltes Ziel weder erfüllt noch verpasst, der Tag wird nicht gewertet (wie "kein Rot" in 3.5).
+- **Feste Wochentage / fester Monatstag:** nur fällige Tage werden gewertet, andere Tage unterbrechen den Streak nicht.
+- **Heute noch offen:** Ein heute nicht erfüllter Tag ist noch nicht vorbei. Er unterbricht den Streak nicht und zählt erst mit, wenn er erreicht ist. Er geht auch nicht in die Quote ein.
+- Tage vor der Erstellung werden nicht gewertet. Wenn es keinen gewerteten Tag gibt, ist der Streak 0 und die Quote leer ("–").
+- **Beendete Habits:** Streaks und Quote werden bis zum Tag des Beendens gerechnet.
+- **Längster Streak** ist die größte Folge erfüllter Tage seit Erstellung und damit nie kleiner als der aktuelle.
+- Pausentage kommen erst mit Phase 6 hinzu.
+
 ### 3.8 Pausen
 
 - Eine Pause hat einen Zeitraum (von, bis, beide Tage eingeschlossen) und gilt für einen oder mehrere ausgewählte Habits.
@@ -162,7 +173,9 @@ Prozent = erledigte Punkte geteilt durch Punkte, gerundet auf ganze Zahl. Bei 0 
 | `WeekDots` | Die 7 Punkte aus 3.6, der angezeigte Tag mit äußerem Ring. |
 | `HabitIconView` | Icon in gedämpfter Habitfarbe auf zarter Kreisfläche derselben Farbe. Bei Status gelb oder rot oben rechts eine kleine runde Statusmarke in Statusfarbe, die den Kreis leicht überlappt und durch einen schmalen freien Rand von ihm abgesetzt ist. Bei grün keine Marke. |
 | `ProgressHeader` | Fortschrittsring und Text "5 von 16 · 31 %". Ohne Karte, direkt auf dem Hintergrund. |
-| `MonthCalendar` | Ein Monat im durchgehenden Kalender (5.4), Monatsname und Tage ohne Karte. Jeder Tag ist ein Kreis, nach Tagesfortschritt in der Akzentfarbe eingefärbt (keine Farbe bei 0 %, bis 100 % zunehmend kräftiger), heute mit Ring, zukünftige Tage blass und gesperrt. Werte in `Theme`. |
+| `MonthCalendar` | Ein Monat, Monatsname mit Pfeil links und rechts, darunter die Wochentagszeile Mo bis So und die Tage, ohne Karte. Der Wechsel zwischen den Monaten (Grenzen, deaktivierte Pfeile) gehört zum Baustein. Jeder Tag ist ein Kreis, nach Tagesfortschritt in einer Tönung eingefärbt (keine Farbe bei 0 %, bis 100 % zunehmend kräftiger), heute mit Ring, zukünftige Tage blass und gesperrt. Im Tab Akzentfarbe und antippbar, im Habit Detail Habitfarbe und nicht antippbar (5.4). Werte in `Theme`. |
+| `HabitStatRow` | Zeile der Habit Liste unter dem Kalender (5.4): `HabitIconView` ohne Statusmarke, Name, Rhythmus Zeile (4.3.1) und rechts der aktuelle Streak mit Flammensymbol ("5 Tage"). In einer Glaskarte, antippen öffnet das Habit Detail. |
+| `StatValue` | Eine Kennzahl im Habit Detail: großer Wert, darunter eine kleine Beschriftung ("12 Tage" / "Längster Streak"). |
 | `GlassBackground` | Farbverlauf für alle Bildschirme. |
 | `SegmentedChoice` | Segmentfeld im Glas Stil, z.B. für den Rhythmus und seine Variante. |
 
@@ -226,11 +239,13 @@ Speichern nur möglich, wenn Name nicht leer.
 
 ### 5.4 Kalender
 
-- Durchgehender Kalender: Die Monate stehen untereinander, ich scrolle hoch (Vergangenheit) und runter. Er beginnt beim aktuellen Monat, der unten endet, einen späteren Monat gibt es nicht. Er reicht mindestens 3 Monate zurück, sonst bis zum Monat des ältesten Habits. Über den Tagen steht eine feste Wochentagszeile Mo bis So.
+- Monatskalender mit Pfeilen: Der Kalender zeigt einen Monat, mit Pfeil links (voriger Monat) und Pfeil rechts (nächster Monat) rechts neben dem Monatsnamen. Er beginnt beim aktuellen Monat, einen späteren Monat gibt es nicht (Pfeil rechts ist dort deaktiviert). Er reicht mindestens 3 Monate zurück, sonst bis zum Monat des ältesten Habits (dort ist der Pfeil links deaktiviert). Unter dem Monatsnamen steht die Wochentagszeile Mo bis So. *(Ersetzt nach Phase 5.1 den durchgehend scrollbaren Kalender aus Phase 4.)*
+- **Gleicher Kalender überall:** Der Kalender im Tab und der Kalender im Habit Detail sind derselbe Baustein mit demselben Aussehen und denselben Pfeilen. Unterschiede nur: Farbe (Akzentfarbe bzw. Habitfarbe), Tippen (im Tab öffnet ein Tag das Sheet, im Detail sind die Tage nicht antippbar) und die Grenzen (im Tab siehe oben, im Detail Erstellmonat bis aktueller Monat, bei beendeten Habits bis Monat des Beendens).
 - Jeder Tag eingefärbt nach Tagesfortschritt (3.4) an diesem Tag: keine Farbe bei 0 %, dann zunehmend kräftigere Akzentfarbe bis 100 %. Zukünftige Tage blass.
 - Tag antippen öffnet Sheet "Tag bearbeiten": dieselbe Liste wie "Heute" für diesen Tag, mit Abhaken und Counter. Zukünftige Tage sind nicht antippbar.
 - Darunter Liste aller Habits (aktive zuerst, dann beendete) mit aktuellem Streak.
-- Habit antippen öffnet **Habit Detail**: Icon, Name, Rhythmus, eigener Monatskalender (nur dieser Habit, Tage mit Erledigung in Habitfarbe), aktueller Streak, längster Streak, Quote 30 Tage.
+- Habit antippen öffnet als Sheet das **Habit Detail**: Icon, Name, Rhythmus, eigener Monatskalender (nur dieser Habit, Tage mit Erledigung in Habitfarbe, bei Tagesziel größer 1 mit Teilfüllung), aktueller Streak, längster Streak, Quote 30 Tage (3.7). Der Monatskalender ist derselbe wie im Tab (siehe oben).
+- Unter dem Monatskalender im Tab steht die Habit Liste. Der ganze Tab scrollt senkrecht, der Kalender selbst wird nur mit den Pfeilen gewechselt.
 
 ### 5.5 Einstellungen
 
@@ -491,7 +506,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Ziel:** Ich sehe meine Vergangenheit und kann alte Tage korrigieren.
 
 **Umfang**
-- Durchgehender, scrollbarer Kalender mit Einfärbung nach Tagesfortschritt (5.4).
+- Durchgehender, scrollbarer Kalender mit Einfärbung nach Tagesfortschritt (5.4). *(In Phase 5.1 ersetzt durch den Monatskalender mit Pfeilen.)*
 - Sheet "Tag bearbeiten" mit derselben Liste wie Heute für den gewählten Tag.
 - Zukünftige Tage gesperrt.
 
@@ -513,11 +528,31 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Unit Tests für Streaks und Quote.
 
 **Definition of Done**
-- [ ] Streak täglicher Habit: 5 Tage in Folge erreicht ergibt 5; ein verpasster Tag setzt auf 0 (bzw. Zählung ab heute).
-- [ ] Streak Wochen Habit läuft weiter, solange das Fenster erfüllt ist.
-- [ ] Längster Streak ist nie kleiner als der aktuelle.
-- [ ] Quote 30 Tage stimmt mit einem von Hand nachgerechneten Testfall überein.
-- [ ] Unit Tests für Streaks und Quote grün.
+- [x] Streak täglicher Habit: 5 Tage in Folge erreicht ergibt 5; ein verpasster Tag setzt auf 0 (bzw. Zählung ab heute).
+- [x] Streak Wochen Habit läuft weiter, solange das Fenster erfüllt ist.
+- [x] Längster Streak ist nie kleiner als der aktuelle.
+- [x] Quote 30 Tage stimmt mit einem von Hand nachgerechneten Testfall überein.
+- [x] Unit Tests für Streaks und Quote grün.
+
+---
+
+### Phase 5.1: Ein Kalender mit Pfeilen
+
+**Ziel:** Der Kalender im Tab und im Habit Detail sehen gleich aus und bedienen sich gleich: ein Monat, Pfeile links und rechts.
+
+**Umfang**
+- `MonthCalendar` bekommt den Monatswechsel (Pfeile, Grenzen) selbst (4.3). Der Wechsel wird in der `HabitEngine` berechnet und mit Unit Tests geprüft: ein Monat vor und zurück, Begrenzung auf erster und letzter Monat, Sprung über Jahresgrenzen.
+- Der Tab Kalender zeigt einen Monat statt der untereinander stehenden Monate. Start beim aktuellen Monat, mindestens 3 Monate zurück, sonst bis zum Monat des ältesten Habits (5.4). Darunter die Habit Liste, der Tab scrollt senkrecht.
+- Das Habit Detail benutzt denselben Baustein (Habitfarbe, nicht antippbar, Grenzen Erstellmonat bis aktueller Monat).
+- Der Wechsel des Monats ändert nichts an Tagesfortschritt, Einfärbung oder Sheet "Tag bearbeiten".
+- Aufräumen: Die Wochentagszeile über dem Scrollbereich, die Scrollposition auf den aktuellen Monat und die Monatsliste im Tab entfallen. Tests, die in den Monaten scrollen (u.a. `CalendarPhase4UITests`), werden auf die Pfeile umgestellt.
+
+**Definition of Done**
+- [x] Im Tab Kalender sehe ich einen Monat mit Pfeil links und rechts neben dem Monatsnamen, im Habit Detail dasselbe Aussehen.
+- [x] Pfeil rechts ist im aktuellen Monat deaktiviert, Pfeil links im ersten Monat (Tab: mindestens 3 Monate zurück).
+- [x] Ich kann im Tab einen Tag von letzter Woche öffnen, auch wenn er im Vormonat liegt.
+- [x] Der Monat im Habit Detail wechselt unabhängig vom Monat im Tab.
+- [x] Unit Tests für den Monatswechsel grün, alle anderen Tests weiter grün.
 
 ---
 

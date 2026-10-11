@@ -100,4 +100,40 @@ struct MonthGridTests {
     @Test func monthIdentifierIsYearAndMonth() {
         #expect(MonthCalendar.monthIdentifier(for: date(2026, 10, 1), calendar: engine.calendar) == "2026-10")
     }
+
+    // MARK: Monatswechsel (Spezifikation 5.4)
+
+    @Test func steppingMovesByWholeMonthsAndReturnsTheFirstOfTheMonth() {
+        let first = date(2026, 1, 20), last = date(2026, 10, 3)
+        #expect(engine.steppedMonth(date(2026, 8, 17), by: -1, from: first, through: last) == date(2026, 7, 1, 0))
+        #expect(engine.steppedMonth(date(2026, 8, 17), by: 1, from: first, through: last) == date(2026, 9, 1, 0))
+    }
+
+    @Test func steppingStopsAtTheLastMonth() {
+        let first = date(2026, 1, 20), last = date(2026, 10, 3)
+        #expect(engine.steppedMonth(date(2026, 10, 1, 0), by: 1, from: first, through: last) == date(2026, 10, 1, 0))
+    }
+
+    @Test func steppingStopsAtTheFirstMonth() {
+        let first = date(2026, 1, 20), last = date(2026, 10, 3)
+        #expect(engine.steppedMonth(date(2026, 1, 1, 0), by: -1, from: first, through: last) == date(2026, 1, 1, 0))
+    }
+
+    @Test func steppingCrossesYearBoundaries() {
+        let first = date(2025, 6, 1), last = date(2026, 10, 3)
+        #expect(engine.steppedMonth(date(2026, 1, 1, 0), by: -1, from: first, through: last) == date(2025, 12, 1, 0))
+        #expect(engine.steppedMonth(date(2025, 12, 31), by: 1, from: first, through: last) == date(2026, 1, 1, 0))
+    }
+
+    @Test func steppingFromOutsideTheRangeClampsIntoIt() {
+        let first = date(2026, 5, 1), last = date(2026, 7, 1)
+        #expect(engine.steppedMonth(date(2026, 12, 1, 0), by: 1, from: first, through: last) == date(2026, 7, 1, 0))
+        #expect(engine.steppedMonth(date(2026, 1, 1, 0), by: -1, from: first, through: last) == date(2026, 5, 1, 0))
+    }
+
+    @Test func aSingleMonthRangeHasNowhereToGo() {
+        let day = date(2026, 10, 12)
+        #expect(engine.steppedMonth(day, by: 1, from: day, through: day) == date(2026, 10, 1, 0))
+        #expect(engine.steppedMonth(day, by: -1, from: day, through: day) == date(2026, 10, 1, 0))
+    }
 }
