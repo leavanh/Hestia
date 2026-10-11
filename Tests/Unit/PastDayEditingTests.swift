@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 import Testing
-@testable import Habitus
+@testable import Hestia
 
 /// Nachtragen an vergangenen Tagen (Spezifikation 5.4): Liste, Werte und Folgen für Heute.
 @MainActor

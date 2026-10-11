@@ -2,7 +2,7 @@ import XCTest
 
 /// Prüft die Definition of Done von Phase 8.1 direkt in der Oberfläche: eigene Tab Bar, Plus und Sortieren ohne Glas,
 /// `StepperControl` im Sheet.
-/// Jeder Test startet mit leerem Datenbestand (`-HabitusResetData`).
+/// Jeder Test startet mit leerem Datenbestand (`-HestiaResetData`).
 final class Phase81UITests: XCTestCase {
     override func setUp() {
         continueAfterFailure = false
@@ -11,7 +11,7 @@ final class Phase81UITests: XCTestCase {
     @MainActor
     private func launch(sampleData: Bool = false) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-HabitusResetData"] + (sampleData ? ["-HabitusSampleData"] : [])
+        app.launchArguments = ["-HestiaResetData"] + (sampleData ? ["-HestiaSampleData"] : [])
         app.launch()
         return app
     }

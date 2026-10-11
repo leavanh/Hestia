@@ -14,7 +14,7 @@ from scipy import ndimage
 
 ROOT = Path(__file__).resolve().parent.parent
 BRANDING = ROOT / "Branding"
-ICONSET = ROOT / "Habitus/Assets.xcassets/AppIcon.appiconset"
+ICONSET = ROOT / "Hestia/Assets.xcassets/AppIcon.appiconset"
 SOURCE = BRANDING / "flame-linocut-source.webp"
 
 SIZE = 1024

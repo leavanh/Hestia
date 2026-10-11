@@ -2,7 +2,7 @@ import XCTest
 
 /// Prüft die Definition of Done von Phase 3.2 direkt in der Oberfläche: erledigte Habits nach unten,
 /// Bearbeiten per langem Drücken und Status am Icon (ab Phase 3.3 als Statusmarke).
-/// Jeder Test startet mit leerem Datenbestand (`-HabitusResetData`).
+/// Jeder Test startet mit leerem Datenbestand (`-HestiaResetData`).
 final class TodayPhase32UITests: XCTestCase {
     override func setUp() {
         continueAfterFailure = false
@@ -11,7 +11,7 @@ final class TodayPhase32UITests: XCTestCase {
     @MainActor
     private func launchFresh(extraArguments: [String] = []) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-HabitusResetData"] + extraArguments
+        app.launchArguments = ["-HestiaResetData"] + extraArguments
         app.launch()
         return app
     }

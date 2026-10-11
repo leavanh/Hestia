@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 import Testing
-@testable import Habitus
+@testable import Hestia
 
 /// Beenden, Wieder aktivieren, Löschen, Pausen beenden und Sortieren gegen eine echte (In Memory) Datenbank
 /// (Spezifikation 3.8, 3.9, 5.2).

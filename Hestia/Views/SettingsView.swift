@@ -1,7 +1,7 @@
 import SwiftData
 import SwiftUI
 
-/// Einstellungen (Spezifikation 5.5): Pausen und in Debug Builds der Entwicklerbereich.
+/// Einstellungen (Spezifikation 5.5): Pausen, in Debug Builds der Entwicklerbereich und ganz unten der Fuß.
 struct SettingsView: View {
     var body: some View {
         NavigationStack {
@@ -12,6 +12,7 @@ struct SettingsView: View {
                     #if DEBUG
                     DeveloperSection()
                     #endif
+                    Footer()
                 }
                 .padding(Theme.spacing)
             }
@@ -19,6 +20,36 @@ struct SettingsView: View {
             .background { PaperBackground() }
             .toolbarVisibility(.hidden, for: .navigationBar)
         }
+    }
+}
+
+/// Fuß der Einstellungen (Phase 12): Wortmarke und Version. Der einzige Ort der Wortmarke in der App.
+private struct Footer: View {
+    private var version: String {
+        let info = Bundle.main.infoDictionary
+        let short = info?["CFBundleShortVersionString"] as? String ?? "–"
+        let build = info?["CFBundleVersion"] as? String ?? "–"
+        return "Version \(short) (\(build))"
+    }
+
+    var body: some View {
+        VStack(spacing: Theme.inlineSpacing) {
+            Text("Hestia\nHabits")
+                .font(Theme.Typography.wordmark)
+                .textCase(.uppercase)
+                .tracking(Theme.Typography.wordmarkTracking)
+                .lineSpacing(-6)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Theme.inkSecondary)
+                .accessibilityLabel("Hestia Habits")
+                .accessibilityIdentifier("settings-wordmark")
+            Text(version)
+                .metaText()
+                .foregroundStyle(Theme.inkSecondary)
+                .accessibilityIdentifier("settings-version")
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, Theme.sectionSpacing)
     }
 }
 

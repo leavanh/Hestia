@@ -1,5 +1,5 @@
 import Testing
-@testable import Habitus
+@testable import Hestia
 
 /// VoiceOver Namen in der Icon und Farbauswahl (Phase 7).
 struct AccessibilityTextTests {

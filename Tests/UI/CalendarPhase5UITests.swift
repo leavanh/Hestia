@@ -15,7 +15,7 @@ final class CalendarPhase5UITests: XCTestCase {
     @MainActor
     private func launchCalendar() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-HabitusResetData", "-HabitusSampleData"]
+        app.launchArguments = ["-HestiaResetData", "-HestiaSampleData"]
         app.launch()
         XCTAssertTrue(app.staticTexts["Lesen"].waitForExistence(timeout: 5))
         app.openTab(.calendar)

@@ -2,7 +2,7 @@ import XCTest
 
 /// Prüft die Definition of Done von Phase 4 direkt in der Oberfläche: Kalender mit Einfärbung (seit Phase 5.1 ein Monat mit Pfeilen),
 /// Nachtragen über das Sheet "Tag bearbeiten" und gesperrte Zukunft.
-/// Jeder Test startet mit leerem Datenbestand (`-HabitusResetData`) und den Testdaten (`-HabitusSampleData`).
+/// Jeder Test startet mit leerem Datenbestand (`-HestiaResetData`) und den Testdaten (`-HestiaSampleData`).
 final class CalendarPhase4UITests: XCTestCase {
     override func setUp() {
         continueAfterFailure = false
@@ -11,7 +11,7 @@ final class CalendarPhase4UITests: XCTestCase {
     @MainActor
     private func launchCalendar() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-HabitusResetData", "-HabitusSampleData"]
+        app.launchArguments = ["-HestiaResetData", "-HestiaSampleData"]
         app.launch()
         XCTAssertTrue(app.staticTexts["Lesen"].waitForExistence(timeout: 5))
         app.openTab(.calendar)

@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import Habitus
+@testable import Hestia
 
 /// Kalenderwoche und Wochenstreifen im Kopfband von Heute (Spezifikation 5.2, Phase 9).
 struct WeekStripTests {

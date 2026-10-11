@@ -1,5 +1,5 @@
 import Testing
-@testable import Habitus
+@testable import Hestia
 
 /// Beschriftung des angezeigten Tags (Spezifikation 5.2).
 struct RelativeDayTests {

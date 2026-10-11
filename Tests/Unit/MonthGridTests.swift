@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import Habitus
+@testable import Hestia
 
 /// Monatsraster und Einfärbung des Kalenders (Spezifikation 5.4).
 @MainActor

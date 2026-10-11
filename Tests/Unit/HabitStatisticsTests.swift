@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import Habitus
+@testable import Hestia
 
 /// Streaks und Quote 30 Tage (Spezifikation 3.7) mit festen Daten und von Hand nachgerechneten Fällen.
 struct HabitStatisticsTests {

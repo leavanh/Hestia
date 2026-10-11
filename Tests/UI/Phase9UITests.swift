@@ -1,7 +1,7 @@
 import XCTest
 
 /// Prüft die Definition of Done von Phase 9 direkt in der Oberfläche: Tag im Wochenstreifen antippen.
-/// Jeder Test startet mit leerem Datenbestand (`-HabitusResetData`).
+/// Jeder Test startet mit leerem Datenbestand (`-HestiaResetData`).
 final class Phase9UITests: XCTestCase {
     override func setUp() {
         continueAfterFailure = false
@@ -33,7 +33,7 @@ final class Phase9UITests: XCTestCase {
     @MainActor
     func testTappingADayInTheWeekStripShowsThatDay() {
         let app = XCUIApplication()
-        app.launchArguments = ["-HabitusResetData", "-HabitusSampleData"]
+        app.launchArguments = ["-HestiaResetData", "-HestiaSampleData"]
         app.launch()
         let today = calendar.startOfDay(for: .now)
         XCTAssertTrue(app.scrollViews["today-list"].waitForExistence(timeout: 5))

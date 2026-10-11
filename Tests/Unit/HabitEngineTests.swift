@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import Habitus
+@testable import Hestia
 
 struct HabitEngineTests {
     let engine: HabitEngine = {

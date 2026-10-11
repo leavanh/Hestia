@@ -1,6 +1,6 @@
 import Testing
 import UIKit
-@testable import Habitus
+@testable import Hestia
 
 /// Schriften (Spezifikation 4.3) und das Modell der `SegmentBar` (4.5, ab Phase 9.1 immer ein durchgehender Balken).
 struct DesignSystemTests {

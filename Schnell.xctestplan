@@ -15,9 +15,9 @@
     {
       "parallelizable" : false,
       "target" : {
-        "containerPath" : "container:Habitus.xcodeproj",
+        "containerPath" : "container:Hestia.xcodeproj",
         "identifier" : "A10000000000000000000011",
-        "name" : "HabitusTests"
+        "name" : "HestiaTests"
       }
     }
   ],

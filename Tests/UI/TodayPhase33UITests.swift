@@ -1,7 +1,7 @@
 import XCTest
 
 /// Prüft die Definition of Done von Phase 3.3 direkt in der Oberfläche: Statusmarke nur bei gelb und rot.
-/// Jeder Test startet mit leerem Datenbestand (`-HabitusResetData`).
+/// Jeder Test startet mit leerem Datenbestand (`-HestiaResetData`).
 final class TodayPhase33UITests: XCTestCase {
     override func setUp() {
         continueAfterFailure = false
@@ -10,7 +10,7 @@ final class TodayPhase33UITests: XCTestCase {
     @MainActor
     func testOnlyYellowAndRedHabitsShowAStatusBadge() {
         let app = XCUIApplication()
-        app.launchArguments = ["-HabitusResetData", "-HabitusSampleData"]
+        app.launchArguments = ["-HestiaResetData", "-HestiaSampleData"]
         app.launch()
         XCTAssertTrue(app.staticTexts["Lesen"].waitForExistence(timeout: 5))
 

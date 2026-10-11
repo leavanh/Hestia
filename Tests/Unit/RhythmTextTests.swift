@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import Habitus
+@testable import Hestia
 
 /// Rhythmus Zeile auf der `HabitCard` (Spezifikation 4.3.1).
 struct RhythmTextTests {

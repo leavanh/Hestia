@@ -1030,7 +1030,9 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
   - **Heute ohne Habits:** Fackel zwischen Altar und Statuette (Met 371844).
   - **Kalender ohne Daten:** Vestalin (Met 402697).
   - Die Leerzustände in Einstellungen ("Keine Pausen") und im Sheet "Tag bearbeiten" bekommen kein Bild. Höchstens ein Bild pro Leerzustand.
-  - Das Bild steht über dem Titel, auf Inhaltsbreite im Seitenverhältnis des Stichs, höchstens etwa 200 pt hoch (Startwert, nach der ersten Sichtung anpassen). Es ist dekorativ und für VoiceOver ausgeblendet.
+  - Das Bild steht über dem Titel, auf Inhaltsbreite im Seitenverhältnis des Stichs, höchstens etwa 200 pt hoch (Startwert, nach der ersten Sichtung anpassen). Es ist dekorativ und für VoiceOver ausgeblendet. *(Umgesetzt: beide Stiche sind hochkant und stehen deshalb 200 pt hoch, linksbündig wie der Text, `Theme.engravingMaxHeight`.)*
+  - Quelle sind die Versionen "web-large" der Met (ca. 550 × 625 px), nicht die Originale. Das reicht für 200 pt Höhe.
+  - Der Stich wird nicht in Punkte zerlegt, sondern aus dem Rotkanal als Tinte gelesen: Papier, Flecken und Bleistiftnotizen fallen weg, die Linien des Stichs bleiben. Hell Markenblau, dunkel Papier, jeweils auf transparentem Grund.
   - Passt ein Stich nach der Sichtung nicht zum Hermes Stil (neben dem Linolschnitt der Flamme), entscheiden wir für diesen Stich einzeln, ob er bleibt.
 
 **Später (nicht in Phase 12):** Feuer als Zustand. Aus der eigenen Flammenmaske werden Stufen abgeleitet (Funke für einen neuen Habit, Glut für eine Pause, volle Flamme für einen langen Streak). Das widerspricht der Regel "Kein Flammensymbol" an den Streak Zahlen (4.5 `HabitStatRow`) und müsste dort neu entschieden werden.
@@ -1038,17 +1040,19 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Umfang**
 - **Umbenennung** wie oben (ein Schritt, mechanisch: Ordner und Projekt mit `git mv`, Targets, Scheme, Testpläne, Bundle Identifier, Startargumente, `@testable import Hestia`). `INFOPLIST_KEY_CFBundleDisplayName` bleibt `Hestia`. *(Anzeigename erledigt.)*
 - **App Icon:** Flamme in Markenblau `#0000F2` auf Papier `#F2F2F2`, Varianten hell, dunkel und getönt (`AppIcon-light/-dark/-tinted`). `Branding/render_flame_icon.py` erzeugt alle Varianten, der Pfad zum Asset Katalog dort wird auf `Hestia/` angepasst. *(Icons erledigt.)* `Branding/render_icon.py` und `habitus-mark.svg` gehören zum alten Wochenkreis Icon.
-- **Wortmarke:** Fuß der Einstellungen (5.5) als Text in Barlow Condensed Regular, kein Bild. Eine Vektorvorlage in `Branding/` ist optional.
-- **Startbildschirm:** Eintrag `UILaunchScreen` mit Bild und Hintergrundfarbe aus dem Asset Katalog (je hell und dunkel) statt `INFOPLIST_KEY_UILaunchScreen_Generation`.
+- **Wortmarke:** Fuß der Einstellungen (5.5) als Text in Barlow Condensed Regular, kein Bild. Eine Vektorvorlage in `Branding/` ist optional. *(Umgesetzt: Schriftrolle `wordmark` in `Theme.Typography`, 28 pt, 6 % Laufweite. Version als "Version 1.0 (1)" aus `CFBundleShortVersionString` und `CFBundleVersion`.)*
+- **Startbildschirm:** Eintrag `UILaunchScreen` mit Bild und Hintergrundfarbe aus dem Asset Katalog (je hell und dunkel) statt `INFOPLIST_KEY_UILaunchScreen_Generation`. *(Umgesetzt: `Hestia/Info.plist` enthält nur `UILaunchScreen` und wird mit der erzeugten Info.plist zusammengeführt. Bild `LaunchFlame` und Farbe `LaunchBackground` erzeugt `Branding/render_launch_flame.py` aus `flame-mark.png`.)*
 - **Bildwelt:** Quellen mit Objektnummer, Link und Lizenz in `Branding/QUELLEN.md` (die Lizenz wird vor dem Einsatz auf der Seite der Met geprüft). Rasterung und Einfärbung per Skript `Branding/render_engravings.py`, keine Bilder von Hand bearbeitet. Die fertigen Bilder (hell und dunkel) liegen in `Assets.xcassets`, `EngravingImage` zeigt sie in `EmptyState`.
 
 **Definition of Done**
-- [ ] Das App Icon ist auf dem Homescreen sichtbar, in Hell, Dunkel und getönt, in unveränderter Größe.
-- [ ] Unter dem Icon steht "Hestia".
-- [ ] Bundle Identifier, Projekt, Targets, Scheme, Testpläne, Ordner und Startargumente heißen Hestia. Eine Suche nach `Habitus` im Projekt (außer in dieser Spezifikation und den alten Dateien in `Branding/`) findet nichts mehr.
-- [ ] Die neue App startet auf einem Gerät ohne die alte App leer und ohne Absturz. Angelegte Habits sind nach einem Neustart noch da.
-- [ ] Der Startbildschirm zeigt die Flamme, in Hell und Dunkel, ohne weißen Blitz.
-- [ ] Ganz unten in den Einstellungen stehen `HESTIA / HABITS` und die Version, in Hell und Dunkel gut lesbar.
-- [ ] Heute ohne Habits zeigt die Fackel, der Kalender ohne Daten die Vestalin, in Hell und Dunkel. Andere Leerzustände haben kein Bild.
-- [ ] Alle Bildquellen sind mit Lizenz in `Branding/QUELLEN.md` dokumentiert.
-- [ ] Unit Tests und die UI Tests aus "Komplett" laufen mit den neuen Startargumenten grün.
+- [x] Das App Icon ist auf dem Homescreen sichtbar, in Hell, Dunkel und getönt, in unveränderter Größe.
+- [x] Unter dem Icon steht "Hestia".
+- [x] Bundle Identifier, Projekt, Targets, Scheme, Testpläne, Ordner und Startargumente heißen Hestia. Eine Suche nach `Habitus` im Projekt (außer in dieser Spezifikation und den alten Dateien in `Branding/`) findet nichts mehr.
+- [x] Die neue App startet auf einem Gerät ohne die alte App leer und ohne Absturz. Angelegte Habits sind nach einem Neustart noch da.
+- [x] Der Startbildschirm zeigt die Flamme, in Hell und Dunkel, ohne weißen Blitz.
+- [x] Ganz unten in den Einstellungen stehen `HESTIA / HABITS` und die Version, in Hell und Dunkel gut lesbar.
+- [x] Heute ohne Habits zeigt die Fackel, der Kalender ohne Daten die Vestalin, in Hell und Dunkel. Andere Leerzustände haben kein Bild.
+- [x] Alle Bildquellen sind mit Lizenz in `Branding/QUELLEN.md` dokumentiert.
+- [x] Unit Tests und die UI Tests aus "Komplett" laufen mit den neuen Startargumenten grün.
+
+*Geprüft im Simulator (iPhone 18 Pro): Homescreen zeigt "Hestia" mit der Flamme, Icons unverändert. Startbildschirm hell Blau auf Papier, dunkel Papier auf Nachtblau, ohne weißen Blitz. Fackel in Heute und Vestalin im Kalender in Hell und Dunkel, "Keine Pausen" und "Nichts fällig" ohne Bild. Wortmarke und "Version 1.0 (1)" unten in den Einstellungen. Alte App und alter UI Test Runner aus beiden Simulatoren gelöscht. Unit Tests (250) grün, Komplett-Lauf grün bis auf `testCreateCheckUncheckAndPersist`, der einzeln wiederholt grün lief (wackelt beim schnellen Abhaken und Aufheben). Auf dem iPhone selbst noch zu prüfen: alte App löschen, neue startet leer.*

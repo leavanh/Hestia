@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import Habitus
+@testable import Hestia
 
 /// Pausen und Beenden in der `HabitEngine` (Spezifikation 3.5, 3.7, 3.8, 3.9) mit festen Daten.
 /// Heute ist Montag, der 12. Oktober 2026.

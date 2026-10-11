@@ -2,7 +2,7 @@ import XCTest
 
 /// Prüft die Definition of Done von Phase 3.1 direkt in der Oberfläche: Tag wechseln per Wischen,
 /// Rhythmus mit Varianten im Sheet, eine Liste und kein Text zum Fenster.
-/// Jeder Test startet mit leerem Datenbestand (`-HabitusResetData`).
+/// Jeder Test startet mit leerem Datenbestand (`-HestiaResetData`).
 final class TodayPhase31UITests: XCTestCase {
     override func setUp() {
         continueAfterFailure = false
@@ -11,7 +11,7 @@ final class TodayPhase31UITests: XCTestCase {
     @MainActor
     private func launchFresh(extraArguments: [String] = []) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-HabitusResetData"] + extraArguments
+        app.launchArguments = ["-HestiaResetData"] + extraArguments
         app.launch()
         return app
     }
@@ -56,7 +56,7 @@ final class TodayPhase31UITests: XCTestCase {
 
     @MainActor
     func testSwipingOnTheListChangesTheDay() {
-        let app = launchFresh(extraArguments: ["-HabitusSampleData"])
+        let app = launchFresh(extraArguments: ["-HestiaSampleData"])
         let list = app.scrollViews["today-list"]
         XCTAssertTrue(list.waitForExistence(timeout: 5))
         assertShownDay(plus: 0, in: app, "Start")
@@ -77,7 +77,7 @@ final class TodayPhase31UITests: XCTestCase {
 
     @MainActor
     func testCheckingOnAPastDayDoesNotChangeToday() {
-        let app = launchFresh(extraArguments: ["-HabitusSampleData"])
+        let app = launchFresh(extraArguments: ["-HestiaSampleData"])
         let list = app.scrollViews["today-list"]
         XCTAssertTrue(list.waitForExistence(timeout: 5))
         // Beispieldaten: "Meditieren" ist weder heute noch gestern erledigt.

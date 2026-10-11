@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import Habitus
+@testable import Hestia
 
 /// Reihenfolge der Heute Liste (Spezifikation 5.2, 6): offene zuerst, dann erledigte.
 struct HabitOrderTests {

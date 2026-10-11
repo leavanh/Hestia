@@ -1,7 +1,7 @@
 import XCTest
 
 /// Prüft die Definition of Done von Phase 7 direkt in der Oberfläche: Leerzustände.
-/// Jeder Test startet mit leerem Datenbestand (`-HabitusResetData`).
+/// Jeder Test startet mit leerem Datenbestand (`-HestiaResetData`).
 final class Phase7UITests: XCTestCase {
     override func setUp() {
         continueAfterFailure = false
@@ -10,7 +10,7 @@ final class Phase7UITests: XCTestCase {
     @MainActor
     private func launch(_ arguments: [String] = []) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-HabitusResetData"] + arguments
+        app.launchArguments = ["-HestiaResetData"] + arguments
         app.launch()
         return app
     }

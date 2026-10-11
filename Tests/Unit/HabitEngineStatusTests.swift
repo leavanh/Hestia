@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import Habitus
+@testable import Hestia
 
 /// Fälligkeit, Zählung im Fortschritt und Ampelstatus (Spezifikation 3.2, 3.4, 3.5) mit festen Daten.
 struct HabitEngineStatusTests {

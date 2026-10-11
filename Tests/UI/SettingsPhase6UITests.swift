@@ -1,7 +1,7 @@
 import XCTest
 
 /// Prüft die Definition of Done von Phase 6 direkt in der Oberfläche: Pausen, Beenden mit Historie behalten oder
-/// löschen und Sortieren. Jeder Test startet mit leerem Datenbestand (`-HabitusResetData`).
+/// löschen und Sortieren. Jeder Test startet mit leerem Datenbestand (`-HestiaResetData`).
 final class SettingsPhase6UITests: XCTestCase {
     override func setUp() {
         continueAfterFailure = false
@@ -10,7 +10,7 @@ final class SettingsPhase6UITests: XCTestCase {
     @MainActor
     private func launchFresh(extraArguments: [String] = []) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-HabitusResetData"] + extraArguments
+        app.launchArguments = ["-HestiaResetData"] + extraArguments
         app.launch()
         return app
     }
@@ -74,7 +74,7 @@ final class PausesWithSampleDataUITests: XCTestCase {
     @MainActor
     private func launch() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-HabitusResetData", "-HabitusSampleData", "-HabitusSamplePauses"]
+        app.launchArguments = ["-HestiaResetData", "-HestiaSampleData", "-HestiaSamplePauses"]
         app.launch()
         XCTAssertTrue(app.staticTexts["Lesen"].waitForExistence(timeout: 5))
         return app

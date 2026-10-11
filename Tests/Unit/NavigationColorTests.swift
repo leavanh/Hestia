@@ -1,6 +1,6 @@
 import Testing
 import UIKit
-@testable import Habitus
+@testable import Hestia
 
 /// Die Farben für die Navigationsleiste (Spezifikation 8.1) lösen sich erst beim Zeichnen auf und folgen dem Modus.
 struct NavigationColorTests {

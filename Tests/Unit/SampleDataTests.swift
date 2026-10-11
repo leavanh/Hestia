@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 import Testing
-@testable import Habitus
+@testable import Hestia
 
 /// Einstellungen > Entwickler: Testdaten und Zurücksetzen (Spezifikation 5.5, Phase 3).
 @MainActor

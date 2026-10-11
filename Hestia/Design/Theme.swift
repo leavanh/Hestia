@@ -102,6 +102,10 @@ enum Theme {
     /// Seitlicher Abstand des Strichs für einen pausierten Tag im kompakten Kalender (bei etwa 48 pt Kantenlänge).
     static let calendarDashInset: CGFloat = 14
 
+    /// Höhe eines Stichs im Leerzustand (`EngravingImage`, Phase 12). Beide Stiche sind hochkant, auf Inhaltsbreite
+    /// wären sie höher, deshalb ist das zugleich die Höchsthöhe.
+    static let engravingMaxHeight: CGFloat = 200
+
     // MARK: Marke
 
     private static let brandHex: UInt32 = 0x0000F2

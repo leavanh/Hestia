@@ -2,7 +2,9 @@ import SwiftUI
 
 /// Leerzustand ohne Karte: Titel in Rolle `display` (klein), ein Satz Erklärung in `body` und optional ein Button.
 /// Für Heute ohne Habits, den Kalender ohne Daten und die Einstellungen ohne Pausen.
+/// Ab Phase 12 optional ein Stich über dem Titel, nur in Heute und Kalender.
 struct EmptyState: View {
+    var engraving: EngravingImage.Motif?
     let title: String
     let message: String
     /// Bezeichner des Erklärungstexts für Tests.
@@ -15,10 +17,14 @@ struct EmptyState: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.inlineSpacing) {
             if showsHairline { Hairline() }
+            if let engraving {
+                EngravingImage(motif: engraving)
+                    .padding(.top, showsHairline ? Theme.spacing : 0)
+            }
             Text(title)
                 .displayText(small: true)
                 .foregroundStyle(Theme.ink)
-                .padding(.top, showsHairline ? Theme.textSpacing : 0)
+                .padding(.top, showsHairline || engraving != nil ? Theme.textSpacing : 0)
                 .accessibilityAddTraits(.isHeader)
             Text(message)
                 .bodyText()
@@ -40,6 +46,7 @@ struct EmptyState: View {
         PaperBackground()
         VStack(spacing: Theme.spacing) {
             EmptyState(
+                engraving: .torch,
                 title: "Noch keine Habits",
                 message: "Lege deinen ersten Habit an.", actionTitle: "Habit anlegen", action: {}
             )

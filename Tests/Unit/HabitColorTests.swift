@@ -1,7 +1,7 @@
 import SwiftUI
 import Testing
 import UIKit
-@testable import Habitus
+@testable import Hestia
 
 /// Habitfarben (Spezifikation 4.2): Tinte im hellen, Leuchtfarbe im dunklen Modus, Schlüssel und Kontrast.
 struct HabitColorTests {
