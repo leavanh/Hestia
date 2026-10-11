@@ -1115,14 +1115,14 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - [x] Das App Icon ist auf dem Homescreen sichtbar, in Hell, Dunkel und getönt, in unveränderter Größe.
 - [x] Unter dem Icon steht "Hestia".
 - [x] Bundle Identifier, Projekt, Targets, Scheme, Testpläne, Ordner und Startargumente heißen Hestia. Eine Suche nach `Habitus` im Projekt (außer in dieser Spezifikation und den alten Dateien in `Branding/`) findet nichts mehr.
-- [ ] Die neue App startet auf einem Gerät ohne die alte App leer und ohne Absturz. Angelegte Habits sind nach einem Neustart noch da.
+- [x] Die neue App startet auf einem Gerät ohne die alte App leer und ohne Absturz. Angelegte Habits sind nach einem Neustart noch da.
 - [x] Der Startbildschirm zeigt die Flamme, in Hell und Dunkel, ohne weißen Blitz.
 - [x] Ganz unten in den Einstellungen stehen `HESTIA / HABITS` und die Version, in Hell und Dunkel gut lesbar.
 - [x] Heute ohne Habits zeigt die Vestalin, der Kalender ohne Daten die Fackel, in Hell und Dunkel. Andere Leerzustände haben kein Bild.
 - [x] Alle Bildquellen sind mit Lizenz in `Branding/QUELLEN.md` dokumentiert.
 - [x] Unit Tests und die UI Tests aus "Komplett" laufen mit den neuen Startargumenten grün.
 
-*Geprüft im Simulator (iPhone 18 Pro): Homescreen zeigt "Hestia" mit der Flamme, Icons unverändert. Startbildschirm hell Blau auf Papier, dunkel Papier auf Nachtblau, ohne weißen Blitz. Vestalin in Heute und Fackel im Kalender in Hell und Dunkel (nach der Sichtung getauscht), "Keine Pausen" und "Nichts fällig" ohne Bild. Wortmarke und "Version 1.0 (1)" unten in den Einstellungen. Alte App und alter UI Test Runner aus beiden Simulatoren gelöscht. Unit Tests (250) grün. Komplett-Lauf auf dem Endstand (große Flamme, Wortmarke links, Stiche getauscht) vollständig grün, alle 20 UI Tests. Im ersten Lauf war `testCreateCheckUncheckAndPersist` einmal fehlgeschlagen (wackelt beim schnellen Abhaken und Aufheben). Auf dem iPhone: "Habitus" ist nicht mehr installiert, der Endstand von Hestia ist als Update installiert. Start auf dem Gerät noch offen (Gerät war gesperrt).*
+*Geprüft im Simulator (iPhone 18 Pro): Homescreen zeigt "Hestia" mit der Flamme, Icons unverändert. Startbildschirm hell Blau auf Papier, dunkel Papier auf Nachtblau, ohne weißen Blitz. Vestalin in Heute und Fackel im Kalender in Hell und Dunkel (nach der Sichtung getauscht), "Keine Pausen" und "Nichts fällig" ohne Bild. Wortmarke und "Version 1.0 (1)" unten in den Einstellungen. Alte App und alter UI Test Runner aus beiden Simulatoren gelöscht. Unit Tests (250) grün. Komplett-Lauf auf dem Endstand (große Flamme, Wortmarke links, Stiche getauscht) vollständig grün, alle 20 UI Tests. Im ersten Lauf war `testCreateCheckUncheckAndPersist` einmal fehlgeschlagen (wackelt beim schnellen Abhaken und Aufheben). Auf dem iPhone 16 Pro: "Habitus" ist nicht mehr installiert. Hestia gelöscht und neu installiert, startet leer (0 Habits) und ohne Absturz. Danach die vorher gesicherten Daten (16 Habits, 5 Erledigungen) zurückgespielt, nach dem Neustart vollständig da.*
 
 ---
 
