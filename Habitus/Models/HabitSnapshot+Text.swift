@@ -12,8 +12,7 @@ extension HabitSnapshot {
         case .monthly:
             return "\(window?.done ?? 0) von \(max(targetCount, 1)) diesen Monat"
         case .weekdays:
-            let names = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
-            return Set(weekdays).sorted().compactMap { (1...7).contains($0) ? names[$0 - 1] : nil }
+            return Set(weekdays).sorted().compactMap { (1...7).contains($0) ? DayText.weekdayNames[$0 - 1] : nil }
                 .joined(separator: " · ")
         case .monthDay:
             return "Am \(monthDay ?? 1). des Monats"

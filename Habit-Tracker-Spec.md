@@ -363,7 +363,7 @@ Ab Phase 8: Die Tab Bar bleibt die des Systems, getönt in `ink`. Hintergrund de
   3. **Fortschritt:** links groß "erledigte Punkte/Punkte" (Rolle `numeral`, z.B. "4/6"), daneben klein untereinander "Erledigt" und die Prozent ("67 %") in Rolle `meta`. Zählung wie 3.4, nur die Darstellung ist neu. Bei 0 Punkten steht statt Zahl und Balken "Heute nichts fällig" (Rolle `title`). Darunter die `SegmentBar`.
   4. **Wochenstreifen** (`WeekStrip`): Mo bis So der ISO Woche des angezeigten Tags, der angezeigte Tag invertiert. Antippen eines vergangenen Tags oder von heute wechselt dorthin, mit derselben Animation wie Wischen (Richtung nach Datum). Tage nach heute sind blass und nicht antippbar. Wischen über eine Wochengrenze zeigt im Streifen die neue Woche. VoiceOver liest jeden Tag als vollständiges Datum, der angezeigte Tag ist als ausgewählt markiert.
 - **Listenkopf (ab Phase 9):** Direkt unter dem Band eine Zeile in Rolle `meta`: links die Anzahl der Zeilen in der Liste ("6 Habits", Einzahl "1 Habit", pausierte zählen mit), rechts der Button "Sortieren" bzw. im Sortiermodus "Fertig" (Variante `text`). Er ersetzt den Button oben links.
-- **Scrollen (ab Phase 9):** Das Band scrollt mit dem Inhalt weg. Ist es aus dem Bild gescrollt (Schwelle `Theme.barTitleScrollOffset`), erscheint oben eine schmale Leiste in `band` mit "Heute · 4/6" (Titel und Fortschritt, Rolle `label`) links und dem Plus Button rechts. Sie ersetzt den kleinen Navigationstitel. Wischen und Tageswechsel funktionieren in beiden Zuständen.
+- **Scrollen (ab Phase 9):** Das Band scrollt mit dem Inhalt weg. Ist es aus dem Bild gescrollt (Schwelle `Theme.compactBarScrollOffset`: vom Band ist weniger als diese Höhe zu sehen), erscheint oben eine schmale Leiste in `band` mit "Heute · 4/6" (Titel und Fortschritt, Rolle `label`) links und dem Plus Button rechts. Sie ersetzt den kleinen Navigationstitel. Wischen und Tageswechsel funktionieren in beiden Zuständen.
 - *Bis Phase 8:* **Kopfbereich ohne Karte:** Oben steht das Datum des angezeigten Tags im Stil eines großen Navigationstitels (Large Title einer `NavigationStack`: Schrift, Gewicht, Einzug links). Titel ist der Wochentag ("Donnerstag"), darunter als Untertitel das Datum ("8. Oktober"). Beim Scrollen verhält sich der Titel wie ein Large Title und wird klein in der Leiste angezeigt. Darunter der `ProgressHeader`, ebenfalls ohne Karte und ohne Glas direkt auf dem Hintergrund. Neben dem Datum steht eine kleine Kapsel: "Heute" in Akzentfarbe, an vergangenen Tagen neutral "Gestern", "Vorgestern" oder "Vor n Tagen". In der kleinen Leiste steht sie hinter dem Datum.
 - **Tag wechseln:** Waagrechtes Wischen im Inhalt von Heute (Kopfbereich und Liste) nach rechts zeigt den vorherigen Tag, nach links den nächsten Tag. Senkrechtes Scrollen, Abhakkreis und Counter funktionieren weiter wie bisher. Weiter als bis heute geht es nicht, zukünftige Tage sind nicht erreichbar. Beim Start der App, beim Zurückkehren in die App und beim Tageswechsel um Mitternacht zeigt die Ansicht wieder heute.
 - **Animation beim Tageswechsel:** Titel, Untertitel, Fortschritt und Liste gleiten in Wischrichtung heraus und der neue Tag gleitet von der anderen Seite herein (zurück in die Vergangenheit: Inhalt kommt von links, vorwärts: von rechts), kurz und weich (ca. 0,3 s). Wird nicht gewechselt, weil heute schon erreicht ist, federt der Inhalt nur kurz zurück. Der neue Tag federt dabei Kopf und Karten nacheinander (leicht versetzt) herein. Bei "Bewegung reduzieren" (Reduce Motion) nur Überblenden. Das Zurückspringen auf heute (Start, Rückkehr, Mitternacht) ist nicht animiert.
@@ -891,13 +891,13 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Plus und Sortieren: den bestehenden Test `testPlusAndSortInTheBar` an die neuen Orte anpassen, kein neuer Test.
 
 **Definition of Done**
-- [ ] Oben in Heute steht ein blaues Band mit Datum und Kalenderwoche, großem Titel, großem Fortschritt, Balken und Wochenstreifen, in Hell und Dunkel.
-- [ ] Der Fortschritt zählt genau wie vorher (3.4), nur die Darstellung ist neu.
-- [ ] Auf den Karten stehen die 7 Tage Punkte neben der Rhythmus Zeile.
-- [ ] Ich kann einen Tag der aktuellen Woche antippen und lande dort. Zukünftige Tage lassen sich nicht antippen. Wischen funktioniert weiter, auch über Wochengrenzen.
-- [ ] Beim Scrollen erscheint oben die schmale blaue Leiste mit Titel und Fortschritt, der Plus Button ist immer erreichbar.
-- [ ] Die Statusleiste ist auf dem Band gut lesbar.
-- [ ] Die Suche aus "Aufräumen" findet nichts mehr.
+- [x] Oben in Heute steht ein blaues Band mit Datum und Kalenderwoche, großem Titel, großem Fortschritt, Balken und Wochenstreifen, in Hell und Dunkel.
+- [x] Der Fortschritt zählt genau wie vorher (3.4), nur die Darstellung ist neu.
+- [x] Auf den Karten stehen die 7 Tage Punkte neben der Rhythmus Zeile.
+- [x] Ich kann einen Tag der aktuellen Woche antippen und lande dort. Zukünftige Tage lassen sich nicht antippen. Wischen funktioniert weiter, auch über Wochengrenzen.
+- [x] Beim Scrollen erscheint oben die schmale blaue Leiste mit Titel und Fortschritt, der Plus Button ist immer erreichbar.
+- [x] Die Statusleiste ist auf dem Band gut lesbar. *Umsetzung: iOS passt die Schrift der Statusleiste selbst an den Inhalt darunter an (hell auf dem Band, dunkel im Sortiermodus auf Papier), dafür war kein eigener Code nötig.*
+- [x] Die Suche aus "Aufräumen" findet nichts mehr.
 
 ---
 

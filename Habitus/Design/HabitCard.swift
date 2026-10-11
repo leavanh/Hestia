@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Flache Zeile eines Habits mit Haarlinie oben: links Icon mit Statusmarke, Name, Rhythmus Zeile und 7 Tage Punkte,
-/// rechts `CheckBox` oder `CounterControl`.
+/// Flache Zeile eines Habits mit Haarlinie oben: links Icon mit Statusmarke, Name und darunter Rhythmus Zeile mit den
+/// 7 Tage Punkten rechts daneben, rechts `CheckBox` oder `CounterControl`.
 /// Festes Drücken (`Theme.editPressDuration`) auf die linke Seite ruft `onEdit` auf (auch als VoiceOver Aktion "Bearbeiten"),
 /// die rechte Seite bedient sich selbst. Ein pausierter Habit ist ausgegraut, trägt den Chip "Pausiert" neben dem Namen
 /// und lässt sich nicht abhaken. Dabei sinkt die Zeile kurz ein und gibt einen leichten, beim Auslösen einen festen Impuls.
@@ -37,11 +37,17 @@ struct HabitCard<Control: View>: View {
                                 .accessibilityIdentifier("paused-\(name)")
                         }
                     }
-                    Text(rhythmText)
-                        .metaText()
-                        .foregroundStyle(Theme.inkSecondary)
-                        .accessibilityIdentifier("repeat-\(name)")
-                    WeekDots(dots: dots, color: habitColor.color)
+                    // Rhythmus Zeile und 7 Tage Punkte in einer Zeile, bei zu wenig Platz die Punkte darunter.
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: Theme.inlineSpacing) {
+                            rhythmLine.fixedSize()
+                            weekDots
+                        }
+                        VStack(alignment: .leading, spacing: Theme.textSpacing) {
+                            rhythmLine
+                            weekDots
+                        }
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -74,6 +80,17 @@ struct HabitCard<Control: View>: View {
         .overlay(alignment: .top) { Hairline() }
         .scaleEffect(isPreviewing ? Theme.pressedCardScale : 1)
         .animation(.spring(duration: 0.25, bounce: 0.3), value: isPreviewing)
+    }
+
+    private var rhythmLine: some View {
+        Text(rhythmText)
+            .metaText()
+            .foregroundStyle(Theme.inkSecondary)
+            .accessibilityIdentifier("repeat-\(name)")
+    }
+
+    private var weekDots: some View {
+        WeekDots(dots: dots, color: habitColor.color)
     }
 }
 

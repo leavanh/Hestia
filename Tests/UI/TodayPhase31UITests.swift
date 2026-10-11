@@ -16,29 +16,29 @@ final class TodayPhase31UITests: XCTestCase {
         return app
     }
 
-    /// Wochentag (Titel) und Datum (Untertitel) von Heute, `offset` Tage nach heute.
-    private func expectedDay(plus offset: Int = 0) -> (title: String, subtitle: String) {
+    /// Titel ("Heute", "Gestern" …) und Datumszeile (als vollständiges Datum für VoiceOver) des Tags `offset` Tage nach heute.
+    private func expectedDay(plus offset: Int = 0) -> (title: String, date: String) {
         let date = Calendar.current.date(byAdding: .day, value: offset, to: .now)!
-        let locale = Locale(identifier: "de_DE")
+        let titles = ["Heute", "Gestern", "Vorgestern"]
         return (
-            date.formatted(.dateTime.weekday(.wide).locale(locale)),
-            date.formatted(.dateTime.day().month(.wide).locale(locale))
+            -offset < titles.count ? titles[-offset] : "Vor \(-offset) Tagen",
+            date.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "de_DE")))
         )
     }
 
-    /// Wartet, bis Titel und Untertitel den Tag zeigen und nur noch ein Kopf im Bild ist (nach der Animation).
+    /// Wartet, bis Titel und Datumszeile den Tag zeigen und nur noch ein Kopf im Bild ist (nach der Animation).
     @MainActor
     private func assertShownDay(plus offset: Int, in app: XCUIApplication, _ message: String) {
         let expected = expectedDay(plus: offset)
         let title = app.staticTexts.matching(identifier: "today-title")
-        let subtitle = app.staticTexts.matching(identifier: "today-subtitle")
+        let date = app.staticTexts.matching(identifier: "today-date")
         let deadline = Date().addingTimeInterval(5)
         while Date() < deadline {
-            if title.count == 1, subtitle.count == 1,
-               title.firstMatch.label == expected.title, subtitle.firstMatch.label == expected.subtitle { return }
+            if title.count == 1, date.count == 1,
+               title.firstMatch.label == expected.title, date.firstMatch.label == expected.date { return }
             Thread.sleep(forTimeInterval: 0.1)
         }
-        XCTFail("\(message): erwartet \(expected.title), \(expected.subtitle)")
+        XCTFail("\(message): erwartet \(expected.title), \(expected.date)")
     }
 
     @MainActor

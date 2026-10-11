@@ -4,7 +4,6 @@ import SwiftUI
 struct TodayView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Query(sort: \Habit.createdAt) private var habits: [Habit]
 
     @State private var today = AppClock.now
@@ -20,8 +19,10 @@ struct TodayView: View {
     @State private var entranceEdge: Edge?
     /// Versatz des Inhalts beim Zurückfedern, wenn über heute hinaus gewischt wird.
     @State private var bounceOffset: CGFloat = 0
-    /// Ob der Titel schon aus dem Sichtbereich gescrollt ist und klein in der Leiste steht.
-    @State private var showsBarTitle = false
+    /// Ob das Kopfband aus dem Bild gescrollt ist und oben die kleine Leiste steht.
+    @State private var showsCompactBar = false
+    /// Höhe des Kopfbands, für die Schwelle der kleinen Leiste.
+    @State private var bandHeight: CGFloat = 0
 
     private let engine = HabitEngine()
 
@@ -42,29 +43,19 @@ struct TodayView: View {
 
     var body: some View {
         let due = dueHabits
-        NavigationStack {
-            Group {
-                if isSorting {
-                    HabitSortList(habits: habits, day: shownDay) { isSorting = false }
-                } else {
-                    dayScroll(for: due, paused: pausedHabits)
-                }
+        Group {
+            if isSorting {
+                HabitSortList(habits: habits, day: shownDay) { isSorting = false }
+            } else {
+                dayScroll(for: due, paused: pausedHabits)
             }
-            .background { PaperBackground() }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    if !isSorting {
-                        barTitle
-                    }
-                }
-            }
-            .sheet(isPresented: $isCreating) {
-                HabitEditorSheet()
-            }
-            .sheet(item: $editingHabit) { habit in
-                HabitEditorSheet(habit: habit)
-            }
+        }
+        .background { PaperBackground() }
+        .sheet(isPresented: $isCreating) {
+            HabitEditorSheet()
+        }
+        .sheet(item: $editingHabit) { habit in
+            HabitEditorSheet(habit: habit)
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { showToday() }
@@ -76,37 +67,37 @@ struct TodayView: View {
         }
     }
 
-    /// Die Tagesansicht: Kopfbereich und Liste, mit Wischen zum Wechseln des Tages.
+    /// Die Tagesansicht: Kopfband, Listenkopf und Liste, mit Wischen zum Wechseln des Tages. Ist das Band aus dem
+    /// Bild gescrollt, steht oben die kleine Leiste.
     private func dayScroll(for due: [Habit], paused: [Habit]) -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: Theme.sectionSpacing) {
-                actionRow
-                header(for: due)
-                    .dayEntrance(from: entranceEdge, index: 0)
-                if hasNoActiveHabits && due.isEmpty && paused.isEmpty {
-                    EmptyState(
-                        title: "Noch keine Habits",
-                        message: "Hier erscheinen deine Habits an jedem Tag, an dem sie fällig sind.",
-                        identifier: "today-empty",
-                        actionTitle: "Lege deinen ersten Habit an",
-                        action: { isCreating = true }
-                    )
-                    .dayEntrance(from: entranceEdge, index: 1)
-                }
-                VStack(spacing: 0) {
-                    ForEach(Array((due + paused).enumerated()), id: \.element.id) { index, habit in
-                        DayHabitCard(habit: habit, day: shownDay) { editingHabit = habit }
-                            .dayEntrance(from: entranceEdge, index: index + 1)
+        let progress = engine.dayProgress(due.map(\.snapshot), on: shownDay)
+        let rows = due + paused
+        return ScrollView {
+            VStack(spacing: 0) {
+                DayHeader(
+                    day: shownDay,
+                    today: today,
+                    progress: progress,
+                    engine: engine,
+                    transition: dayTransition,
+                    entranceEdge: entranceEdge,
+                    onAdd: { isCreating = true },
+                    onBackToToday: { show(today) },
+                    onSelectDay: { show($0) }
+                )
+                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { bandHeight = $0 }
+                VStack(alignment: .leading, spacing: 0) {
+                    listHeader(count: rows.count)
+                    ZStack(alignment: .top) {
+                        dayList(rows, isEmpty: hasNoActiveHabits && rows.isEmpty)
+                            .id(engine.startOfDay(shownDay))
+                            .transition(dayTransition)
                     }
                 }
-                .animation(reduceMotion ? nil : .smooth, value: (due + paused).map(\.id))
+                .padding(.horizontal, Theme.spacing)
+                .padding(.bottom, Theme.spacing)
             }
-            .padding(.horizontal, Theme.spacing)
-            .padding(.top, Theme.headerTopSpacing)
-            .padding(.bottom, Theme.spacing)
             .offset(x: bounceOffset)
-            .id(engine.startOfDay(shownDay))
-            .transition(dayTransition)
         }
         .accessibilityIdentifier("today-list")
         .scrollsToTopOnTabReselect()
@@ -115,11 +106,77 @@ struct TodayView: View {
                 .onEnded { swipe(by: $0.translation) }
         )
         .onScrollGeometryChange(for: Bool.self) { geometry in
-            geometry.contentOffset.y + geometry.contentInsets.top > Theme.barTitleScrollOffset
-        } action: { _, isScrolled in
-            showsBarTitle = isScrolled
+            bandHeight > 0
+                && geometry.contentOffset.y + geometry.contentInsets.top > bandHeight - Theme.compactBarScrollOffset
+        } action: { _, isScrolledOut in
+            showsCompactBar = isScrolledOut
         }
+        .overlay(alignment: .top) {
+            if showsCompactBar {
+                compactBar(progress: progress)
+                    .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .animation(.easeInOut(duration: Theme.compactBarFadeDuration), value: showsCompactBar)
         .sensoryFeedback(.selection, trigger: engine.startOfDay(shownDay))
+    }
+
+    /// Anzahl der Zeilen links, "Sortieren" rechts (Spezifikation 5.2).
+    private func listHeader(count: Int) -> some View {
+        HStack {
+            Text(HabitCountText.text(count))
+                .metaText()
+                .foregroundStyle(Theme.inkSecondary)
+                .accessibilityIdentifier("habit-count")
+            Spacer()
+            HermesButton("Sortieren", variant: .text) {
+                isSorting = true
+            }
+            .fixedSize()
+            .disabled(hasNoActiveHabits)
+            .accessibilityIdentifier("sort-toggle")
+        }
+    }
+
+    /// Die Karten des angezeigten Tags, ohne aktive Habits der Leerzustand. Sie federn nach dem Kopfband herein.
+    private func dayList(_ rows: [Habit], isEmpty: Bool) -> some View {
+        VStack(spacing: Theme.sectionSpacing) {
+            if isEmpty {
+                EmptyState(
+                    title: "Noch keine Habits",
+                    message: "Hier erscheinen deine Habits an jedem Tag, an dem sie fällig sind.",
+                    identifier: "today-empty",
+                    actionTitle: "Lege deinen ersten Habit an",
+                    action: { isCreating = true }
+                )
+                .dayEntrance(from: entranceEdge, index: 3)
+            }
+            VStack(spacing: 0) {
+                ForEach(Array(rows.enumerated()), id: \.element.id) { index, habit in
+                    DayHabitCard(habit: habit, day: shownDay) { editingHabit = habit }
+                        .dayEntrance(from: entranceEdge, index: index + 3)
+                }
+            }
+            .animation(reduceMotion ? nil : .smooth, value: rows.map(\.id))
+        }
+    }
+
+    /// Schmale Leiste in `band`, solange das Kopfband aus dem Bild gescrollt ist: "Heute · 4/6" und Plus.
+    private func compactBar(progress: DayProgress) -> some View {
+        let title = RelativeDay.text(daysAgo: daysAgo)
+        return HStack(spacing: Theme.inlineSpacing) {
+            Text(progress.total == 0 ? title : "\(title) · \(progress.done)/\(progress.total)")
+                .labelText()
+                .lineLimit(1)
+            Spacer(minLength: 0)
+            PlusButton { isCreating = true }
+        }
+        .foregroundStyle(Theme.onBand)
+        .padding(.horizontal, Theme.spacing)
+        .padding(.vertical, Theme.compactBarPadding)
+        .background { Theme.band.ignoresSafeArea(edges: .top) }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("compact-bar")
     }
 
     /// Beim Start, beim Zurückkehren in die App und um Mitternacht zeigt die Ansicht wieder heute, ohne Animation.
@@ -142,15 +199,20 @@ struct TodayView: View {
         guard let day = engine.calendar.date(byAdding: .day, value: step, to: shownDay) else { return }
 
         if engine.startOfDay(day) <= engine.startOfDay(today) {
-            show(day, enteringFrom: step < 0 ? .leading : .trailing)
+            show(day)
         } else {
             bounce()
         }
     }
 
-    /// Wechselt den Tag animiert. Die Richtung wird zuerst gesetzt und der Tag erst im nächsten Durchlauf,
-    /// damit auch der abgehende Inhalt in die richtige Richtung herausgleitet.
-    private func show(_ day: Date, enteringFrom edge: Edge) {
+    /// Wechselt den Tag animiert (Wischen, Wochenstreifen, "Heute ›"). Ein früherer Tag kommt von links, ein späterer
+    /// von rechts. Die Richtung wird zuerst gesetzt und der Tag erst im nächsten Durchlauf, damit auch der abgehende
+    /// Inhalt in die richtige Richtung herausgleitet.
+    private func show(_ day: Date) {
+        let target = engine.startOfDay(day)
+        let current = engine.startOfDay(shownDay)
+        guard target != current, target <= engine.startOfDay(today) else { return }
+        let edge: Edge = target < current ? .leading : .trailing
         slideEdge = edge
         entranceEdge = reduceMotion ? nil : edge
         Task { @MainActor in
@@ -185,106 +247,8 @@ struct TodayView: View {
         )
     }
 
-    private var weekdayText: String {
-        shownDay.formatted(.dateTime.weekday(.wide).locale(Locale(identifier: "de_DE")))
-    }
-
-    private var dateText: String {
-        shownDay.formatted(.dateTime.day().month(.wide).locale(Locale(identifier: "de_DE")))
-    }
-
     private var daysAgo: Int {
         engine.calendar.dateComponents([.day], from: engine.startOfDay(shownDay), to: engine.startOfDay(today)).day ?? 0
-    }
-
-    private var dayLabel: String {
-        RelativeDay.text(daysAgo: daysAgo)
-    }
-
-    /// Springt auf der Datumszeile animiert zu heute zurück. Das Chevron zeigt vorwärts in Richtung heute.
-    private var backToTodayButton: some View {
-        Button {
-            show(today, enteringFrom: .trailing)
-        } label: {
-            HStack(spacing: 2) {
-                Text("Heute").labelText()
-                Image(systemName: "chevron.right")
-                    .font(Theme.Typography.symbolSmall)
-            }
-        }
-        .buttonStyle(.hermes(.text))
-        .accessibilityIdentifier("back-to-today")
-    }
-
-    /// Sortieren links und Plus rechts über dem Kopfbereich. Die Buttons stehen im Inhalt statt in der Navigationsleiste,
-    /// weil die Leiste nach einem Wechsel zwischen Hell und Dunkel bei laufender App ihre Farben nicht mehr aktualisiert.
-    private var actionRow: some View {
-        HStack {
-            HermesButton("Sortieren", variant: .text) {
-                isSorting = true
-            }
-            .fixedSize()
-            .disabled(hasNoActiveHabits)
-            .accessibilityIdentifier("sort-toggle")
-            Spacer()
-            Button {
-                isCreating = true
-            } label: {
-                Image(systemName: "plus")
-                    .font(Theme.Typography.symbol)
-                    .fixedControlTypeSize()
-            }
-            .buttonStyle(.hermes(.quiet, isSquare: true))
-            .accessibilityLabel("Neuer Habit")
-        }
-    }
-
-    /// Kopfbereich ohne Karte: Wochentag als großer Titel, Datum als Untertitel, darunter der Fortschritt.
-    private func header(for due: [Habit]) -> some View {
-        VStack(alignment: .leading, spacing: Theme.spacing) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(weekdayText)
-                    .displayText()
-                    .foregroundStyle(Theme.ink)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
-                    .accessibilityAddTraits(.isHeader)
-                    .accessibilityIdentifier("today-title")
-                AdaptiveStack(spacing: Theme.inlineSpacing) {
-                    Text(dateText)
-                        .metaText()
-                        .foregroundStyle(Theme.inkSecondary)
-                        .accessibilityIdentifier("today-subtitle")
-                    Chip(text: dayLabel, isInverted: daysAgo == 0)
-                        .accessibilityIdentifier("today-badge")
-                    if !dynamicTypeSize.isAccessibilitySize {
-                        Spacer(minLength: 0)
-                    }
-                    if daysAgo > 0 {
-                        backToTodayButton
-                    }
-                }
-            }
-            ProgressHeader(progress: engine.dayProgress(due.map(\.snapshot), on: shownDay))
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("today-header")
-    }
-
-    /// Kleiner Titel in der Leiste, sobald der große aus dem Bild gescrollt ist.
-    private var barTitle: some View {
-        VStack(spacing: 0) {
-            Text(weekdayText)
-                .labelText()
-                .foregroundStyle(Theme.ink)
-            Text("\(dateText) · \(dayLabel)")
-                .metaText()
-                .foregroundStyle(Theme.inkSecondary)
-        }
-        .opacity(showsBarTitle ? 1 : 0)
-        .animation(.easeInOut(duration: 0.2), value: showsBarTitle)
-        .accessibilityHidden(true)
     }
 }
 

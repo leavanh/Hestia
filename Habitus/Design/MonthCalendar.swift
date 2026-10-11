@@ -116,7 +116,7 @@ struct MonthCalendar: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .accessibilityLabel(day.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "de_DE"))))
+        .accessibilityLabel(DayText.fullDate(day))
         .accessibilityValue(isFuture ? "" : (isPausedDay ? "Pausiert" : value(for: dayProgress)))
         .accessibilityIdentifier("\(identifierPrefix)-day-\(Self.identifier(for: day, calendar: engine.calendar))")
     }
@@ -139,8 +139,6 @@ struct MonthCalendar: View {
 
 /// Wochentagszeile Mo bis So unter dem Monatsnamen.
 struct CalendarWeekdayHeader: View {
-    private static let weekdays = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
-
     /// Sieben gleich breite Spalten, auch für die Tage darunter.
     static var columns: [GridItem] {
         Array(repeating: GridItem(.flexible(), spacing: Theme.calendarDaySpacing), count: 7)
@@ -148,7 +146,7 @@ struct CalendarWeekdayHeader: View {
 
     var body: some View {
         LazyVGrid(columns: Self.columns, spacing: 0) {
-            ForEach(Self.weekdays, id: \.self) { weekday in
+            ForEach(DayText.weekdayNames, id: \.self) { weekday in
                 Text(weekday)
                     .labelText(small: true)
                     .fixedControlTypeSize()

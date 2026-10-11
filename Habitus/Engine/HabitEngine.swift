@@ -68,6 +68,19 @@ nonisolated struct DayProgress: Equatable, Sendable {
     }
 }
 
+/// Ein Tag im Wochenstreifen von Heute (Spezifikation 5.2).
+nonisolated struct WeekStripDay: Equatable, Sendable {
+    /// Tagesbeginn.
+    var day: Date
+    /// Der Tag, den Heute gerade zeigt.
+    var isShown: Bool
+    /// Nach heute: blass und nicht antippbar.
+    var isFuture: Bool
+
+    /// Heute und vergangene Tage lassen sich antippen.
+    var isSelectable: Bool { !isFuture }
+}
+
 /// Rechenlogik ohne Oberfläche und ohne SwiftData.
 /// "Heute" wird immer als Parameter übergeben, damit Tests mit festen Daten möglich sind.
 nonisolated struct HabitEngine: Sendable {
@@ -371,6 +384,33 @@ nonisolated struct HabitEngine: Sendable {
             if startOfDay(date) >= created, isPaused(habit, on: date) { return .paused }
             let value = Double(count(on: date, in: habit.counts))
             return .fill(min(max(value / target, 0), 1))
+        }
+    }
+
+    // MARK: Wochenstreifen (Spezifikation 5.2)
+
+    /// Kalenderwoche nach ISO 8601: Wochen beginnen am Montag, Woche 1 enthält den ersten Donnerstag des Jahres.
+    func isoWeek(_ day: Date) -> Int {
+        var iso = Calendar(identifier: .iso8601)
+        iso.timeZone = calendar.timeZone
+        return iso.component(.weekOfYear, from: day)
+    }
+
+    /// Montag der Woche von `day`.
+    func startOfWeek(_ day: Date) -> Date {
+        let start = startOfDay(day)
+        return calendar.date(byAdding: .day, value: 1 - weekday(of: start), to: start) ?? start
+    }
+
+    /// Die 7 Tage Mo bis So der Woche von `day`. `day` ist angezeigt, Tage nach `today` sind Zukunft.
+    func weekStrip(_ day: Date, today: Date) -> [WeekStripDay] {
+        let shown = startOfDay(day)
+        let today = startOfDay(today)
+        let monday = startOfWeek(shown)
+        return (0..<7).compactMap { offset in
+            guard let date = calendar.date(byAdding: .day, value: offset, to: monday) else { return nil }
+            let start = startOfDay(date)
+            return WeekStripDay(day: start, isShown: start == shown, isFuture: start > today)
         }
     }
 }

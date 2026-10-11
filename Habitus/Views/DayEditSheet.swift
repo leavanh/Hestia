@@ -20,7 +20,7 @@ struct DayEditSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: Theme.sectionSpacing) {
-                    ProgressHeader(progress: engine.dayProgress(due.map(\.snapshot), on: day))
+                    progressSummary(engine.dayProgress(due.map(\.snapshot), on: day))
                     if due.isEmpty && paused.isEmpty {
                         EmptyState(
                             title: "Nichts fällig",
@@ -53,6 +53,21 @@ struct DayEditSheet: View {
                 HabitEditorSheet(habit: habit)
             }
         }
+    }
+
+    /// Einfacher Kopf des Sheets: "5 von 16 · 31 %" in Rolle `meta` und darunter die `SegmentBar`.
+    private func progressSummary(_ progress: DayProgress) -> some View {
+        // Geschütztes Leerzeichen, damit "%" bei großer Schrift nicht allein umbricht.
+        let text = progress.total == 0
+            ? "Nichts fällig"
+            : "\(progress.done) von \(progress.total) · \(progress.percent)\u{00A0}%"
+        return VStack(alignment: .leading, spacing: Theme.inlineSpacing) {
+            Text(text)
+                .metaText()
+                .accessibilityIdentifier("progress-text")
+            SegmentBar(done: progress.done, total: progress.total)
+        }
+        .foregroundStyle(Theme.ink)
     }
 }
 

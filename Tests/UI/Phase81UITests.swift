@@ -48,6 +48,13 @@ final class Phase81UITests: XCTestCase {
         let sort = app.buttons["sort-toggle"]
         XCTAssertTrue(sort.waitForExistence(timeout: 5))
         XCTAssertEqual(sort.label, "Sortieren")
+        // Ab Phase 9: Plus im Kopfband, Sortieren im Listenkopf neben der Anzahl der Habits.
+        let header = app.otherElements["today-header"]
+        XCTAssertTrue(header.buttons["Neuer Habit"].exists, "Plus steht im Kopfband")
+        XCTAssertFalse(header.buttons["sort-toggle"].exists, "Sortieren steht nicht im Kopfband")
+        let count = app.staticTexts["habit-count"]
+        XCTAssertTrue(count.label.hasSuffix(" Habits"))
+        XCTAssertEqual(sort.frame.midY, count.frame.midY, accuracy: 12, "Sortieren steht in der Zeile mit der Anzahl")
 
         app.buttons["Neuer Habit"].tap()
         XCTAssertTrue(app.navigationBars["Neuer Habit"].waitForExistence(timeout: 5))

@@ -54,8 +54,17 @@ enum Theme {
     static let entranceOffset: CGFloat = 90
     static let entranceStagger: Double = 0.05
     static let entranceMaxStaggeredItems = 8
-    /// Abstand zwischen Leiste und großem Titel in Heute.
-    static let headerTopSpacing: CGFloat = 28
+    /// Abstand zwischen den Zeilen im Kopfband von Heute (`DayHeader`).
+    static let bandSpacing: CGFloat = 14
+    /// So weit reicht die Fläche des Kopfbands über seinen oberen Rand hinaus: unter die Statusleiste und beim
+    /// Ziehen über den Anfang der Liste.
+    static let bandOverscroll: CGFloat = 1000
+    /// Senkrechter Innenabstand eines Tages in `WeekStrip` und Dauer, mit der die Markierung innerhalb der Woche wandert.
+    static let weekStripPadding: CGFloat = 7
+    static let weekStripMarkerDuration: Double = 0.2
+    /// Senkrechter Innenabstand der kleinen Leiste in Heute und Dauer ihres Ein- und Ausblendens.
+    static let compactBarPadding: CGFloat = 2
+    static let compactBarFadeDuration: Double = 0.15
     /// So lange muss eine Karte gedrückt werden, bis das Bearbeiten Sheet öffnet.
     static let editPressDuration: Double = 0.6
     /// Nach dieser Zeit gibt die Karte beim Drücken ein erstes Zeichen (leichter Impuls, kurz einsinken).
@@ -71,8 +80,8 @@ enum Theme {
     static let buttonMinHeight: CGFloat = 44
     /// Wie weit der Inhalt beim Wischen über heute hinaus nachgibt, bevor er zurückfedert.
     static let swipeBounceDistance: CGFloat = 28
-    /// Ab dieser Scrolltiefe steht der Titel von Heute klein in der Leiste.
-    static let barTitleScrollOffset: CGFloat = 44
+    /// Die kleine Leiste in Heute erscheint, sobald vom Kopfband weniger als diese Höhe zu sehen ist.
+    static let compactBarScrollOffset: CGFloat = 44
     /// Höhe des Strichs über dem gewählten Tab in `PaperTabBar`.
     static let tabIndicatorHeight: CGFloat = 2
     /// Höhe des Strichs, der in `WeekDots` einen pausierten Tag zeigt.
