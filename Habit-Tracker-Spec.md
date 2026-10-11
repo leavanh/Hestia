@@ -896,14 +896,14 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 
 **Ziel:** Die App hat einen Namen, eine Wortmarke und ein App Icon im Hermes Stil.
 
-**Vor Beginn mit mir entscheiden (noch offen):**
-- **Name:** Habitus behalten (lateinische Übersetzung von Aristoteles' "Hexis", durch Übung erworbene Haltung) oder umbenennen, z.B. Hexis, Hestia (Herdfeuer, das täglich gepflegt wird) oder Horai (Göttinnen der Stunden und Jahreszeiten).
-- **Bildmarke:** die sieben Quadrate als Weiterführung von `Branding/habitus-mark.svg` (sieben Tage) oder ein Motiv passend zum Namen (z.B. Flamme bei Hestia).
-- **Bildwelt:** ob gemeinfreie Stiche (z.B. Met Open Access, CC0) blau gerastert eingesetzt werden, und wenn ja, wo (z.B. in den Leerzuständen).
+**Entschieden:**
+- **Name:** Hestia (Herdfeuer, das täglich gepflegt wird). Nur der Anzeigename ändert sich, Bundle Identifier, Modulname `Habitus` und Startargumente (`-HabitusResetData` usw.) bleiben.
+- **Bildmarke:** eine Flamme als Linolschnitt, Blau auf Papier. Quelle ist `Branding/flame-linocut-source.webp` (KI erzeugt, keine Lizenz nötig), `Branding/render_flame_icon.py` liest daraus die Maske und baut die drei Icons. Hell ist Blau auf Papier, dunkel Papier auf Nachtblau, getönt Weiß auf Schwarz. Die Flamme füllt etwa 86 % der Höhe (`FLAME_HEIGHT` 880, oben 46 px und unten 96 px Rand) und ist leicht aufgeraut (wellige Kante, kleine Fehlstellen, feste Seed), damit sie wie ein echter Abzug wirkt. Das ersetzt die frühere Idee mit Markenblau Fläche, weil die Schnitte als helle Linien auf Blau klein besser lesbar sind.
+- **Bildwelt:** noch offen. Ob gemeinfreie Stiche (z.B. Met Open Access, CC0) blau gerastert eingesetzt werden, und wenn ja, wo (z.B. in den Leerzuständen). Kandidaten: Met 371844 (Fackel zwischen Altar und Statuette), 402697 (Vestalin).
 
 **Umfang (nach der Entscheidung)**
 - **Wortmarke:** Name in Barlow Condensed Regular, Versalien, zweizeilig gesetzt wie "HERMES / AGENT" bei Hermes. Als Vektor in `Branding/`. In der App höchstens an einer Stelle (z.B. Leerzustand Heute oder Einstellungen unten).
-- **App Icon:** Markenblau `#0000F2` mit Bildmarke in `#F2F2F2`, Varianten hell, dunkel und getönt (wie die vorhandenen `AppIcon-light/-dark/-tinted`). `Branding/render_icon.py` erzeugt alle Varianten.
+- **App Icon:** Flamme in Markenblau `#0000F2` auf Papier `#F2F2F2`, Varianten hell, dunkel und getönt (`AppIcon-light/-dark/-tinted`). `Branding/render_flame_icon.py` erzeugt alle Varianten. *(Erledigt.)* `Branding/render_icon.py` und `habitus-mark.svg` gehören zum alten Wochenkreis Icon.
 - **Anzeigename:** `INFOPLIST_KEY_CFBundleDisplayName`. Bundle Identifier und Datenbank bleiben gleich, damit keine Daten verloren gehen.
 - **Bildwelt (falls gewählt):** Quellen mit Lizenz in `Branding/QUELLEN.md`. Rasterung und Einfärbung per Skript in `Branding/`, keine Bilder von Hand bearbeitet. Höchstens ein Bild pro Leerzustand, in `Assets.xcassets`.
 
