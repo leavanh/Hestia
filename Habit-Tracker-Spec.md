@@ -13,7 +13,7 @@
 
 ## 1. Überblick
 
-Ein persönlicher Habit Tracker für das iPhone. Clean, modern, minimalistisch, mit dezentem Glassmorphism.
+Ein persönlicher Habit Tracker für das iPhone. Ab Phase 8 im Stil von Hermes Agent (Nous Research): flach, Blau auf Papier, schmale dünne Schrift, Großbuchstaben für alles Funktionale. *(Bis Phase 7: clean, modern, minimalistisch, mit dezentem Glassmorphism.)*
 
 | Punkt | Festlegung |
 |---|---|
@@ -26,6 +26,8 @@ Ein persönlicher Habit Tracker für das iPhone. Clean, modern, minimalistisch, 
 | Darstellung | Hell und Dunkel (folgt der Systemeinstellung) |
 
 **Bewusst nicht enthalten:** Erinnerungen, Notizen, Messwerte, negative Habits, Überspringen von Tagen, Widgets, Export, Haptik, Animationen über Standard hinaus, jährliche Habits.
+
+*Ausnahme ab Phase 10:* ein kurzer **Zusatz** am Habit (höchstens 24 Zeichen, z.B. "20 Min"). Das ist eine Beschriftung, kein Notizfeld und kein Messwert. Es wird nichts damit gerechnet.
 
 ---
 
@@ -64,7 +66,7 @@ Beim festen Monatstag gilt: Hat ein Monat weniger Tage (z.B. 31. im Februar), is
 ### 3.3 Abhaken
 
 - **Täglich mit Anzahl größer 1:** Counter mit Minus und Plus. Wert von 0 bis Zielanzahl.
-- **Alle anderen:** Ein Kreis zum Abhaken. Wert 0 oder 1 pro Tag. Erneutes Tippen hebt das Abhaken auf.
+- **Alle anderen:** Ein Feld zum Abhaken (bis Phase 7 ein Kreis, ab Phase 8 ein Quadrat, `CheckBox`). Wert 0 oder 1 pro Tag. Erneutes Tippen hebt das Abhaken auf.
 - Abgehakt wird immer für den angezeigten Tag (5.2).
 
 ### 3.4 Tagesfortschritt ("5 von 16 · 31 %")
@@ -106,7 +108,7 @@ Prozent = erledigte Punkte geteilt durch Punkte, gerundet auf ganze Zahl. Bei 0 
 - Füllung: Wert des Tages geteilt durch Tagesziel (bei nicht täglichen Habits ist das Tagesziel 1). 0 = nur Umriss, Zwischenwerte = Habitfarbe mit steigender Deckkraft, 100 % = voll gefüllt.
 - Tage vor der Erstellung: leerer Umriss wie ein Tag ohne Erledigung. Es sind also auch am Erstelltag alle 7 Punkte zu sehen. Status, Streaks und Statistik ändern sich dadurch nicht.
 - Pausierte Tage: kleiner grauer Strich statt Punkt.
-- Der angezeigte Tag (der Punkt ganz rechts) ist immer gut erkennbar: Er hat zusätzlich einen äußeren Ring in Habitfarbe mit verringerter Deckkraft und etwas Abstand zum Punkt. Das gilt für jede Füllung und auch für einen pausierten Tag. Der Ring verändert Abstände und Ausrichtung der Punkte nicht.
+- Der angezeigte Tag (der Punkt ganz rechts) ist immer gut erkennbar: Er hat zusätzlich einen äußeren Ring (ab Phase 8 ein quadratischer Rahmen) in Habitfarbe mit verringerter Deckkraft und etwas Abstand zum Punkt. Das gilt für jede Füllung und auch für einen pausierten Tag. Der Ring bzw. Rahmen verändert Abstände und Ausrichtung der Punkte nicht.
 
 ### 3.7 Streaks und Statistik
 
@@ -125,6 +127,8 @@ Präzisierung (Phase 5), wann ein Tag als erfüllt oder verpasst zählt:
 - **Beendete Habits:** Streaks und Quote werden bis zum Tag des Beendens gerechnet.
 - **Längster Streak** ist die größte Folge erfüllter Tage seit Erstellung und damit nie kleiner als der aktuelle.
 - **Pausentage** (Phase 6) werden übersprungen: sie unterbrechen keinen Streak, zählen nicht mit und gehören nicht zur Quote. Fenster und das erste Fenster nach der Erstellung zählen nur nicht pausierte Tage (3.5). Die Quote bleibt auf 30 Kalendertage bezogen, pausierte Tage darin entfallen.
+- **Erledigungen** (ab Phase 11): Summe aller Erledigungen (`count`) des Habits von der Erstellung bis zum Statistiktag (heute bzw. Tag des Beendens), auch an Tagen, die später rückwirkend pausiert wurden. Ein 3x täglich Habit mit 3 vollen Tagen hat also 9.
+- **Pausen** (ab Phase 11): Anzahl der Pausen dieses Habits, die am Statistiktag schon begonnen haben (laufende und vergangene). Geplante Pausen zählen nicht.
 - **Beenden mit Historie** (Phase 6): Ab dem Tag des Beendens ist der Habit nicht mehr fällig. Tage davor bleiben mit ihrer Historie in Kalender, Statistik und in Heute an vergangenen Tagen.
 
 ### 3.8 Pausen
@@ -148,55 +152,180 @@ Präzisierung (Phase 5), wann ein Tag als erfüllt oder verpasst zählt:
 
 ## 4. Design
 
+*Ab Phase 8 gilt dieses Designsystem. Die Nummern der Unterabschnitte haben sich dabei geändert (Bausteine jetzt 4.5, Rhythmus Zeile 4.5.1, Icons 4.6). Verweise in den Phasen 1 bis 7 beziehen sich auf die alte Nummerierung. Es ersetzt das frühere Glas Design (Farbverlauf, Liquid Glass Karten, SF Pro, Kreise, gedämpfte Icon Farben). Die Phasen 1 bis 7 beschreiben den damaligen Stand. Vorbild ist die Website von Hermes Agent (hermes-agent.nousresearch.com). Die Referenz Skizze mit den Mockups liegt unter https://claude.ai/artifact/6ZK2dXDRfcRrSLCJ6eBmKh.*
+
 ### 4.1 Grundprinzipien
 
-- Minimalistisch: viel Abstand, wenig Text, keine Rahmenlinien, keine Schatten außer dem Glas Effekt.
-- Ein Muster für alles: Jede Eingabe öffnet ein Sheet von unten. Keine Alerts außer für Bestätigungen (z.B. "Habit beenden?").
-- Eine Schrift: SF Pro (Systemschrift), Dynamic Type unterstützen.
+1. **Blau ist die Marke.** Text, Linien und Bedienelemente sind blau (hell) bzw. Papier (dunkel), nie Schwarz oder Systemgrau. Abstufungen entstehen über Deckkraft derselben Farbe.
+2. **Flach mit Haarlinien.** Keine Glaskarten, kein Farbverlauf, keine Schatten, keine Karte in der Karte. Zeilen und Abschnitte werden durch Weißraum und eine Haarlinie (0,5 pt) getrennt.
+3. **Fast keine Rundung.** Ecken 0 bis 2 pt. Was bisher ein Kreis war, wird ein Quadrat: Abhaken, Counter Tasten, 7 Tage Punkte, Icon Fläche, Kalendertage, Statusmarke, Farbauswahl.
+4. **Großer Größenkontrast.** Riesige, dünne Zahlen und Titel neben kleinen Labels. Mittlere Größen möglichst vermeiden.
+5. **Großbuchstaben für Funktion.** Buttons, Labels, Rubriken und Meta Zeilen stehen in Versalien mit Laufweite. Inhalte (Habit Namen, Titel) stehen in normaler Schreibweise. Die Versalien entstehen in der Ansicht (`.textCase(.uppercase)`), die Texte im Code bleiben normal geschrieben, damit VoiceOver sie normal vorliest und Tests stabil bleiben.
+6. **Umkehrung statt Grau.** Das Wichtigste steht invertiert, also Papier auf Blau: das Kopfband in Heute, der angezeigte Tag im Wochenstreifen, das erledigte Häkchen, das gewählte Segment.
+7. **Habitfarbe nur als Tinte.** Sie färbt Icon, Häkchen, Counter Tasten, 7 Tage Punkte und Kalendertage, nie eine ganze Zeile. Nur das Habit Detail nutzt sie als Fläche (Band, 5.4).
+8. **Ein Muster für alles:** Jede Eingabe öffnet ein Sheet von unten. Keine Alerts außer für Bestätigungen (z.B. "Habit beenden?").
+9. **Dynamic Type bleibt.** Alle Schriften skalieren mit (4.3). Bei großer Schrift gelten weiter die Regeln aus Phase 7 (`AdaptiveStack`, nichts abgeschnitten).
 
 ### 4.2 Farben
 
-- **Hintergrund:** Ruhiger Farbverlauf. Hell: sehr helles Blau zu hellem Flieder. Dunkel: tiefes Marineblau zu dunklem Violett.
-- **Karten und Tab Bar:** Liquid Glass (`.glassEffect()`), damit der Verlauf leicht durchscheint.
-- **Habitfarben:** Feste Palette mit 8 Farben (Blau, Türkis, Grün, Gelb, Orange, Rot, Pink, Violett). Nur für Icon, Ring im Counter, Abhakkreis und 7 Tage Punkte.
-- **Gedämpfte Habitfarben für Icons:** Zu jeder Habitfarbe gibt es eine gedämpfte Variante (weniger Sättigung, hell und dunkel abgestimmt auf den Hintergrundverlauf). Symbol und Kreisfläche von `HabitIconView` nutzen nur diese gedämpfte Variante, auch in der Icon Vorschau im Sheet. Abhakkreis, Counter und 7 Tage Punkte bleiben in der normalen Habitfarbe.
-- **Statusfarben:** Systemgelb und Systemrot. Nur für die Statusmarke am Icon (4.3). Für grün gibt es keine Anzeige und keine Farbe.
-- Alle Farben als zentrale Definition im Designsystem, nirgendwo Farbwerte direkt im Code der Ansichten.
+Alle Farben stehen zentral in `Theme` bzw. `HabitColor`. In den Ansichten stehen keine Farbwerte.
 
-### 4.3 Bausteine (einmal bauen, überall nutzen)
+**Marke**
+
+| Name | Wert | Verwendung |
+|---|---|---|
+| `brand` | `#0000F2` | Markenblau. Kopfband in Heute (hell und dunkel), Tinte im hellen Modus |
+| `paper` | `#F2F2F2` | Fläche im hellen Modus, Schrift auf Blau |
+| `night` | `#000030` | Fläche im dunklen Modus (Blau, 80 % abgedunkelt) |
+| `frame` | `#000091` | Blau, 40 % abgedunkelt. Kopfband in der kleinen Leiste beim Scrollen im dunklen Modus, falls nötig |
+
+**Rollen** (hell / dunkel)
+
+| Rolle | Hell | Dunkel |
+|---|---|---|
+| `background` | `paper` | `night` |
+| `ink` (Text, Linien, Bedienelemente) | `brand` | `paper` |
+| `inkSecondary` | `ink` mit 70 % | `ink` mit 70 % |
+| `hairline` | `ink` mit 25 % | `ink` mit 20 % |
+| `band` (Kopfband Heute) | `brand` | `brand` |
+| `onBand` | `paper` | `paper` |
+| `onBandSecondary` | `paper` mit 80 % | `paper` mit 80 % |
+
+Die 70 % bzw. 80 % sind bewusst höher als in den Mockups (60 %), damit kleine Schrift den Kontrast 4,5 : 1 erreicht.
+
+**Habitfarben**
+
+Weiterhin 8 Farben mit denselben Schlüsseln wie bisher, damit gespeicherte Habits ihre Farbe behalten. Die Farbtöne folgen dem Farbkreis von Hermes (30 Grad Schritte). Im hellen Modus ist jede Farbe eine dunkle **Tinte** auf Papier (Kontrast mindestens 4,4 : 1), im dunklen Modus eine helle **Leuchtfarbe** auf Nachtblau (Kanalwerte nur 79, B5, F2).
+
+| Schlüssel | Name (VoiceOver) | Tinte (hell) | Leuchtfarbe (dunkel) |
+|---|---|---|---|
+| `blue` | Blau | `#0000F2` | `#7979F2` |
+| `violet` | Indigo | `#5C00D6` | `#B079F2` |
+| `pink` | Pink | `#D1005F` | `#F279B5` |
+| `red` | Rot | `#D10000` | `#F27979` |
+| `orange` | Orange | `#B35500` | `#F2B579` |
+| `yellow` | Ocker | `#806B00` | `#F2F279` |
+| `green` | Grün | `#00804C` | `#79F2B5` |
+| `teal` | Cyan | `#007A80` | `#79F2F2` |
+
+- `HabitColor.color`: Tinte bzw. Leuchtfarbe, je nach Modus.
+- `HabitColor.tint`: `color` mit 14 % Deckkraft, für die Icon Fläche.
+- `HabitColor.onColor`: Vordergrund auf voller Habitfarbe (Häkchen, Text im Band des Detail) = `Theme.background`.
+- Es gibt keine gedämpfte Variante mehr (`mutedColor` entfällt). Symbol und Kreisfläche von `HabitIconView` nutzen `color` und `tint`.
+- Die Reihenfolge in der Farbauswahl folgt dem Farbkreis: Blau, Indigo, Pink, Rot, Orange, Ocker, Grün, Cyan.
+
+**Statusfarben** (nur für die Statusmarke am Icon, 4.5)
+
+| Status | Hell | Dunkel |
+|---|---|---|
+| Gelb | `#A88000` | `#F2C200` |
+| Rot | `#E00000` | `#F27979` |
+
+Für grün gibt es weiter keine Anzeige und keine Farbe. Die Werte erreichen als Grafik mindestens 3 : 1 gegen die Fläche.
+
+**Grau für Pausen:** Pausierte Tage und pausierte Habits nutzen `ink` mit verringerter Deckkraft (Werte wie bisher in `Theme`), kein Systemgrau.
+
+### 4.3 Schrift
+
+Drei freie Schriften (SIL Open Font License 1.1, dürfen in die App eingebettet werden). Die Lizenzdateien liegen neben den Schriftdateien im Projekt.
+
+| Schrift | Quelle | Schnitte | Ersetzt bei Hermes |
+|---|---|---|---|
+| Barlow Condensed | Google Fonts | ExtraLight (200), Regular (400), Medium (500) | Rules Gothic Condensed, Rules Condensed |
+| Antonio | Google Fonts | Thin (100) | Rules Gothic Compressed |
+| Geist Mono | Vercel (github.com/vercel/geist-font) bzw. Google Fonts | Regular (400), Medium (500) | Aeonik Fono |
+
+**Rollen** in `Theme.Typography` (Größe in pt bei Standard Schriftgröße, `relativeTo` für Dynamic Type):
+
+| Rolle | Schrift | Größe | `relativeTo` | Stil | Verwendung |
+|---|---|---|---|---|---|
+| `display` | Barlow Condensed ExtraLight | 58 | `.largeTitle` | Laufweite −2 %, Zeilenhöhe eng | Titel im Kopfband ("Heute"), Habit Name im Detail, Titel der Leerzustände |
+| `numeral` | Antonio Thin | 76 | `.largeTitle` | Ziffern gleich breit (`monospacedDigit`) | Fortschritt "4/6", Streak im Detail |
+| `stat` | Antonio Thin | 52 | `.title` | gleich breite Ziffern | Kennzahlen im Detail (`StatValue`), Streak in `HabitStatRow` |
+| `title` | Barlow Condensed Regular | 21 | `.headline` | normal | Habit Name auf Karten und Zeilen, Sheet Titel |
+| `label` | Barlow Condensed Medium | 14 | `.subheadline` | Versalien, Laufweite +10 % | Buttons, Segmente, Wochentage, Chips |
+| `body` | Geist Mono Regular | 14 | `.body` | normal | Fließtext, Eingabefelder, Erklärungen in Leerzuständen |
+| `meta` | Geist Mono Regular | 11 | `.caption` | Versalien, Laufweite +4 % | Rhythmus Zeile, Datum im Band, Abschnittsüberschriften, Beschriftungen unter Kennzahlen |
+
+- Alle Rollen nutzen `Font.custom(_:size:relativeTo:)`, damit Dynamic Type wirkt. In Ansichten wird nur noch `Theme.Typography` verwendet, keine `.font(.headline)` usw. mehr.
+- Laufweite und Versalien sind als Modifier gebündelt (z.B. `.labelStyle()` / `.metaStyle()` als View Extension), damit sie nicht an jeder Stelle einzeln stehen.
+- **Einbinden:** Die Schriftdateien (`.ttf`) liegen in `Habitus/Design/Fonts/` und werden beim Start registriert (`CTFontManagerRegisterFontsForURL`, einmalig, z.B. in `FontRegistry.registerAll()` beim App Start und in Previews). Das Projekt erzeugt seine Info.plist selbst (`GENERATE_INFOPLIST_FILE`), deshalb kein `UIAppFonts` Eintrag. Fehlt eine Schrift, meldet ein Debug Assert das sofort.
+- Die Systemschrift bleibt nur dort, wo das System sie selbst setzt (Tab Bar, Systemleisten in Sheets, Datumsauswahl, Alerts).
+
+### 4.4 Formen, Linien, Abstände
+
+| Wert | Festlegung |
+|---|---|
+| `cornerRadius` | 2 pt (Buttons, Chips, Segmentfeld). Quadrate (Häkchen, Punkte, Kacheln, Kalendertage) haben 0 pt. |
+| `hairlineWidth` | 0,5 pt in `hairline` Farbe |
+| `controlSize` | 36 pt (Häkchen, Icon Kachel, unverändert) |
+| Counter Tasten | 26 pt Quadrat, 1 pt Rand in Habitfarbe |
+| 7 Tage Punkte | 6 pt Quadrat, Abstand 3 pt |
+| Abstände | `spacing`, `sectionSpacing`, `cardPadding` bleiben wie bisher |
+
+Werte, die nur zum Glas Design gehörten (z.B. `cornerRadius` 24, `iconBackgroundOpacity`, `backgroundTop`, `backgroundBottom`), entfallen in Phase 8.
+
+**Buttons** (`HermesButtonStyle`, ein Stil mit Varianten):
+
+| Variante | Aussehen | Beispiel |
+|---|---|---|
+| `primary` | Fläche `ink`, Schrift `background`, Rolle `label` | "Ersten Habit anlegen", "Neue Pause" |
+| `secondary` | Fläche `ink` mit 14 %, Schrift `ink` | "Pause beenden" |
+| `onBand` | Fläche `onBand` mit 20 %, Schrift `onBand` | Plus im Kopfband, "Heute ›" |
+| `text` | ohne Fläche, Schrift `ink`, Rolle `label` | "Sortieren", "Fertig" in Heute |
+| `destructive` | wie `secondary`, Schrift und Fläche in Statusrot | "Habit beenden" |
+
+Systemleisten in Sheets (Abbrechen, Sichern, Fertig) bleiben Systembuttons, getönt in `ink`. Ihr Liquid Glass Aussehen wird akzeptiert, eigene Glasflächen gibt es nicht.
+
+### 4.5 Bausteine (einmal bauen, überall nutzen)
 
 | Baustein | Inhalt |
 |---|---|
-| `HabitCard` | Links `HabitIconView` mit Statusmarke, daneben der Name, darunter eine kleine Zeile mit dem Rhythmus (siehe 4.3.1), darunter 7 Tage Punkte. Rechts Abhakkreis oder Counter. Kein weiterer Text. |
-| `CheckCircle` | Kreis mit Umriss in Habitfarbe, abgehakt gefüllt mit Häkchen. |
-| `CounterControl` | Minus im Kreis, Ring mit Zahl in der Mitte (Ring füllt sich mit Fortschritt), Plus im Kreis. Gleiche Kreisgröße wie `CheckCircle`, alles auf einer Linie. |
-| `WeekDots` | Die 7 Punkte aus 3.6, der angezeigte Tag mit äußerem Ring. |
-| `HabitIconView` | Icon in gedämpfter Habitfarbe auf zarter Kreisfläche derselben Farbe. Bei Status gelb oder rot oben rechts eine kleine runde Statusmarke in Statusfarbe, die den Kreis leicht überlappt und durch einen schmalen freien Rand von ihm abgesetzt ist. Bei grün keine Marke. |
-| `ProgressHeader` | Fortschrittsring und Text "5 von 16 · 31 %". Ohne Karte, direkt auf dem Hintergrund. |
-| `MonthCalendar` | Ein Monat, Monatsname mit Pfeil links und rechts, darunter die Wochentagszeile Mo bis So und die Tage, ohne Karte. Der Wechsel zwischen den Monaten (Grenzen, deaktivierte Pfeile) gehört zum Baustein. Jeder Tag ist ein Kreis, nach Tagesfortschritt in einer Tönung eingefärbt (keine Farbe bei 0 %, bis 100 % zunehmend kräftiger), heute mit Ring, zukünftige Tage blass und gesperrt. Im Tab Akzentfarbe und antippbar, im Habit Detail Habitfarbe und nicht antippbar (5.4). Werte in `Theme`. |
-| `HabitStatRow` | Zeile der Habit Liste unter dem Kalender (5.4): `HabitIconView` ohne Statusmarke, Name, Rhythmus Zeile (4.3.1) und rechts der aktuelle Streak mit Flammensymbol ("5 Tage"). In einer Glaskarte, antippen öffnet das Habit Detail. |
-| `StatValue` | Eine Kennzahl im Habit Detail: großer Wert, darunter eine kleine Beschriftung ("12 Tage" / "Längster Streak"). |
-| `GlassBackground` | Farbverlauf für alle Bildschirme. |
-| `SegmentedChoice` | Segmentfeld im Glas Stil, z.B. für den Rhythmus und seine Variante. |
+| `PaperBackground` | Fläche `background` für alle Bildschirme und Sheets. Ersetzt `GlassBackground`. |
+| `PaperSection` | Abschnitt mit Überschrift in Rolle `meta` und darunter dem Inhalt, oben eine Haarlinie. Keine Karte. Ersetzt `GlassSection` und `glassCard()`. |
+| `HabitCard` | Flache Zeile ohne Karte, oben eine Haarlinie. Links `HabitIconView`, daneben Name (Rolle `title`), darunter die Rhythmus Zeile (4.5.1) und daneben die 7 Tage Punkte, rechts `CheckBox` oder `CounterControl`. Kein weiterer Text. Langes Drücken, Einsinken und VoiceOver Aktion wie bisher. |
+| `CheckBox` | Quadrat 36 pt mit 1 pt Rand in Habitfarbe. Abgehakt: gefüllt mit Habitfarbe, Häkchen in `onColor`. Ersetzt `CheckCircle`. |
+| `CounterControl` | Taste "−" (Quadrat 26 pt), Wert als "5/8" (Rolle `meta` in Medium, gleich breite Ziffern), Taste "+". Kein Ring mehr. Gesperrte Taste mit `disabledOpacity`. Gesamthöhe wie `CheckBox`. |
+| `WeekDots` | 7 Quadrate (6 pt). Füllung wie 3.6 (Deckkraft nach Anteil), 0 = Habitfarbe mit 22 %. Der angezeigte Tag hat einen äußeren quadratischen Rahmen in Habitfarbe mit verringerter Deckkraft. Pausierte Tage: kurzer waagrechter Strich in `ink` mit Pausen Deckkraft. |
+| `HabitIconView` | Quadratische Kachel (36 pt), Fläche `tint`, Symbol in `color`. Bei Status gelb oder rot oben rechts eine quadratische Statusmarke in Statusfarbe, mit schmalem freiem Rand in `background`. Bei grün keine Marke. |
+| `Chip` | Kleine Kapsel mit 2 pt Ecken, Rolle `label` in klein (11 pt), Fläche `ink` mit 14 %. Für "Pausiert". Ersetzt `DayBadge`. |
+| `DayHeader` | Das Kopfband in Heute (5.2): Datumszeile, Titel, Fortschritt, `SegmentBar`, `WeekStrip`. Ersetzt `ProgressHeader` und den bisherigen Kopf. |
+| `SegmentBar` | Fortschritt als Reihe kurzer Balken (3 pt hoch, 3 pt Abstand), ein Balken pro Punkt (3.4), erledigte Punkte voll, offene mit 25 %. Bei mehr als 12 Punkten ein durchgehender Balken mit Füllung nach Prozent. Ersetzt `ProgressRing`. |
+| `WeekStrip` | 7 Felder Mo bis So der Woche des angezeigten Tags (Rolle `label`). Der angezeigte Tag invertiert (Fläche `onBand`, Schrift `band`). Tage nach heute mit `calendarFutureOpacity` und nicht antippbar. Antippen eines anderen Tags wechselt dorthin (5.2). |
+| `MonthCalendar` | Wie bisher (Monat mit Pfeilen, Grenzen, Wochentagszeile), aber jeder Tag ist ein Quadrat mit der Tageszahl (Rolle `meta`, ohne Versalien). Monatsname in Rolle `meta`. Heute mit äußerem quadratischem Rahmen. Einfärbung, Pausen, Zukunft, Tippen wie bisher. |
+| `HabitStatRow` | Flache Zeile mit Haarlinie: `HabitIconView` ohne Statusmarke, Name, Rhythmus Zeile, rechts der aktuelle Streak als Zahl (Rolle `stat`, kleiner: 32 pt) mit "Tage" darunter (Rolle `meta`). Kein Flammensymbol. Antippen öffnet das Habit Detail. |
+| `StatValue` | Eine Kennzahl: großer Wert (Rolle `stat`), darunter die Beschriftung (Rolle `meta`). |
+| `SegmentedChoice` | Segmentfeld mit 0,5 pt Rahmen in `ink`, Segmente in Rolle `label`, gewähltes Segment invertiert (Fläche `ink`, Schrift `background`). |
+| `WeekdayPicker` | 7 Quadrate M D M D F S S, gewählt invertiert. |
+| `ColorPicker` (Farbauswahl im Sheet) | 8 Quadrate (28 pt) in Habitfarbe, gewählt mit äußerem Rahmen in `ink`. |
+| `EmptyState` | Titel in Rolle `display` (kleiner: 40 pt), Erklärung in `body`, Button `primary`. |
+| `PauseRow` | Flache Zeile mit Haarlinie, Zeitraum in `title`, Habits in `meta`, Button rechts. |
 
-#### 4.3.1 Rhythmus Zeile auf der `HabitCard`
+#### 4.5.1 Rhythmus Zeile
 
-Kleine Zeile (`.caption`, sekundäre Farbe) unter dem Namen, vor den 7 Tage Punkten. Sie sagt, wie oft der Habit wiederholt werden soll. Bei Woche und Monat steht davor, wie viele Erledigungen im Fenster des angezeigten Tags schon da sind (`windowProgress`).
+Kleine Zeile in Rolle `meta` (Versalien) und Farbe `inkSecondary` unter dem Namen. Inhalt wie bisher, mit drei Änderungen:
 
-| Rhythmus | Text | Beispiel |
+- Steht ein **Zusatz** am Habit (ab Phase 10), steht er vorne, getrennt mit " · ".
+- Wochentage werden mit " · " statt ", " getrennt.
+- Die Texte im Code bleiben normal geschrieben, die Versalien entstehen in der Ansicht.
+
+| Rhythmus | Text (im Code) | Anzeige |
 |---|---|---|
-| Täglich, Anzahl 1 | "Täglich" | Täglich |
-| Täglich, Anzahl n größer 1 | "n pro Tag" | 2 pro Tag |
-| Woche, Anzahl | "erledigt von Ziel diese Woche" | 1 von 3 diese Woche |
-| Monat, Anzahl | "erledigt von Ziel diesen Monat" | 1 von 1 diesen Monat |
-| Feste Wochentage | Kurzname der Tage | Mo, Do |
-| Fester Monatstag | "Am n. des Monats" | Am 15. des Monats |
+| Täglich, Anzahl 1 | "Täglich" | TÄGLICH |
+| Täglich, Anzahl n größer 1 | "n pro Tag" | 8 PRO TAG |
+| Woche, Anzahl | "erledigt von Ziel diese Woche" | 1 VON 3 DIESE WOCHE |
+| Monat, Anzahl | "erledigt von Ziel diesen Monat" | 1 VON 1 DIESEN MONAT |
+| Feste Wochentage | Kurznamen der Tage | MO · MI · FR |
+| Fester Monatstag | "Am n. des Monats" | AM 15. DES MONATS |
+| Mit Zusatz | "Zusatz · Rhythmus" | 20 MIN · TÄGLICH |
 
-*Ersetzt nach Phase 3.1 die dort entfernte Anzeige "x/y im Fenster". Das Format ist neu und steht jetzt in der Zeile unter dem Namen, nicht mehr neben den Punkten.*
+### 4.6 Icons
 
-### 4.4 Icons
+Auswahl aus ca. 30 kuratierten SF Symbols wie bisher (z.B. figure.run, drop.fill, book.fill, bed.double.fill, leaf.fill, dumbbell.fill, brain.head.profile, pills.fill, cup.and.saucer.fill, figure.walk, music.note, pencil, house.fill, cart.fill, heart.fill). Sie stehen in `color` auf der Kachel aus 4.5. Schnitt der Symbole: `.regular`, damit sie zur dünnen Schrift passen.
 
-Auswahl aus ca. 30 kuratierten SF Symbols (z.B. figure.run, drop.fill, book.fill, bed.double.fill, leaf.fill, dumbbell.fill, brain.head.profile, pills.fill, cup.and.saucer.fill, figure.walk, music.note, pencil, house.fill, cart.fill, heart.fill).
+### 4.7 Bewegung
+
+Unverändert: Tageswechsel, Einsinken beim langen Drücken, Rutschen erledigter Habits, Reduce Motion nur Überblenden. Neue Übergänge (z.B. Einblenden der kleinen Leiste in Heute) sind kurz (ca. 0,1 bis 0,2 s) und bei Reduce Motion ohne Bewegung.
 
 ---
 
@@ -208,13 +337,22 @@ Auswahl aus ca. 30 kuratierten SF Symbols (z.B. figure.run, drop.fill, book.fill
 2. **Kalender** (Symbol: calendar)
 3. **Einstellungen** (Symbol: gearshape)
 
+Ab Phase 8: Die Tab Bar bleibt die des Systems, getönt in `ink`. Hintergrund der Bildschirme ist `PaperBackground`.
+
 ### 5.2 Heute
 
-- **Kopfbereich ohne Karte:** Oben steht das Datum des angezeigten Tags im Stil eines großen Navigationstitels (Large Title einer `NavigationStack`: Schrift, Gewicht, Einzug links). Titel ist der Wochentag ("Donnerstag"), darunter als Untertitel das Datum ("8. Oktober"). Beim Scrollen verhält sich der Titel wie ein Large Title und wird klein in der Leiste angezeigt. Darunter der `ProgressHeader`, ebenfalls ohne Karte und ohne Glas direkt auf dem Hintergrund. Neben dem Datum steht eine kleine Kapsel: "Heute" in Akzentfarbe, an vergangenen Tagen neutral "Gestern", "Vorgestern" oder "Vor n Tagen". In der kleinen Leiste steht sie hinter dem Datum.
+- **Kopfband (ab Phase 9, ersetzt den nächsten Punkt):** Oben ein Band in Markenblau (`band`, hell und dunkel gleich), randlos bis unter die Statusleiste. Es gibt in Heute keine Navigationsleiste mehr. Das Band (`DayHeader`) enthält von oben nach unten:
+  1. **Datumszeile** (Rolle `meta`, `onBandSecondary`): links Wochentag kurz, Datum und Kalenderwoche ("So · 11. Okt · KW 41"), rechts der Plus Button (Variante `onBand`, Quadrat mit Plus Symbol, VoiceOver "Neuer Habit"). Die Kalenderwoche ist die ISO Kalenderwoche des angezeigten Tags.
+  2. **Titel** (Rolle `display`): der angezeigte Tag relativ zu heute: "Heute", "Gestern", "Vorgestern", sonst "Vor n Tagen" (wie bisher `RelativeDay`). Die bisherige Kapsel neben dem Datum entfällt, weil der Titel das schon sagt. An vergangenen Tagen steht rechts auf Höhe des Titels der Button "Heute ›" (Variante `onBand`), der wie bisher animiert zu heute springt.
+  3. **Fortschritt:** links groß "erledigte Punkte/Punkte" (Rolle `numeral`, z.B. "4/6"), daneben klein untereinander "Erledigt" und die Prozent ("67 %") in Rolle `meta`. Zählung wie 3.4, nur die Darstellung ist neu. Bei 0 Punkten steht statt Zahl und Balken "Heute nichts fällig" (Rolle `title`). Darunter die `SegmentBar`.
+  4. **Wochenstreifen** (`WeekStrip`): Mo bis So der ISO Woche des angezeigten Tags, der angezeigte Tag invertiert. Antippen eines vergangenen Tags oder von heute wechselt dorthin, mit derselben Animation wie Wischen (Richtung nach Datum). Tage nach heute sind blass und nicht antippbar. Wischen über eine Wochengrenze zeigt im Streifen die neue Woche. VoiceOver liest jeden Tag als vollständiges Datum, der angezeigte Tag ist als ausgewählt markiert.
+- **Listenkopf (ab Phase 9):** Direkt unter dem Band eine Zeile in Rolle `meta`: links die Anzahl der Zeilen in der Liste ("6 Habits", Einzahl "1 Habit", pausierte zählen mit), rechts der Button "Sortieren" bzw. im Sortiermodus "Fertig" (Variante `text`). Er ersetzt den Button oben links.
+- **Scrollen (ab Phase 9):** Das Band scrollt mit dem Inhalt weg. Ist es aus dem Bild gescrollt (Schwelle `Theme.barTitleScrollOffset`), erscheint oben eine schmale Leiste in `band` mit "Heute · 4/6" (Titel und Fortschritt, Rolle `label`) links und dem Plus Button rechts. Sie ersetzt den kleinen Navigationstitel. Wischen und Tageswechsel funktionieren in beiden Zuständen.
+- *Bis Phase 8:* **Kopfbereich ohne Karte:** Oben steht das Datum des angezeigten Tags im Stil eines großen Navigationstitels (Large Title einer `NavigationStack`: Schrift, Gewicht, Einzug links). Titel ist der Wochentag ("Donnerstag"), darunter als Untertitel das Datum ("8. Oktober"). Beim Scrollen verhält sich der Titel wie ein Large Title und wird klein in der Leiste angezeigt. Darunter der `ProgressHeader`, ebenfalls ohne Karte und ohne Glas direkt auf dem Hintergrund. Neben dem Datum steht eine kleine Kapsel: "Heute" in Akzentfarbe, an vergangenen Tagen neutral "Gestern", "Vorgestern" oder "Vor n Tagen". In der kleinen Leiste steht sie hinter dem Datum.
 - **Tag wechseln:** Waagrechtes Wischen im Inhalt von Heute (Kopfbereich und Liste) nach rechts zeigt den vorherigen Tag, nach links den nächsten Tag. Senkrechtes Scrollen, Abhakkreis und Counter funktionieren weiter wie bisher. Weiter als bis heute geht es nicht, zukünftige Tage sind nicht erreichbar. Beim Start der App, beim Zurückkehren in die App und beim Tageswechsel um Mitternacht zeigt die Ansicht wieder heute.
 - **Animation beim Tageswechsel:** Titel, Untertitel, Fortschritt und Liste gleiten in Wischrichtung heraus und der neue Tag gleitet von der anderen Seite herein (zurück in die Vergangenheit: Inhalt kommt von links, vorwärts: von rechts), kurz und weich (ca. 0,3 s). Wird nicht gewechselt, weil heute schon erreicht ist, federt der Inhalt nur kurz zurück. Der neue Tag federt dabei Kopf und Karten nacheinander (leicht versetzt) herein. Bei "Bewegung reduzieren" (Reduce Motion) nur Überblenden. Das Zurückspringen auf heute (Start, Rückkehr, Mitternacht) ist nicht animiert.
 - Für den angezeigten Tag gelten Fälligkeit, Fortschritt, Abhaken, Status und 7 Tage Punkte so, als wäre dieser Tag heute. Tage vor der Erstellung eines Habits und pausierte Tage verhalten sich wie in Abschnitt 3 beschrieben.
-- Oben rechts: Plus Button für neuen Habit. Zeigt die Ansicht einen vergangenen Tag, steht in der Datumszeile rechts (auf einer Ebene mit Datum und Kapsel, nicht in der Leiste) ein Button "Heute >" mit kleinem Chevron, der (animiert, wie ein Wischen nach vorn) zu heute zurückspringt. Auf heute ist er nicht zu sehen. Oben links: Button "Sortieren".
+- *Bis Phase 8:* Oben rechts: Plus Button für neuen Habit. Zeigt die Ansicht einen vergangenen Tag, steht in der Datumszeile rechts (auf einer Ebene mit Datum und Kapsel, nicht in der Leiste) ein Button "Heute >" mit kleinem Chevron, der (animiert, wie ein Wischen nach vorn) zu heute zurückspringt. Auf heute ist er nicht zu sehen. Oben links: Button "Sortieren".
 - Darunter eine einzige Liste mit `HabitCard`s, ohne Abschnitte und ohne Überschriften.
 - **Pausierte Habits** (3.8) stehen am Ende der Liste, nach den erledigten, in der gespeicherten Reihenfolge: Icon und Name ausgegraut, daneben die Kapsel "Pausiert" (wie im Sheet "Neue Pause"), Abhakkreis bzw. Counter ausgegraut und nicht bedienbar. Langes Drücken öffnet weiter das Bearbeiten Sheet. Sie zählen nicht im Fortschritt. Dasselbe gilt im Sheet "Tag bearbeiten" für den gewählten Tag.
 - **Reihenfolge:** Oben die offenen Habits, darunter die erledigten. Innerhalb beider Teile gilt die gespeicherte Reihenfolge (`sortOrder`, dann `createdAt`). Erledigt heißt: Am angezeigten Tag ist das Tagesziel erreicht, also Abhakkreis abgehakt bzw. Counter voll. Ein Wochen oder Monats Habit, dessen Fenster erfüllt ist, der am angezeigten Tag aber nicht abgehakt ist, bleibt oben. Wird ein Habit erledigt, rutscht er animiert nach unten, wird es wieder aufgehoben, rutscht er animiert zurück an seinen Platz.
@@ -225,14 +363,15 @@ Auswahl aus ca. 30 kuratierten SF Symbols (z.B. figure.run, drop.fill, book.fill
 
 Felder in dieser Reihenfolge:
 1. Name
-2. Icon (Raster)
-3. Farbe (8 Kreise)
-4. Rhythmus (Segmente: Täglich, Woche, Monat) und passende Einstellung darunter:
+2. **Zusatz** (ab Phase 10): einzeiliges Textfeld unter dem Namen, optional, Platzhalter "z.B. 20 Min", höchstens 24 Zeichen (weitere Eingaben werden nicht angenommen). Leerzeichen am Anfang und Ende werden beim Speichern entfernt, ein leerer Zusatz wird nicht angezeigt.
+3. Icon (Raster)
+4. Farbe (8 Kreise, ab Phase 8 8 Quadrate in der Reihenfolge des Farbkreises, 4.2)
+5. Rhythmus (Segmente: Täglich, Woche, Monat) und passende Einstellung darunter:
    - **Täglich:** Anzahl pro Tag als Stepper.
    - **Woche:** zweites Segmentfeld "Anzahl" / "Wochentage". Bei Anzahl ein Stepper ("2x pro Woche"), bei Wochentage 7 Kreise M D M D F S S.
    - **Monat:** zweites Segmentfeld "Anzahl" / "Monatstag". Bei Anzahl ein Stepper ("1x pro Monat"), bei Monatstag die Auswahl 1 bis 31.
    - Beim Bearbeiten eines bestehenden Habits sind Rhythmus und Variante passend vorausgewählt (z.B. Wochentage Habit: Woche + Wochentage).
-5. Nur beim Bearbeiten, ganz unten: "Habit beenden" (Dialog: Historie behalten oder löschen, siehe 3.9)
+6. Nur beim Bearbeiten, ganz unten: "Habit beenden" (Dialog: Historie behalten oder löschen, siehe 3.9)
 
 Es gibt keine Auswahl von Tagesgruppen (Morgens, Mittags, Abends). Alle Habits gelten ganztägig.
 
@@ -245,7 +384,14 @@ Speichern nur möglich, wenn Name nicht leer.
 - Jeder Tag eingefärbt nach Tagesfortschritt (3.4) an diesem Tag: keine Farbe bei 0 %, dann zunehmend kräftigere Akzentfarbe bis 100 %. Zukünftige Tage blass.
 - Tag antippen öffnet Sheet "Tag bearbeiten": dieselbe Liste wie "Heute" für diesen Tag, mit Abhaken und Counter. Zukünftige Tage sind nicht antippbar.
 - Darunter Liste aller Habits (aktive zuerst, dann beendete) mit aktuellem Streak.
-- Habit antippen öffnet als Sheet das **Habit Detail**: Icon, Name, Rhythmus, eigener Monatskalender (nur dieser Habit, Tage mit Erledigung in Habitfarbe, bei Tagesziel größer 1 mit Teilfüllung), aktueller Streak, längster Streak, Quote 30 Tage (3.7). Der Monatskalender ist derselbe wie im Tab (siehe oben).
+- **Habit Detail ab Phase 11** (ersetzt den nächsten Punkt): Habit antippen öffnet das Detail als Sheet. Oben ein randloses **Band in Habitfarbe** (Fläche `color`, Schrift `onColor`), wie das Kopfband in Heute, nur in der Farbe des Habits:
+  1. Zeile oben: links "Fertig" (schließt), rechts "Bearbeiten" (Variante `onBand` bzw. `text` in `onColor`). "Bearbeiten" öffnet das Sheet "Habit bearbeiten" (5.3) über dem Detail. Nach dem Sichern zeigt das Detail die neuen Werte. Nach "Historie löschen" schließen sich beide Sheets. Nach "Historie behalten" bleibt das Detail offen und zeigt den beendeten Habit. Bei einem beendeten Habit gibt es "Bearbeiten" nicht.
+  2. Meta Zeile (Rolle `meta`): die Rhythmus Zeile (4.5.1, mit Zusatz). Bei beendeten Habits stattdessen "Beendet am 3. Okt".
+  3. Name in Rolle `display`.
+  4. Aktueller Streak groß (Rolle `numeral`), daneben "Tage in Folge" (Einzahl "Tag in Folge") in Rolle `meta`.
+  
+  Darunter auf `background` ein Raster aus 2 × 2 Kennzahlen (`StatValue`), getrennt durch Haarlinien: **Quote 30 Tage** ("86 %" bzw. "–"), **Längster Streak**, **Erledigungen** (Summe aller Erledigungen, 3.7) und **Pausen** (Anzahl der Pausen, 3.7). Darunter der `MonthCalendar` in Habitfarbe wie bisher. Kein Icon im Detail, kein Titel "Habit Detail" in einer Leiste.
+- *Bis Phase 10:* Habit antippen öffnet als Sheet das **Habit Detail**: Icon, Name, Rhythmus, eigener Monatskalender (nur dieser Habit, Tage mit Erledigung in Habitfarbe, bei Tagesziel größer 1 mit Teilfüllung), aktueller Streak, längster Streak, Quote 30 Tage (3.7). Der Monatskalender ist derselbe wie im Tab (siehe oben).
 - Unter dem Monatskalender im Tab steht die Habit Liste. Der ganze Tab scrollt senkrecht, der Kalender selbst wird nur mit den Pfeilen gewechselt.
 
 ### 5.5 Einstellungen
@@ -258,7 +404,7 @@ Speichern nur möglich, wenn Name nicht leer.
 
 ## 6. Datenmodell (SwiftData)
 
-Das Modell wurde in Phase 1 vollständig angelegt. In Phase 3.1 entfallen `timeSlots` und `sortIndex`, neu ist `sortOrder`. Das ist eine leichte Migration (Feld entfernt, Feld mit Standardwert hinzugefügt), vorhandene Habits und Erledigungen bleiben erhalten.
+Das Modell wurde in Phase 1 vollständig angelegt. In Phase 10 kommt `detail` an `Habit` dazu (leichte Migration, Feld mit Standardwert). In Phase 3.1 entfallen `timeSlots` und `sortIndex`, neu ist `sortOrder`. Das ist eine leichte Migration (Feld entfernt, Feld mit Standardwert hinzugefügt), vorhandene Habits und Erledigungen bleiben erhalten.
 
 **Habit**
 - `id: UUID`
@@ -269,6 +415,7 @@ Das Modell wurde in Phase 1 vollständig angelegt. In Phase 3.1 entfallen `timeS
 - `targetCount: Int` (pro Tag bei daily, pro Fenster bei weekly/monthly, sonst 1)
 - `weekdays: [Int]` (1 = Montag bis 7 = Sonntag)
 - `monthDay: Int?`
+- `detail: String` (Zusatz, ab Phase 10, Standard "", höchstens 24 Zeichen, 5.3)
 - `sortOrder: Int` (Reihenfolge in der Heute Ansicht, Standard 0, bei Gleichstand nach `createdAt`)
 - `createdAt: Date`
 - `endedAt: Date?`
@@ -294,6 +441,8 @@ Das Modell wurde in Phase 1 vollständig angelegt. In Phase 3.1 entfallen `timeS
 - `status(habit, day)`
 - `weekDots(habit, day)` (immer 7 Punkte, siehe 3.6)
 - `currentStreak`, `longestStreak`, `rate30`
+- ab Phase 9: `isoWeek(day)` (Kalenderwoche nach ISO 8601) und `weekStrip(day, today)` (7 Tage Mo bis So der Woche von `day`, je mit Datum und Zustand: angezeigt, antippbar, Zukunft)
+- ab Phase 11: `totalCompletions` und `pauseCount` (3.7), als Teil von `statistics`
 - Nimmt das "heutige" Datum immer als Parameter entgegen, damit Tests mit festen Daten möglich sind.
 
 ---
@@ -598,3 +747,168 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - [x] App Icon ist auf dem Homescreen sichtbar.
 - [x] Bei größter Schriftgröße ist nichts abgeschnitten.
 - [x] Abstände, Ecken und Schriftgrößen sind auf allen Bildschirmen gleich.
+
+---
+
+### Phase 8: Designsystem im Hermes Stil
+
+**Ziel:** Die ganze App sieht aus wie Hermes Agent: Blau auf Papier, flach, schmale Schrift, Quadrate statt Kreise. Aufbau und Verhalten aller Bildschirme bleiben gleich, es gibt keine neuen Funktionen. Alles, was zum Glas Design gehörte, ist vollständig entfernt.
+
+**Umfang**
+- **Schriften** (4.3): Barlow Condensed (ExtraLight, Regular, Medium), Antonio (Thin) und Geist Mono (Regular, Medium) als `.ttf` mit ihren `OFL.txt` in `Habitus/Design/Fonts/`. `FontRegistry` registriert sie einmalig beim App Start und in Previews. `Theme.Typography` mit den 7 Rollen `display`, `numeral`, `stat`, `title`, `label`, `body`, `meta`, alle mit `relativeTo` für Dynamic Type. View Extensions für Versalien und Laufweite (`label`, `meta`).
+- **Farben** (4.2): `Theme` bekommt Marke (`brand`, `paper`, `night`, `frame`) und Rollen (`background`, `ink`, `inkSecondary`, `hairline`, `band`, `onBand`, `onBandSecondary`) sowie die neuen Statusfarben. Die Hex Werte stehen nur in `Theme` und `HabitColor` (Hilfsfunktion z.B. `Color(hex:)` bzw. `dynamic(light:dark:)` mit Hex). Das Asset `AccentColor` wird auf `#0000F2` (hell) und `#F2F2F2` (dunkel) gesetzt, damit Systemelemente (Toggle, Datumsauswahl, Tab Bar) passen.
+- **Habitfarben** (4.2): `HabitColor` mit Tinte und Leuchtfarbe pro Modus, `tint`, `onColor`, neue VoiceOver Namen (Indigo, Ocker, Cyan), Reihenfolge des Farbkreises. Die Schlüssel (`rawValue`) bleiben unverändert, gespeicherte Habits behalten ihre Farbe.
+- **Formen** (4.4): `cornerRadius` 2, `hairlineWidth` 0,5, Maße für Counter Tasten und 7 Tage Punkte in `Theme`. `HermesButtonStyle` mit den Varianten aus 4.4.
+- **Bausteine umbauen** (4.5), Identifier bleiben gleich:
+  - `GlassBackground` → `PaperBackground`, `GlassSection` und `glassCard()` → `PaperSection`, `CheckCircle` → `CheckBox`, `DayBadge` → `Chip`.
+  - `HabitCard`, `CounterControl`, `WeekDots`, `HabitIconView`, `MonthCalendar`, `HabitStatRow`, `StatValue`, `SegmentedChoice`, `WeekdayPicker`, Farbauswahl, `EmptyState`, `PauseRow` im neuen Stil.
+  - `ProgressRing` → `SegmentBar`. `ProgressHeader` zeigt bis Phase 9 die `SegmentBar` und darüber "5 von 16 · 31 %" in Rolle `meta`.
+- **Bildschirme** auf die neuen Bausteine umstellen: Heute, Sheet "Tag bearbeiten", Sheet "Habit anlegen / bearbeiten", Sortiermodus, Kalender, Habit Detail, Einstellungen, Sheet "Neue Pause", alle Leerzustände.
+  - Navigationstitel (Large und Inline) in Rolle `display` bzw. `label` über `UINavigationBarAppearance`, Leisten ohne eigenen Hintergrund auf `background`.
+  - Heute behält bis Phase 9 seinen Aufbau (Large Title mit Wochentag, Untertitel, Kapsel, Fortschritt, Liste). Die Kapsel "Heute" ist ein invertierter `Chip`, "Gestern" usw. neutral.
+  - Die Tab Bar bleibt die des Systems, getönt in `ink` (5.1).
+- **Rhythmus Zeile** (4.5.1) in Rolle `meta` und `inkSecondary`. Wochentage werden mit " · " statt ", " getrennt (`RhythmTextTests` anpassen).
+- **App Icon** bleibt bis Phase 12 unverändert.
+
+**Aufräumen (Pflicht, keine Überbleibsel)**
+- Löschen: `GlassBackground`, `GlassSection`, `glassCard()`, `CheckCircle`, `DayBadge`, `ProgressRing` (Dateien und Typen), `HabitColor.mutedColor` samt Hilfsfunktion und Konstanten.
+- Aus `Theme` löschen: `backgroundTop`, `backgroundBottom`, `accent` (ersetzt durch `ink` bzw. `brand`), `paused` (Systemgrau), `statusYellow`/`statusRed` als Systemfarben, `segmentTrack`, `segmentSelected`, `onHabitColor`, `onAccent`, `iconBackgroundOpacity`, `ringTrackOpacity`, `ringWidth`, `progressRingSize`, der alte `cornerRadius` 24 und alle weiteren Werte, die danach nicht mehr verwendet werden.
+- In Ansichten keine Systemschriften mehr (`.font(.headline)` usw.), keine `.foregroundStyle(.secondary)` bzw. `Color.secondary` / `Color.primary`, keine Systemfarben (`.systemGray`, `.systemYellow` …), kein `.glassEffect`.
+- Tests anpassen, die gedämpfte Farben, Kreise oder alte Typnamen prüfen (u.a. `HabitColorTests`). Kommentare, die von Glas, Verlauf, Kreis oder gedämpften Farben sprechen, anpassen.
+- Abschluss: Eine Suche in `Habitus/` nach `glassEffect`, `glassCard`, `GlassBackground`, `GlassSection`, `CheckCircle`, `DayBadge`, `ProgressRing`, `mutedColor`, `accentColor` (außer im Asset), `systemGray`, `systemYellow`, `systemRed`, `.secondary`, `.font(.` (außer in `Theme`/`FontRegistry`) und `Verlauf` findet nichts mehr. Ausnahme ist nur diese Spezifikation.
+
+**Pflicht Testfälle**
+- Unit Test: Jede der 8 Habitfarben liefert in Hell und Dunkel genau die Werte aus 4.2 (aufgelöst mit `UITraitCollection`).
+- Unit Test: Kontrast (WCAG Formel, Hilfsfunktion im Test): jede Tinte mindestens 4,4 : 1 gegen `paper`, jede Leuchtfarbe mindestens 4,5 : 1 gegen `night`, `inkSecondary` mindestens 4,5 : 1 gegen `background` in beiden Modi, Statusfarben mindestens 3 : 1.
+- Unit Test: `HabitColor(key:)` liefert für alle 8 bisherigen Schlüssel den passenden Fall, ein unbekannter Schlüssel ergibt `blue`.
+- Unit Test: Nach `FontRegistry.registerAll()` liefert `UIFont(name:size:)` für alle 6 Schnitte eine Schrift.
+- Unit Test: `SegmentBar` Modell (ohne Oberfläche): 4 von 6 Punkten ergibt 6 Segmente, davon 4 voll. 5 von 16 ergibt einen durchgehenden Balken mit 31 %. 0 Punkte ergibt keinen Balken.
+- Alle bestehenden UI Tests sind weiter grün (Identifier unverändert).
+
+**Definition of Done**
+- [ ] Auf keinem Bildschirm gibt es noch Farbverlauf, Glaskarte oder Schatten. Glas gibt es nur noch in Tab Bar und Systemleisten.
+- [ ] Hell: Papier mit blauer Schrift. Dunkel: Nachtblau mit Schrift in Papier. Nirgends Schwarz oder Systemgrau als Schrift.
+- [ ] Alle Texte stehen in Barlow Condensed, Antonio oder Geist Mono, außer Tab Bar, Systemleisten, Datumsauswahl und Alerts.
+- [ ] Abhaken, Counter Tasten, 7 Tage Punkte, Icon Fläche, Statusmarke, Kalendertage und Farbauswahl sind Quadrate.
+- [ ] Vorhandene Habits haben nach dem Update dieselbe Farbfamilie wie vorher.
+- [ ] Bei größter Schriftgröße ist nichts abgeschnitten (wie Phase 7).
+- [ ] Die Suche aus "Aufräumen" findet nichts mehr, es gibt keine ungenutzten Dateien, Typen oder Werte.
+
+---
+
+### Phase 9: Heute mit Kopfband und Wochenstreifen
+
+**Ziel:** Heute sieht aus wie der erste Mockup: ein blaues Band oben mit großem Titel, großem Fortschritt und Wochenstreifen, darunter die flache Liste. Ich kann einen Tag der Woche direkt antippen.
+
+**Umfang**
+- `DayHeader` (4.5, 5.2) mit Datumszeile inklusive Kalenderwoche, Titel relativ zu heute, Fortschritt "erledigt/Punkte" mit Prozent, `SegmentBar` und `WeekStrip`. Das Band ist in Hell und Dunkel Markenblau und reicht bis unter die Statusleiste. Die Statusleiste ist auf dem Band lesbar (helle Schrift, auch im hellen Modus), auf welchem Weg ist frei.
+- In Heute gibt es keine Navigationsleiste mehr. Der Plus Button sitzt in der Datumszeile, "Heute ›" auf Höhe des Titels, "Sortieren" / "Fertig" im Listenkopf (5.2).
+- **Listenkopf** mit Anzahl der Habits ("6 Habits" / "1 Habit").
+- **Kleine Leiste beim Scrollen** in `band` mit "Heute · 4/6" und Plus Button (5.2).
+- **Wochenstreifen antippen** wechselt den Tag mit derselben Animation wie Wischen. Zukünftige Tage sind blass und nicht antippbar.
+- **Animation:** Datumszeile, Titel, Fortschritt und Liste gleiten wie bisher (5.2). Der Wochenstreifen gleitet nur, wenn sich die Woche ändert. Sonst wandert nur die Markierung des angezeigten Tags (kurz, bei Reduce Motion sofort).
+- `HabitEngine`: `isoWeek(day)` und `weekStrip(day, today)` (6), ohne SwiftUI, mit Unit Tests.
+- Das Sheet "Tag bearbeiten" behält seinen einfachen Kopf (Navigationstitel mit Datum), zeigt aber dieselbe Liste.
+
+**Aufräumen (Pflicht, keine Überbleibsel)**
+- Löschen: `ProgressHeader`, die Toolbar Einträge von `TodayView` (Plus, Sortieren, kleiner Titel `barTitle`), die Kapsel neben dem Datum in Heute, den bisherigen Untertitel mit dem Datum.
+- Identifier: `today-header` sitzt am `DayHeader`. Bestehende Identifier für Plus, Sortieren und "Heute" Button bleiben gleich. Neu: `week-number`, `week-strip-<yyyy-MM-dd>`, `habit-count`, `compact-bar`.
+- UI Tests anpassen, die den Wochentag als Titel oder die Kapsel erwarten (u.a. `TodayPhase31UITests`, `TodayPhase32UITests`, `TodayUITests`): Der Titel ist jetzt "Heute", "Gestern" usw., das Datum steht in der Datumszeile.
+- Abschluss: Eine Suche nach `ProgressHeader` und `barTitle` findet nichts mehr. Ausnahme ist nur diese Spezifikation.
+
+**Pflicht Testfälle**
+- Unit Test: `isoWeek` ergibt für den 11.10.2026 die Woche 41, für den 29.12.2025 die Woche 1, für den 1.1.2027 die Woche 53.
+- Unit Test: `weekStrip` für Sonntag 11.10.2026 (heute) liefert Mo 5.10. bis So 11.10., der 11. ist angezeigt, alle sind antippbar.
+- Unit Test: `weekStrip` für Mittwoch 14.10.2026 (heute) liefert Do 15. bis So 18. als Zukunft und nicht antippbar.
+- Unit Test: Anzahl Text: 1 ergibt "1 Habit", 6 ergibt "6 Habits".
+- UI Test: Mit Testdaten zeigt der Titel "Heute", nach Wischen nach rechts "Gestern". Die Datumszeile passt jeweils zum Tag.
+- UI Test: Tippen auf einen früheren Tag im Wochenstreifen zeigt diesen Tag (Titel und Datumszeile). Tippen auf einen zukünftigen Tag ändert nichts.
+- UI Test: Der Plus Button im Band öffnet das Sheet "Neuer Habit". "Sortieren" im Listenkopf startet den Sortiermodus, "Fertig" beendet ihn.
+- UI Test: Nach dem Scrollen nach unten erscheint `compact-bar` mit dem Fortschritt, nach dem Zurückscrollen verschwindet sie.
+
+**Definition of Done**
+- [ ] Oben in Heute steht ein blaues Band mit Datum und Kalenderwoche, großem Titel, großem Fortschritt, Balken und Wochenstreifen, in Hell und Dunkel.
+- [ ] Der Fortschritt zählt genau wie vorher (3.4), nur die Darstellung ist neu.
+- [ ] Ich kann einen Tag der aktuellen Woche antippen und lande dort. Zukünftige Tage lassen sich nicht antippen. Wischen funktioniert weiter, auch über Wochengrenzen.
+- [ ] Beim Scrollen erscheint oben die schmale blaue Leiste mit Titel und Fortschritt, der Plus Button ist immer erreichbar.
+- [ ] Die Statusleiste ist auf dem Band gut lesbar.
+- [ ] Mit Reduce Motion wird nur überblendet.
+- [ ] Die Suche aus "Aufräumen" findet nichts mehr.
+
+---
+
+### Phase 10: Zusatz am Habit
+
+**Ziel:** Ich kann einem Habit eine kurze Angabe mitgeben, z.B. "20 Min", und sehe sie überall in der Rhythmus Zeile.
+
+**Umfang**
+- Datenmodell: `detail: String` an `Habit`, Standard "" (6). Leichte Migration, vorhandene Daten bleiben erhalten. `HabitSnapshot` bekommt das Feld ebenfalls.
+- Sheet "Habit anlegen / bearbeiten": Feld "Zusatz" unter dem Namen (5.3), höchstens 24 Zeichen, beim Speichern ohne Leerzeichen am Anfang und Ende.
+- Rhythmus Zeile mit Zusatz vorne (4.5.1) überall, wo sie steht: `HabitCard` (Heute, Tag bearbeiten), `HabitStatRow` (Kalender), Habit Detail. Die Textlogik liegt ohne Oberfläche bei `HabitSnapshot+Text`.
+- Testdaten (Einstellungen > Entwickler): "Lesen" bekommt den Zusatz "20 Min", ein weiterer Habit einen Zusatz, die übrigen keinen.
+
+**Pflicht Testfälle**
+- Unit Test: Täglich mit Zusatz "20 Min" ergibt "20 Min · Täglich". Wochentage Mo und Do mit Zusatz "Yoga" ergibt "Yoga · Mo · Do".
+- Unit Test: Zusatz nur aus Leerzeichen ergibt nur den Rhythmus. Zusatz mit Leerzeichen außen wird gekürzt gespeichert. Mehr als 24 Zeichen werden auf 24 begrenzt.
+- Unit Test: Ein vorhandener Habit ohne Zusatz (Migration bzw. Standardwert) ergibt dieselbe Rhythmus Zeile wie vorher.
+- UI Test: Habit mit Zusatz "20 Min" anlegen: `repeat-<Name>` enthält "20 Min" (Groß und Kleinschreibung beim Vergleich ignorieren, weil die Anzeige in Versalien ist). Bearbeiten zeigt den Zusatz im Feld.
+
+**Definition of Done**
+- [ ] Ich kann einen Zusatz eingeben, ändern und löschen. Mehr als 24 Zeichen gehen nicht.
+- [ ] Der Zusatz steht vorne in der Rhythmus Zeile in Heute, im Kalender und im Detail.
+- [ ] Habits ohne Zusatz sehen aus wie vorher.
+- [ ] Nach dem Update sind alle Habits und Erledigungen noch da.
+
+---
+
+### Phase 11: Habit Detail als eigene Seite
+
+**Ziel:** Das Habit Detail sieht aus wie der dritte Mockup: ein Band in der Farbe des Habits mit Name und großem Streak, darunter vier Kennzahlen und der Kalender. Ich kann den Habit von dort aus bearbeiten.
+
+**Umfang**
+- Detail mit Band in Habitfarbe, Kennzahlen Raster und Kalender (5.4). Die Statusleiste ist auf dem Band lesbar.
+- "Bearbeiten" im Band öffnet das Sheet "Habit bearbeiten" über dem Detail, mit den Folgen aus 5.4 (Sichern, Historie behalten, Historie löschen). Bei beendeten Habits kein "Bearbeiten", stattdessen "Beendet am …" in der Meta Zeile.
+- Neue Kennzahlen **Erledigungen** und **Pausen** (3.7): `HabitStatistics` bekommt `totalCompletions` und `pauseCount`, berechnet in der `HabitEngine`, mit Unit Tests.
+
+**Aufräumen (Pflicht, keine Überbleibsel)**
+- Löschen: Kopf mit Icon im Detail, Navigationstitel "Habit Detail", der Abschnitt "Statistik" als Überschrift.
+- Identifier: `detail-name`, `detail-rhythm`, `stat-current-streak`, `stat-longest-streak`, `stat-rate-30` bleiben gleich. Neu: `stat-total`, `stat-pauses`, `detail-edit`.
+- UI Tests anpassen, die den Kopf mit Icon oder den Titel "Habit Detail" erwarten (u.a. `CalendarPhase5UITests`, `CalendarPhase51UITests`).
+
+**Pflicht Testfälle**
+- Unit Test: 3x täglich, an 3 Tagen voll erledigt, an einem Tag 1: `totalCompletions` ist 10.
+- Unit Test: Beendeter Habit: Erledigungen nach dem Tag des Beendens zählen nicht.
+- Unit Test: Eine vergangene, eine laufende und eine geplante Pause: `pauseCount` ist 2. Ohne Pausen 0.
+- UI Test: Detail eines Habits aus den Testdaten zeigt alle fünf Kennzahlen (Streak im Band, vier im Raster).
+- UI Test: "Bearbeiten" im Detail öffnet das Sheet. Name ändern und sichern zeigt den neuen Namen im Detail.
+- UI Test: Nach "Habit beenden" mit "Historie löschen" aus dem Detail ist das Detail geschlossen und der Habit nicht mehr in der Liste.
+- UI Test: Ein beendeter Habit (Testdaten) hat kein `detail-edit` und zeigt "Beendet am".
+
+**Definition of Done**
+- [ ] Das Detail hat oben ein Band in der Farbe des Habits mit Name und großem Streak, in Hell und Dunkel gut lesbar.
+- [ ] Darunter stehen Quote 30 Tage, Längster Streak, Erledigungen und Pausen, darunter der Kalender wie bisher.
+- [ ] Ich kann einen aktiven Habit aus dem Detail heraus bearbeiten und beenden. Ein beendeter Habit lässt sich dort nicht bearbeiten.
+- [ ] Die Kennzahlen stimmen mit einem von Hand nachgerechneten Beispiel aus den Testdaten überein.
+
+---
+
+### Phase 12: Name, Logo und App Icon
+
+**Ziel:** Die App hat einen Namen, eine Wortmarke und ein App Icon im Hermes Stil.
+
+**Vor Beginn mit mir entscheiden (noch offen):**
+- **Name:** Habitus behalten (lateinische Übersetzung von Aristoteles' "Hexis", durch Übung erworbene Haltung) oder umbenennen, z.B. Hexis, Hestia (Herdfeuer, das täglich gepflegt wird) oder Horai (Göttinnen der Stunden und Jahreszeiten).
+- **Bildmarke:** die sieben Quadrate als Weiterführung von `Branding/habitus-mark.svg` (sieben Tage) oder ein Motiv passend zum Namen (z.B. Flamme bei Hestia).
+- **Bildwelt:** ob gemeinfreie Stiche (z.B. Met Open Access, CC0) blau gerastert eingesetzt werden, und wenn ja, wo (z.B. in den Leerzuständen).
+
+**Umfang (nach der Entscheidung)**
+- **Wortmarke:** Name in Barlow Condensed Regular, Versalien, zweizeilig gesetzt wie "HERMES / AGENT" bei Hermes. Als Vektor in `Branding/`. In der App höchstens an einer Stelle (z.B. Leerzustand Heute oder Einstellungen unten).
+- **App Icon:** Markenblau `#0000F2` mit Bildmarke in `#F2F2F2`, Varianten hell, dunkel und getönt (wie die vorhandenen `AppIcon-light/-dark/-tinted`). `Branding/render_icon.py` erzeugt alle Varianten.
+- **Anzeigename:** `INFOPLIST_KEY_CFBundleDisplayName`. Bundle Identifier und Datenbank bleiben gleich, damit keine Daten verloren gehen.
+- **Bildwelt (falls gewählt):** Quellen mit Lizenz in `Branding/QUELLEN.md`. Rasterung und Einfärbung per Skript in `Branding/`, keine Bilder von Hand bearbeitet. Höchstens ein Bild pro Leerzustand, in `Assets.xcassets`.
+
+**Definition of Done**
+- [ ] Das neue App Icon ist auf dem Homescreen sichtbar, in Hell, Dunkel und getönt.
+- [ ] Unter dem Icon steht der gewählte Name.
+- [ ] Nach dem Update sind alle Habits und Erledigungen noch da.
+- [ ] Alle Bildquellen sind mit Lizenz dokumentiert.
