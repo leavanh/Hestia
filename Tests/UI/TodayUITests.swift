@@ -6,6 +6,19 @@ final class TodayUITests: XCTestCase {
         continueAfterFailure = false
     }
 
+    /// Wartet, bis das Element nicht mehr wandert (z.B. weil ein erledigter Habit animiert nach unten rutscht).
+    @MainActor
+    private func waitUntilStill(_ element: XCUIElement) {
+        var last = element.frame
+        let deadline = Date().addingTimeInterval(5)
+        while Date() < deadline {
+            Thread.sleep(forTimeInterval: 0.3)
+            let current = element.frame
+            if current == last { return }
+            last = current
+        }
+    }
+
     /// Legt über das Sheet einen Habit mit Name, Icon und Farbe an.
     @MainActor
     private func createHabit(named name: String, in app: XCUIApplication) {
@@ -39,10 +52,13 @@ final class TodayUITests: XCTestCase {
 
         let check = app.buttons["check-\(name)"]
         XCTAssertFalse(check.isSelected)
+        waitUntilStill(check)
         check.tap()
         XCTAssertTrue(check.isSelected, "Abhaken")
+        waitUntilStill(check)
         check.tap()
         XCTAssertFalse(check.isSelected, "Aufheben")
+        waitUntilStill(check)
         check.tap()
         XCTAssertTrue(check.isSelected)
 

@@ -29,6 +29,8 @@ struct RootView: View {
     }
 
     var body: some View {
+        // Vorab gelesen, weil die Closure des `keyframeAnimator` nicht auf dem Main Actor läuft.
+        let slideOffset = reduceMotion ? 0 : Theme.tabSlideOffset * direction
         TabView(selection: $selection) {
             Tab(AppTab.today.title, systemImage: AppTab.today.systemImage, value: AppTab.today) {
                 TodayView().environment(\.tabReselectCount, reselectCounts[.today, default: 0])
@@ -44,7 +46,7 @@ struct RootView: View {
         .keyframeAnimator(initialValue: Transition(), trigger: selection) { content, value in
             content
                 .opacity(1 - value.progress)
-                .offset(x: reduceMotion ? 0 : value.progress * Theme.tabSlideOffset * direction)
+                .offset(x: value.progress * slideOffset)
         } keyframes: { _ in
             KeyframeTrack(\.progress) {
                 MoveKeyframe(1)
