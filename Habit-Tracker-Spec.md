@@ -25,8 +25,8 @@ Ein persönlicher Habit Tracker für das iPhone. Ab Phase 8 im Stil von Hermes A
 | Technik | Xcode, Swift, SwiftUI, SwiftData |
 | Nutzer | Nur ich, kein Login |
 | Daten | Nur lokal auf dem Gerät, kein Sync, kein Export |
-| Sprache der App | Deutsch |
-| Darstellung | Hell und Dunkel (folgt der Systemeinstellung) |
+| Sprache der App | Deutsch. Ab Phase 16 Deutsch und Englisch, Wahl über die Sprachwahl von iOS (5.5) |
+| Darstellung | Hell und Dunkel (folgt der Systemeinstellung). Ab Phase 14 in den Einstellungen wählbar: System, Hell oder Dunkel (5.5) |
 
 **Bewusst nicht enthalten:** Erinnerungen, Notizen, Messwerte, negative Habits, Überspringen von Tagen, Widgets, Export, Haptik, Animationen über Standard hinaus, jährliche Habits.
 
@@ -40,6 +40,7 @@ Ein persönlicher Habit Tracker für das iPhone. Ab Phase 8 im Stil von Hermes A
 - **Erledigung:** Ein Eintrag "an Tag X habe ich Habit Y n mal gemacht".
 - **Tag:** Kalendertag, lokale Zeitzone, Wechsel um Mitternacht.
 - **Fenster:** Rollierender Zeitraum, der heute endet. Woche = heute plus 6 Tage davor (7 Tage). Monat = heute plus 29 Tage davor (30 Tage).
+- **Kalenderzeitraum** (ab Phase 15, wenn in den Einstellungen Zeiträume "Kalender" gewählt ist): Woche = die Kalenderwoche des Tags, beginnend am Wochenbeginn (5.5). Monat = der Kalendermonat des Tags. Gezählt wird vom ersten Tag des Zeitraums bis zum Tag selbst.
 - **Angezeigter Tag:** Der Tag, den die Heute Ansicht gerade zeigt. Standard ist heute, per Wischen kann ich auf vergangene Tage wechseln (5.2).
 
 ---
@@ -65,6 +66,12 @@ Beim festen Monatstag gilt: Hat ein Monat weniger Tage (z.B. 31. im Februar), is
 - Täglich, pro Woche, pro Monat: jeden Tag.
 - Feste Wochentage und fester Monatstag: nur an den fälligen Tagen.
 - Nie, wenn der Habit heute pausiert oder beendet ist. Ein pausierter Habit, der sonst fällig wäre, steht trotzdem in der Liste (5.2), zählt aber nicht als fällig.
+- **Ab Phase 13** teilt Heute die aktiven Habits in die **Hauptliste** und **Weitere** (5.2). Für den angezeigten Tag gilt:
+  - Täglich: Hauptliste.
+  - Feste Wochentage, fester Monatstag: fällig in der Hauptliste, sonst in Weitere.
+  - Pro Woche, pro Monat: in Weitere, wenn das Ziel im Fenster (ab Phase 15 bzw. im Zeitraum) schon erfüllt ist und der Status grün ist, sonst in der Hauptliste. Beides wird dafür **ohne die Erledigung des angezeigten Tags** berechnet. So wechselt ein Habit beim Abhaken nie die Liste: Wer am Montag den 1x pro Woche Habit abhakt, sieht ihn am Montag unten bei den erledigten in der Hauptliste und ab Dienstag in Weitere. Ein gelber Habit (Ziel erfüllt, fällt aber bald heraus) bleibt in der Hauptliste.
+  - Pausiert: in Weitere, am Ende.
+  - Beendet: nirgends (wie bisher).
 
 ### 3.3 Abhaken
 
@@ -74,7 +81,7 @@ Beim festen Monatstag gilt: Hat ein Monat weniger Tage (z.B. 31. im Februar), is
 
 ### 3.4 Tagesfortschritt ("5 von 16 · 31 %")
 
-Gezählt werden alle am angezeigten Tag fälligen Habits (siehe 3.2).
+Gezählt werden alle am angezeigten Tag fälligen Habits (siehe 3.2). **Ab Phase 13** zählen nur die Habits der Hauptliste. Habits in Weitere zählen nie mit, auch nicht, wenn sie am Tag abgehakt werden.
 
 | Rhythmus | Punkte | Erledigte Punkte |
 |---|---|---|
@@ -100,6 +107,18 @@ Prozent = erledigte Punkte geteilt durch Punkte, gerundet auf ganze Zahl. Bei 0 
 - Rot: Ziel im Fenster nicht erfüllt.
 - Neu angelegt: Das erste Fenster beginnt am Erstelltag. Bis es zu Ende ist, gibt es kein Rot. Ist das Ziel noch nicht erfüllt, gilt grün, in den letzten 2 bzw. 5 Tagen des ersten Fensters gelb.
 
+**Pro Woche / pro Monat mit Kalenderzeiträumen (ab Phase 15)**
+
+Gilt statt des Abschnitts davor, wenn Zeiträume "Kalender" gewählt ist.
+- **Erledigt:** Summe der Erledigungen vom Beginn des Zeitraums bis heute, nur nicht pausierte Tage (wie rollierend).
+- **Ziel:** die Zielanzahl, höchstens die Anzahl der Tage im Zeitraum (z.B. 30x pro Monat im Februar: 28).
+- **Noch nötig:** Ziel minus erledigt. **Noch möglich:** nicht pausierte Tage von heute (eingeschlossen) bis zum Ende des Zeitraums.
+- Grün: Ziel erreicht, **oder** noch möglich ist größer als noch nötig.
+- Gelb: noch möglich ist gleich noch nötig (jeder verbleibende Tag wird gebraucht).
+- Rot: noch möglich ist kleiner als noch nötig (nicht mehr zu schaffen).
+- Ein neuer Zeitraum beginnt ohne Altlast: Am ersten Tag einer Woche ist der Status grün, auch wenn die Woche davor verpasst wurde.
+- **Zeiträume, die nur gewertet werden, wenn das Ziel erreicht ist:** der angebrochene Zeitraum, in dem der Habit erstellt wurde, ein Zeitraum mit mindestens einem Pausentag und der Zeitraum, in dem der Habit beendet wurde. In ihnen gibt es kein Rot, statt Rot gilt Gelb.
+
 **Feste Wochentage / fester Monatstag**
 - Rot: Der letzte fällige Tag vor heute (nicht pausiert, nach Erstellung) wurde nicht abgehakt.
 - Grün: sonst.
@@ -124,6 +143,7 @@ Präzisierung (Phase 5), wann ein Tag als erfüllt oder verpasst zählt:
 
 - **Täglich:** erfüllt, wenn das Tagesziel erreicht ist. Sonst verpasst.
 - **Pro Woche / pro Monat:** erfüllt, wenn das Fenster des Tages das Ziel erreicht (Status grün oder gelb). Im ersten Fenster nach der Erstellung ist ein unerfülltes Ziel weder erfüllt noch verpasst, der Tag wird nicht gewertet (wie "kein Rot" in 3.5).
+- **Pro Woche / pro Monat mit Kalenderzeiträumen (ab Phase 15):** Ein Tag übernimmt das Ergebnis seines Zeitraums. Ist ein abgeschlossener Zeitraum erfüllt, zählen alle seine nicht pausierten Tage ab Erstellung als erfüllt, sonst als verpasst. Zeiträume, die nur bei erreichtem Ziel gewertet werden (3.5), sind sonst weder erfüllt noch verpasst. Im laufenden Zeitraum zählen die Tage bis heute als erfüllt, sobald das Ziel erreicht ist, vorher sind sie noch offen (wie "Heute noch offen").
 - **Feste Wochentage / fester Monatstag:** nur fällige Tage werden gewertet, andere Tage unterbrechen den Streak nicht.
 - **Heute noch offen:** Ein heute nicht erfüllter Tag ist noch nicht vorbei. Er unterbricht den Streak nicht und zählt erst mit, wenn er erreicht ist. Er geht auch nicht in die Quote ein.
 - Tage vor der Erstellung werden nicht gewertet. Wenn es keinen gewerteten Tag gibt, ist der Streak 0 und die Quote leer ("–").
@@ -329,9 +349,31 @@ Kleine Zeile in Rolle `meta` (Versalien) und Farbe `inkSecondary` unter dem Name
 | Fester Monatstag | "Am n. des Monats" | AM 15. DES MONATS |
 | Mit Zusatz | "Zusatz · Rhythmus" | 20 MIN · TÄGLICH |
 
+**Ab Phase 15** hängen die Texte bei Woche und Monat mit Anzahl von den Zeiträumen ab (5.5). Die Zahl "erledigt" ist dabei der Stand im jeweiligen Fenster bzw. Zeitraum:
+
+| Rhythmus | Rollierend | Kalender |
+|---|---|---|
+| Woche, Anzahl | 1 VON 3 IN 7 TAGEN | 1 VON 3 DIESE WOCHE |
+| Monat, Anzahl | 1 VON 1 IN 30 TAGEN | 1 VON 1 DIESEN MONAT |
+
+Ab Phase 14 folgt die Reihenfolge fester Wochentage dem Wochenbeginn (5.5).
+
 ### 4.6 Icons
 
 Auswahl aus ca. 30 kuratierten SF Symbols wie bisher (z.B. figure.run, drop.fill, book.fill, bed.double.fill, leaf.fill, dumbbell.fill, brain.head.profile, pills.fill, cup.and.saucer.fill, figure.walk, music.note, pencil, house.fill, cart.fill, heart.fill). Sie stehen in `color` auf der Kachel aus 4.5. Schnitt der Symbole: `.regular`, damit sie zur dünnen Schrift passen.
+
+**Ab Phase 14.1:** 36 Symbole in 6 Zeilen zu je 6, jede Zeile ein Thema. Alle gibt es seit spätestens iOS 17.
+
+| Zeile | Symbole (VoiceOver Name) |
+|---|---|
+| Bewegung | `figure.run` (Laufen), `figure.walk` (Gehen), `figure.hiking` (Wandern), `dumbbell.fill` (Hantel), `figure.yoga` (Yoga), `bicycle` (Fahrrad) |
+| Pflege | `sparkles` (Hautpflege), `bubbles.and.sparkles.fill` (Reinigung), `face.smiling.fill` (Gesicht), `mouth.fill` (Zähne), `comb.fill` (Haare), `shower.fill` (Dusche) |
+| Essen und Gesundheit | `drop.fill` (Wasser), `cup.and.saucer.fill` (Tasse), `fork.knife` (Essen), `carrot.fill` (Gemüse), `pills.fill` (Tabletten), `heart.fill` (Herz) |
+| Ruhe | `bed.double.fill` (Bett), `moon.fill` (Mond), `sun.max.fill` (Sonne), `brain.head.profile` (Kopf), `figure.mind.and.body` (Meditation), `leaf.fill` (Blatt) |
+| Lernen und Kreatives | `book.fill` (Buch), `pencil` (Schreiben), `character.bubble.fill` (Sprache), `music.note` (Musik), `paintbrush.fill` (Malen), `camera.fill` (Kamera) |
+| Alltag | `house.fill` (Haushalt), `washer.fill` (Wäsche), `cart.fill` (Einkauf), `banknote.fill` (Geld), `iphone.slash` (Weniger Handy), `pawprint.fill` (Haustier) |
+
+Entfallen: `figure.pool.swim`, `tree.fill`, `graduationcap.fill`, `creditcard.fill`, `phone.fill`, `envelope.fill`. Kein vorhandener Habit trägt eines davon, eine Sonderbehandlung gibt es nicht.
 
 ### 4.7 Bewegung
 
@@ -365,7 +407,7 @@ Ab Phase 8: Die Tab Bar bleibt die des Systems, getönt in `ink`. Hintergrund de
   2. **Titel** (Rolle `display`): der angezeigte Tag relativ zu heute: "Heute", "Gestern", "Vorgestern", sonst "Vor n Tagen" (wie bisher `RelativeDay`). Die bisherige Kapsel neben dem Datum entfällt, weil der Titel das schon sagt. An vergangenen Tagen steht rechts auf Höhe des Titels der Button "Heute ›" (Variante `onBand`), der wie bisher animiert zu heute springt.
   3. **Fortschritt:** links groß "erledigte Punkte/Punkte" (Rolle `numeral`, z.B. "4/6"), daneben klein untereinander "Erledigt" und die Prozent ("67 %") in Rolle `meta`. Zählung wie 3.4, nur die Darstellung ist neu. Bei 0 Punkten steht statt Zahl und Balken "Heute nichts fällig" (Rolle `title`). Darunter die `SegmentBar`.
   4. **Wochenstreifen** (`WeekStrip`): Mo bis So der ISO Woche des angezeigten Tags, der angezeigte Tag invertiert. Antippen eines vergangenen Tags oder von heute wechselt dorthin, mit derselben Animation wie Wischen (Richtung nach Datum). Tage nach heute sind blass und nicht antippbar. Wischen über eine Wochengrenze zeigt im Streifen die neue Woche. Ab Phase 9.1 gleitet der Streifen ohne Verzögerung und genauso schnell wie Datumszeile und Titel (nicht als letztes Glied der Kaskade, kein Nachfedern). Wandert nur die Markierung innerhalb der Woche, geschieht das sofort mit dem Wischen, ebenso kurz. VoiceOver liest jeden Tag als vollständiges Datum, der angezeigte Tag ist als ausgewählt markiert.
-- **Listenkopf (ab Phase 9):** Direkt unter dem Band eine Zeile in Rolle `meta`: links die Anzahl der Zeilen in der Liste ("6 Habits", Einzahl "1 Habit", pausierte zählen mit), rechts der Button "Sortieren" bzw. im Sortiermodus "Fertig" (Variante `text`). Er ersetzt den Button oben links.
+- **Listenkopf (ab Phase 9):** Direkt unter dem Band eine Zeile in Rolle `meta`: links die Anzahl der Zeilen in der Liste ("6 Habits", Einzahl "1 Habit", pausierte zählen mit; ab Phase 13 nur die Zeilen der Hauptliste), rechts der Button "Sortieren" bzw. im Sortiermodus "Fertig" (Variante `text`). Er ersetzt den Button oben links.
 - **Scrollen (ab Phase 9):** Das Band scrollt mit dem Inhalt weg. Ist es aus dem Bild gescrollt (Schwelle `Theme.compactBarScrollOffset`: vom Band ist weniger als diese Höhe zu sehen), erscheint oben eine schmale Leiste in `band` mit "Heute · 4/6" (Titel und Fortschritt, Rolle `label`) links und dem Plus Button rechts. Sie ersetzt den kleinen Navigationstitel. Wischen und Tageswechsel funktionieren in beiden Zuständen. Ab Phase 9.1 hat die Leiste oben und unten so viel Innenabstand, dass der Plus Button mit Luft darin steht (mindestens `Theme.spacing` bzw. 8 pt über und unter dem Button, Wert in `Theme`, z.B. `compactBarPadding`). Er reicht nicht bis an die Unterkante.
 - *Bis Phase 8:* **Kopfbereich ohne Karte:** Oben steht das Datum des angezeigten Tags im Stil eines großen Navigationstitels (Large Title einer `NavigationStack`: Schrift, Gewicht, Einzug links). Titel ist der Wochentag ("Donnerstag"), darunter als Untertitel das Datum ("8. Oktober"). Beim Scrollen verhält sich der Titel wie ein Large Title und wird klein in der Leiste angezeigt. Darunter der `ProgressHeader`, ebenfalls ohne Karte und ohne Glas direkt auf dem Hintergrund. Neben dem Datum steht eine kleine Kapsel: "Heute" in Akzentfarbe, an vergangenen Tagen neutral "Gestern", "Vorgestern" oder "Vor n Tagen". In der kleinen Leiste steht sie hinter dem Datum.
 - **Tag wechseln:** Waagrechtes Wischen im Inhalt von Heute (Kopfbereich und Liste) nach rechts zeigt den vorherigen Tag, nach links den nächsten Tag. Senkrechtes Scrollen, Abhakkreis und Counter funktionieren weiter wie bisher. Weiter als bis heute geht es nicht, zukünftige Tage sind nicht erreichbar. Beim Start der App, beim Zurückkehren in die App und beim Tageswechsel um Mitternacht zeigt die Ansicht wieder heute.
@@ -373,7 +415,14 @@ Ab Phase 8: Die Tab Bar bleibt die des Systems, getönt in `ink`. Hintergrund de
 - Für den angezeigten Tag gelten Fälligkeit, Fortschritt, Abhaken, Status und 7 Tage Punkte so, als wäre dieser Tag heute. Tage vor der Erstellung eines Habits und pausierte Tage verhalten sich wie in Abschnitt 3 beschrieben.
 - *Bis Phase 8:* Oben rechts: Plus Button für neuen Habit. Zeigt die Ansicht einen vergangenen Tag, steht in der Datumszeile rechts (auf einer Ebene mit Datum und Kapsel, nicht in der Leiste) ein Button "Heute >" mit kleinem Chevron, der (animiert, wie ein Wischen nach vorn) zu heute zurückspringt. Auf heute ist er nicht zu sehen. Oben links: Button "Sortieren".
 - Darunter eine einzige Liste mit `HabitCard`s, ohne Abschnitte und ohne Überschriften.
-- **Pausierte Habits** (3.8) stehen am Ende der Liste, nach den erledigten, in der gespeicherten Reihenfolge: Icon und Name ausgegraut, daneben die Kapsel "Pausiert" (wie im Sheet "Neue Pause"), Abhakkreis bzw. Counter ausgegraut und nicht bedienbar. Langes Drücken öffnet weiter das Bearbeiten Sheet. Sie zählen nicht im Fortschritt. Dasselbe gilt im Sheet "Tag bearbeiten" für den gewählten Tag.
+- **Pausierte Habits** (3.8) stehen am Ende der Liste (ab Phase 13 am Ende von Weitere), nach den erledigten, in der gespeicherten Reihenfolge: Icon und Name ausgegraut, daneben die Kapsel "Pausiert" (wie im Sheet "Neue Pause"), Abhakkreis bzw. Counter ausgegraut und nicht bedienbar. Langes Drücken öffnet weiter das Bearbeiten Sheet. Sie zählen nicht im Fortschritt. Dasselbe gilt im Sheet "Tag bearbeiten" für den gewählten Tag.
+- **Weitere (ab Phase 13):** Unter der Hauptliste steht der Abschnitt **Weitere** mit den Habits, die am angezeigten Tag nicht dran oder schon erfüllt sind (Zuordnung 3.2).
+  - Kopfzeile mit Haarlinie oben, Rolle `meta`: links "Weitere · 3" (Anzahl der Habits darin), rechts ein Chevron (zu: nach rechts, offen: nach unten). Tippen auf die ganze Zeile klappt auf und zu, kurz animiert, bei Reduce Motion ohne Bewegung. **Voreinstellung zugeklappt.** Der Zustand bleibt gespeichert (UserDefaults, Schlüssel `HestiaOtherExpanded`) und gilt für jeden Tag.
+  - Aufgeklappt stehen darunter `HabitCard`s wie in der Hauptliste, in der gespeicherten Reihenfolge (`sortOrder`, dann `createdAt`), pausierte am Ende. Erledigte rutschen hier nicht nach unten, die Reihenfolge bleibt fest.
+  - Abhaken, Counter, 7 Tage Punkte, Status und langes Drücken zum Bearbeiten funktionieren wie in der Hauptliste. Pausierte sind ausgegraut und nicht abhakbar (wie bisher).
+  - Ist Weitere leer, fehlt der Abschnitt ganz. Ist die Hauptliste leer, aber Weitere nicht, zeigt das Band "Heute nichts fällig" und darunter steht nur Weitere.
+  - Gilt genauso für vergangene Tage und im Sheet "Tag bearbeiten". Im Sortiermodus ist Weitere ausgeblendet, der Sortiermodus zeigt wie bisher alle aktiven Habits.
+  - VoiceOver: Die Kopfzeile ist ein Button "Weitere, 3 Habits" mit Zustand auf- bzw. zugeklappt. Identifier `other-habits-toggle`, die Karten behalten ihre Identifier.
 - **Reihenfolge:** Oben die offenen Habits, darunter die erledigten. Innerhalb beider Teile gilt die gespeicherte Reihenfolge (`sortOrder`, dann `createdAt`). Erledigt heißt: Am angezeigten Tag ist das Tagesziel erreicht, also Abhakkreis abgehakt bzw. Counter voll. Ein Wochen oder Monats Habit, dessen Fenster erfüllt ist, der am angezeigten Tag aber nicht abgehakt ist, bleibt oben. Wird ein Habit erledigt, rutscht er animiert nach unten, wird es wieder aufgehoben, rutscht er animiert zurück an seinen Platz.
 - **Bearbeiten:** Festes Drücken (ca. 0,6 s) auf die Karte (nicht auf Kreis/Counter) öffnet das Bearbeiten Sheet. Die Karte sinkt dabei ein und gibt ein haptisches Signal, beim Auslösen ein festeres. Einfaches Tippen auf die Karte tut nichts. Für VoiceOver gibt es auf der Karte die Aktion "Bearbeiten".
 - **Sortieren:** Im Sortiermodus Habits per Drag and Drop verschieben. Es gibt eine Reihenfolge für alle Habits, sie wird gespeichert. Auch im Sortiermodus stehen erledigte Habits unten. Verschieben lassen sich nur die offenen Habits, die erledigten sind im Sortiermodus nicht verschiebbar. Nach dem Verschieben bekommen die offenen Habits in ihrer neuen Reihenfolge die vorderen Plätze in `sortOrder`, die erledigten folgen dahinter in ihrer bisherigen Reihenfolge. *(Ab Phase 9.1 ersetzt durch den nächsten Punkt.)*
@@ -422,6 +471,18 @@ Speichern nur möglich, wenn Name nicht leer.
 - Beendete Habits haben keinen Platz in den Einstellungen (3.9).
 - **Entwickler** (nur in Debug Builds sichtbar): "Testdaten erzeugen" und "Alle Daten zurücksetzen". Startargumente für Vorschauen und UI Tests: `-HestiaSampleData` und dazu `-HestiaSamplePauses` (Lesen war vorgestern und gestern pausiert, Sport hat eine geplante Pause ab übermorgen).
 - **Fuß (ab Phase 12):** Ganz unten steht linksbündig die Wortmarke `HESTIA / HABITS` (zweizeilig, Barlow Condensed Regular, 56 pt, Versalien, Farbe `inkSecondary`) und darunter die Version in Rolle `meta`. Sie ist der einzige Ort der Wortmarke in der App und kein Button.
+- **Aufbau ab Phase 14** (von oben nach unten): Titel "Einstellungen", Abschnitt **Pausen** (wie bisher), Abschnitt **Kalender** (Wochenbeginn, ab Phase 15 Zeiträume), Abschnitt **Anzeige** (Darstellung, ab Phase 16 Sprache), Abschnitt **Über**, in Debug Builds **Entwickler**, ganz unten der Fuß. Alle Abschnitte sind `PaperSection`, es gibt keine neuen Bausteine.
+- **Darstellung (ab Phase 14):** `SegmentedChoice` mit "System", "Hell", "Dunkel", Voreinstellung "System". Die Wahl gilt sofort für die ganze App samt Sheets (`.preferredColorScheme` an der Wurzel, `nil` bei System). Gespeichert in UserDefaults (`@AppStorage`, Schlüssel `HestiaAppearance`). Der Startbildschirm folgt weiter dem System, das lässt iOS nicht anders zu.
+- **Wochenbeginn (ab Phase 14):** `SegmentedChoice` mit "Automatisch", "Montag", "Sonntag", Voreinstellung "Automatisch". Automatisch übernimmt den ersten Wochentag aus den Systemeinstellungen (`Locale.current`, iOS: Allgemein › Sprache & Region › Erster Wochentag). Gespeichert in UserDefaults (Schlüssel `HestiaFirstWeekday`).
+  - Bei rollierenden Zeiträumen ändert der Wochenbeginn **nur die Anzeige**, nie die Rechnung. Status, Streaks und Quoten bleiben gleich. Ab Phase 15 legt er bei Zeiträumen "Kalender" auch fest, wann eine Woche für die Rechnung beginnt (3.5).
+  - Er gilt für: Wochenstreifen in Heute (5.2), Wochentagszeile und Raster im `MonthCalendar` (Tab, Detail, `DateRow`), Reihenfolge der 7 Quadrate im `WeekdayPicker` (5.3), Reihenfolge der Tage in der Rhythmus Zeile (4.5.1, z.B. "SO · MI" statt "MI · SO"). Gespeichert bleibt `weekdays` unverändert (1 = Montag bis 7 = Sonntag).
+  - **Kalenderwoche:** Bei Montag ist sie wie bisher die ISO Kalenderwoche. Bei einem anderen Wochenbeginn zählt sie Wochen ab diesem Tag mit der ISO Regel für die erste Woche (mindestens 4 Tage im neuen Jahr). So gehört jeder Tag im Wochenstreifen zur selben KW wie die Datumszeile.
+- **Über (ab Phase 14):** Zeile "Über Hestia" im Abschnitt Über, Tippen öffnet ein Sheet (Titel "Über", Systembutton "Fertig"). Inhalt:
+  - **Schriften:** je eine Zeile für Barlow Condensed, Antonio und Geist Mono mit Urheber und "SIL Open Font License 1.1". Tippen auf eine Zeile zeigt im Sheet den vollen Lizenztext aus der mitgelieferten Datei (`OFL-*.txt`, Rolle `body`, scrollbar).
+  - **Bilder** (nur wenn die Stiche aus Phase 12 in der App sind): je eine Zeile mit Titel des Stichs, "The Metropolitan Museum of Art", "CC0".
+  - Version und Wortmarke stehen nicht im Sheet, sondern weiter im Fuß.
+- **Zeiträume (ab Phase 15):** `SegmentedChoice` mit "Rollierend" und "Kalender", Voreinstellung "Rollierend" (wie bisher). Darunter in Rolle `meta` eine Zeile, die die gewählte Variante erklärt: "Die letzten 7 bzw. 30 Tage" oder "Die laufende Woche bzw. der laufende Monat". Gilt für alle Habits mit Rhythmus pro Woche und pro Monat (3.5). Gespeichert in UserDefaults (Schlüssel `HestiaPeriods`). Ein Wechsel rechnet Status, Streaks und Quoten auch für die Vergangenheit neu (wie 3.10), gespeicherte Erledigungen ändern sich nicht.
+- **Sprache (ab Phase 16):** Zeile "Sprache" im Abschnitt Anzeige, rechts die aktuelle Sprache der App in ihrem eigenen Namen ("Deutsch", "English"), dahinter ein Pfeil nach außen. Tippen öffnet die Seite der App in den iOS Einstellungen (`UIApplication.openSettingsURLString`), dort wählt man die Sprache. Es gibt keinen eigenen Umschalter in der App. iOS zeigt die Sprachwahl erst, wenn die App mehr als eine Sprache mitbringt.
 
 ---
 
@@ -466,7 +527,12 @@ Das Modell wurde in Phase 1 vollständig angelegt. In Phase 10 kommt `detail` an
 - `currentStreak`, `longestStreak`, `rate30`
 - ab Phase 9: `isoWeek(day)` (Kalenderwoche nach ISO 8601) und `weekStrip(day, today)` (7 Tage Mo bis So der Woche von `day`, je mit Datum und Zustand: angezeigt, antippbar, Zukunft)
 - ab Phase 11: `totalCompletions` und `pauseCount` (3.7), als Teil von `statistics`
+- ab Phase 13: `section(habit, day)` liefert Hauptliste oder Weitere (3.2). `dayProgress` zählt nur Habits der Hauptliste.
+- ab Phase 14: `weekStrip` und die Kalenderwoche bekommen den Wochenbeginn als Parameter (5.5). Bei Montag ist das Ergebnis wie bisher. Die Rechnung (Fenster, Status, Streaks, Quoten) kennt keinen Wochenbeginn.
+- ab Phase 15: Die `HabitEngine` bekommt Zeiträume (rollierend, Kalender) und Wochenbeginn als Eigenschaften, wie den Kalender. Alle Fensterberechnungen (`windowProgress`, `donePoints`, `status`, Streaks, Quote) gehen über eine Stelle, die je nach Zeitraum das rollierende Fenster oder den Kalenderzeitraum liefert. Ansichten erzeugen die Engine mit den aktuellen Einstellungen, ändert sich eine, rechnen sie neu.
 - Nimmt das "heutige" Datum immer als Parameter entgegen, damit Tests mit festen Daten möglich sind.
+
+**Einstellungen (ab Phase 14)** liegen nicht in SwiftData, sondern in UserDefaults (`@AppStorage`): `HestiaAppearance` (system, light, dark), `HestiaFirstWeekday` (automatic, monday, sunday) und ab Phase 15 `HestiaPeriods` (rolling, calendar). Fehlt ein Wert, gilt die Voreinstellung. Die Sprache speichert iOS selbst.
 
 ---
 
@@ -1057,3 +1123,180 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - [x] Unit Tests und die UI Tests aus "Komplett" laufen mit den neuen Startargumenten grün.
 
 *Geprüft im Simulator (iPhone 18 Pro): Homescreen zeigt "Hestia" mit der Flamme, Icons unverändert. Startbildschirm hell Blau auf Papier, dunkel Papier auf Nachtblau, ohne weißen Blitz. Vestalin in Heute und Fackel im Kalender in Hell und Dunkel (nach der Sichtung getauscht), "Keine Pausen" und "Nichts fällig" ohne Bild. Wortmarke und "Version 1.0 (1)" unten in den Einstellungen. Alte App und alter UI Test Runner aus beiden Simulatoren gelöscht. Unit Tests (250) grün. Komplett-Lauf auf dem Endstand (große Flamme, Wortmarke links, Stiche getauscht) vollständig grün, alle 20 UI Tests. Im ersten Lauf war `testCreateCheckUncheckAndPersist` einmal fehlgeschlagen (wackelt beim schnellen Abhaken und Aufheben). Auf dem iPhone selbst noch zu prüfen: alte App löschen, neue startet leer.*
+
+---
+
+### Phase 13: Weitere Habits in Heute
+
+**Ziel:** In Heute sehe ich oben nur, was am Tag wirklich zu tun ist. Darunter, eingeklappt, stehen unter "Weitere" alle anderen aktiven Habits, die ich trotzdem abhaken kann.
+
+**Entschieden:**
+- In Weitere stehen: Habits mit festen Wochentagen oder festem Monatstag, die am Tag nicht fällig sind, Wochen und Monats Habits, deren Ziel schon erfüllt und deren Status grün ist, und pausierte Habits (3.2).
+- Die Zuordnung rechnet ohne die Erledigung des angezeigten Tags. Ein Habit wechselt beim Abhaken also nie die Liste (3.2).
+- Habits in Weitere zählen nie im Tagesfortschritt (3.4), auch abgehakt nicht. Ihre Erledigungen zählen sonst ganz normal (Fenster, 7 Tage Punkte, Streaks, Kalender).
+- Weitere ist einklappbar, Voreinstellung zu, der Zustand bleibt gespeichert (5.2).
+- Folge für den Kalender: Die Einfärbung der Tage nutzt den Tagesfortschritt. Tage, an denen ein erfüllter Wochen oder Monats Habit bisher als erledigter Punkt zählte, ändern dadurch leicht ihre Einfärbung. Das ist gewollt.
+
+**Umfang**
+- **Engine:** `section(habit, day)` (Hauptliste oder Weitere) und `dayProgress` nur über die Hauptliste (6), mit Unit Tests.
+- **Heute und Sheet "Tag bearbeiten":** Abschnitt Weitere unter der Liste (5.2), Listenkopf zählt nur die Hauptliste, pausierte Habits wandern ans Ende von Weitere.
+- **Testdaten:** ein zusätzlicher Habit mit festem Wochentag, der heute nie fällig ist (z.B. der Wochentag von übermorgen), damit Weitere in Vorschauen und UI Tests sicher nicht leer ist.
+
+**Pflicht Testfälle** (Rollierend, Woche vom Mo 12.10. bis So 18.10.2026)
+- Unit Test: Wochentage Mo und Do: am Mi 14.10. Weitere, am Do 15.10. Hauptliste.
+- Unit Test: 1x pro Woche, abgehakt am Mo 12.10.: am Mo Hauptliste (erledigt), am Di 13.10. Weitere. Wird er am Di zusätzlich abgehakt, bleibt er in Weitere und der Tagesfortschritt ändert sich nicht.
+- Unit Test: 1x pro Woche, abgehakt am Mo 12.10.: am Fr 16.10. Weitere (grün), am Sa 17.10. Hauptliste (gelb).
+- Unit Test: 2x pro Woche mit einer Erledigung im Fenster: Hauptliste.
+- Unit Test: Pausierter Habit: Weitere, zählt nicht im Tagesfortschritt.
+- Unit Test: drei tägliche Habits und ein 1x pro Woche Habit in Weitere: der Tagesfortschritt hat 3 Punkte.
+- UI Test (einer): Mit Testdaten ist Weitere zugeklappt, Tippen auf `other-habits-toggle` klappt auf, der Habit mit festem Wochentag ist zu sehen. Ihn abhaken ändert den Fortschritt im Band nicht.
+
+**Definition of Done**
+- [ ] In Heute stehen oben nur die Habits, die am Tag zu tun sind. Ein 1x pro Woche Habit, den ich diese Woche schon gemacht habe, steht in Weitere.
+- [ ] Weitere ist beim ersten Start zu, lässt sich auf und zuklappen und merkt sich das.
+- [ ] Ich kann einen Habit in Weitere abhaken, er bleibt dort, und der Fortschritt im Band ändert sich nicht.
+- [ ] Ein Habit, den ich in der Hauptliste abhake, bleibt am selben Tag in der Hauptliste.
+- [ ] Pausierte Habits stehen ausgegraut am Ende von Weitere.
+- [ ] Im Sheet "Tag bearbeiten" ist es genauso.
+
+---
+
+### Phase 14: Einstellungen
+
+**Ziel:** In den Einstellungen wähle ich Darstellung und Wochenbeginn und finde unter "Über" die Lizenzen der Schriften und Bilder.
+
+**Entschieden:**
+- Nur Einstellungen, die Apple selbst so anbietet bzw. die dem System folgen können: Darstellung mit "System" als Voreinstellung, Wochenbeginn mit "Automatisch" als Voreinstellung (5.5).
+- Der Wochenbeginn ändert in dieser Phase nur die Anzeige. Fenster bleiben rollierend, Status, Streaks und Quoten ändern sich nicht (2, 3.5).
+- Die Kalenderwoche folgt dem Wochenbeginn (bei Montag ISO wie bisher), damit Datumszeile und Wochenstreifen nie verschiedene Wochen zeigen (5.5).
+- Die Zeile "Sprache" kommt erst in Phase 16, weil iOS die Sprachwahl erst mit einer zweiten Sprache anzeigt.
+
+**Umfang**
+- Einstellungen neu aufgebaut wie in 5.5: Pausen, Kalender, Anzeige, Über, Entwickler, Fuß.
+- **Darstellung:** `SegmentedChoice` System / Hell / Dunkel, `@AppStorage("HestiaAppearance")`, `.preferredColorScheme` an der Wurzel der App. Gilt auch für alle Sheets.
+- **Wochenbeginn:** `SegmentedChoice` Automatisch / Montag / Sonntag, `@AppStorage("HestiaFirstWeekday")`. Wirkt auf `WeekStrip`, `MonthCalendar` (Wochentagszeile und Raster, auch kompakt und in `DateRow`), `WeekdayPicker` und die Reihenfolge der Tage in der Rhythmus Zeile (4.5.1). Die Wochentagskürzel kommen aus dem `Calendar`, nicht aus festen Listen.
+- **Engine:** `weekStrip` und Kalenderwoche mit Wochenbeginn als Parameter (6). `isoWeek` wird dabei umbenannt (z.B. `weekOfYear`), weil sie nur bei Montag ISO ist. `MonthGrid` bekommt den Wochenbeginn für den Versatz am Monatsanfang.
+- **Über:** Zeile "Über Hestia" öffnet das Sheet "Über" mit Schriften (Lizenztext aus den `OFL-*.txt` im Projekt) und, falls vorhanden, Bildquellen (5.5).
+- Identifier: `settings-appearance`, `settings-first-weekday`, `settings-about`, `about-done`, im Sheet je Schrift `about-font-<Name>`.
+
+**Pflicht Testfälle**
+- Unit Test: Wochenbeginn Montag ergibt dieselben Werte wie bisher für `weekStrip` und die Kalenderwoche (bestehende Tests bleiben unverändert grün).
+- Unit Test: Wochenbeginn Sonntag: Der Wochenstreifen für Mi 14.10.2026 beginnt am So 11.10. und endet am Sa 17.10. So 11.10. und Sa 17.10. haben dieselbe Kalenderwoche.
+- Unit Test: `MonthGrid` für Oktober 2026 (1.10. ist ein Donnerstag): bei Montag 3 leere Felder vor dem 1., bei Sonntag 4.
+- Unit Test: Rhythmus Zeile für Wochentage Mo und So: bei Montag "Mo · So", bei Sonntag "So · Mo".
+- Unit Test: "Automatisch" ergibt bei Region Deutschland Montag, bei Region USA Sonntag.
+- UI Test (einer): In den Einstellungen Wochenbeginn "Sonntag" wählen, in Heute ist das erste Feld des Wochenstreifens ein Sonntag. Danach "Über Hestia" öffnen, die Zeile für Barlow Condensed ist zu sehen, "Fertig" schließt das Sheet.
+
+**Definition of Done**
+- [ ] Ich kann Hell oder Dunkel fest einstellen, die App samt Sheets folgt sofort. Mit "System" folgt sie wieder dem iPhone.
+- [ ] Mit Wochenbeginn Sonntag beginnen Wochenstreifen, Kalender und Wochentagsauswahl mit Sonntag. Datumszeile und Wochenstreifen zeigen dieselbe Woche.
+- [ ] Mit "Automatisch" folgt der Wochenbeginn der Einstellung "Erster Wochentag" in iOS.
+- [ ] Status, Streaks und Quoten sind nach dem Umstellen des Wochenbeginns genau wie vorher.
+- [ ] Unter "Über Hestia" stehen die drei Schriften mit Lizenz, der volle Lizenztext ist lesbar.
+- [ ] Die Einstellungen bleiben nach einem Neustart der App erhalten.
+
+---
+
+### Phase 14.1: Neue Habit Icons
+
+**Ziel:** Die Icon Auswahl passt zu meinen Habits: mehr Symbole, nach Themen geordnet, unter anderem für Hautpflege, ohne die, die ich nicht brauche.
+
+**Entschieden:**
+- Liste, Reihenfolge und VoiceOver Namen wie in 4.6: 36 Symbole, 6 Zeilen zu je 6 Themen. Die Themen sind nur die Reihenfolge, das Raster bekommt keine Überschriften.
+- Kein vorhandener Habit trägt ein entfallenes Symbol. Es gibt keine Migration, keine Sonderbehandlung und keine Änderung am Datenmodell.
+- Die Phase liegt vor Phase 16, damit die neuen VoiceOver Namen in die Texttabelle kommen.
+
+**Umfang**
+- `HabitIcons.all` und die Namen für VoiceOver neu nach 4.6. `HabitIcons.default` bleibt `figure.run`.
+- Raster im Sheet "Habit anlegen / bearbeiten" wie bisher mit 6 Spalten, jetzt 6 Zeilen.
+- Testdaten: "Auto waschen" bekommt statt `cart.fill` ein passendes Symbol aus der neuen Liste (z.B. `bubbles.and.sparkles.fill`), ein Habit "Hautpflege" mit `sparkles` kommt dazu.
+
+**Pflicht Testfälle**
+- Unit Test: `HabitIcons.all` hat 36 Einträge ohne Doppelte, jeder hat einen VoiceOver Namen, und jedes Symbol lässt sich laden (`UIImage(systemName:)` ist nicht `nil`).
+- Kein neuer UI Test.
+
+**Definition of Done**
+- [ ] Im Sheet sehe ich 6 Zeilen Symbole in der Reihenfolge aus 4.6, Schwimmen ist nicht mehr dabei, Hautpflege schon.
+- [ ] Alle Symbole sehen im Schnitt `.regular` auf der Kachel in Hell und Dunkel ordentlich aus.
+
+---
+
+### Phase 15: Feste Zeiträume
+
+**Ziel:** Ich kann in den Einstellungen wählen, ob "x pro Woche" und "x pro Monat" in rollierenden Fenstern (die letzten 7 bzw. 30 Tage) oder in Kalenderwochen und Kalendermonaten gezählt werden.
+
+**Entschieden:**
+- Eine Einstellung "Zeiträume" (Rollierend / Kalender) für Wochen und Monate zusammen, für alle Habits. Voreinstellung "Rollierend", also verhält sich die App ohne Umstellen wie bisher.
+- Bei "Kalender" beginnt die Woche am Wochenbeginn aus Phase 14. Der Monat ist der Kalendermonat.
+- **Ampel:** Rot erst, wenn das Ziel im Zeitraum nicht mehr zu schaffen ist. Gelb, wenn jeder verbleibende Tag gebraucht wird (3.5).
+- **Pausen und angebrochene Zeiträume** (Erstellung, Beenden, Pausentage im Zeitraum): Sie zählen nur, wenn das Ziel erreicht ist, sonst sind sie weder erfüllt noch verpasst. Kein Rot darin (3.5, 3.7).
+- Ein Wechsel der Einstellung rechnet auch die Vergangenheit neu. Gespeichert werden weiter nur Erledigungen.
+
+**Umfang**
+- **Einstellungen:** Zeile "Zeiträume" im Abschnitt Kalender mit Erklärzeile (5.5), `@AppStorage("HestiaPeriods")`.
+- **Engine:** Zeitraum (rollierend oder Kalender) und Wochenbeginn als Eigenschaften der `HabitEngine` (6). Eine Stelle liefert für Habit und Tag den Zeitraum (Beginn, Ende, ob er nur bei erreichtem Ziel zählt). `windowProgress`, `donePoints`, `status` und die Bewertung der Tage für Streaks und Quote nutzen sie. Die rollierende Rechnung bleibt unverändert.
+- **Weitere (Phase 13):** Ob ein Wochen oder Monats Habit in Weitere steht, richtet sich bei "Kalender" nach dem Zeitraum (3.2). Das ergibt sich aus der gemeinsamen Stelle in der Engine, braucht aber einen Unit Test.
+- **Rhythmus Zeile:** "in 7 Tagen" / "in 30 Tagen" bei rollierend, "diese Woche" / "diesen Monat" bei Kalender (4.5.1).
+- **Testdaten** bleiben gleich. Mit beiden Einstellungen ergeben sie sinnvolle, verschiedene Werte.
+- Identifier: `settings-periods`.
+
+**Pflicht Testfälle** (Wochenbeginn Montag, Zeiträume Kalender, 3x pro Woche, erstellt vor der Woche vom Mo 12.10. bis So 18.10.2026, falls nicht anders genannt)
+- Unit Test Ampel: Mi 14.10. ohne Erledigung grün (noch 5 Tage möglich, 3 nötig). Fr 16.10. ohne Erledigung gelb (3 und 3). Sa 17.10. ohne Erledigung rot (2 und 3). Sa 17.10. mit einer Erledigung am Mo gelb (2 und 2).
+- Unit Test: Woche vom 12.10. verpasst, Mo 19.10. ohne Erledigung grün.
+- Unit Test: drei Erledigungen bis Di 13.10.: `donePoints` ist an jedem Tag bis So 18.10. 1, am Mo 19.10. ohne Erledigung 0.
+- Unit Test Wochenbeginn: Bei Sonntag zählt eine Erledigung am So 18.10. zur Woche vom 18.10. bis 24.10., bei Montag zur Woche vom 12.10.
+- Unit Test Monat: 1x pro Monat ohne Erledigung im Oktober: am Sa 31.10. gelb, am So 1.11. grün. 30x pro Monat im Februar 2027: Ziel 28.
+- Unit Test Pause: Pause am 14. und 15.10., eine Erledigung in der Woche: am So 18.10. gelb statt rot, die Woche ist weder erfüllt noch verpasst und unterbricht keinen Streak.
+- Unit Test Erstellung: erstellt Do 15.10., 5x pro Woche, keine Erledigung: Sa 17.10. gelb statt rot, die Woche wird nicht gewertet.
+- Unit Test Streak: erstellt Mo 5.10., Wochen vom 5.10. und 12.10. erfüllt, heute Mi 21.10. ohne Erledigung: aktueller Streak 14, die laufende Woche ist noch offen.
+- Unit Test: Bei Zeiträumen "Rollierend" bleiben alle bestehenden Tests zu Status, Streaks und Quote unverändert grün.
+- Unit Test Weitere: 1x pro Woche, abgehakt Mo 12.10.: bei "Kalender" am So 18.10. in Weitere, am Mo 19.10. in der Hauptliste.
+- Unit Test Rhythmus Zeile: 1 von 3 ergibt "1 von 3 in 7 Tagen" bzw. "1 von 3 diese Woche".
+- UI Test (einer, bestehenden erweitern, wenn möglich): Mit Testdaten Zeiträume "Kalender" wählen, die Rhythmus Zeile eines Wochen Habits enthält "diese Woche". Zurück auf "Rollierend": "in 7 Tagen".
+
+**Definition of Done**
+- [ ] Ich kann zwischen rollierend und Kalender wählen, die Erklärzeile sagt, was gilt.
+- [ ] Bei "Kalender" ist ein Wochen Habit am Montag grün, auch wenn die letzte Woche verpasst war. Gelb und rot stimmen mit einem von Hand nachgerechneten Beispiel überein.
+- [ ] Wochen mit Pausen und die erste angebrochene Woche werden nie rot.
+- [ ] Streaks und Quote im Detail stimmen für beide Einstellungen mit einem von Hand nachgerechneten Beispiel aus den Testdaten überein.
+- [ ] Mit "Rollierend" ist alles wie vor dieser Phase.
+
+---
+
+### Phase 16: Texte und Sprachen
+
+**Ziel:** Alle Texte der App sind überarbeitet und einheitlich, und die App gibt es auf Deutsch und Englisch. Die Sprache wähle ich über iOS.
+
+**Entschieden:**
+- **Sprachen:** Deutsch (Basis, `developmentRegion = de`) und Englisch. Weitere Sprachen später nur, wenn ich sie gegenlesen kann.
+- **Ansprache:** neutral, weder "du" noch "Sie". Beispiele: "Noch keine Habits" statt "Du hast noch keine Habits", "Ersten Habit anlegen" (Infinitiv) statt "Lege deinen ersten Habit an". Im Englischen ebenso ohne "you", wo es natürlich geht.
+- **Sprachwahl** nur über iOS (Einstellungen › Hestia › Sprache), in der App eine Zeile "Sprache", die dorthin springt (5.5). Kein eigener Umschalter.
+- **Technik nach Apple:** ein String Catalog `Localizable.xcstrings`. Nicht übersetzt werden die Wortmarke `HESTIA / HABITS`, der App Name und die Namen und Zusätze der Habits.
+
+**Ablauf (Reihenfolge ist Pflicht)**
+1. **Glossar:** Die KI schlägt die festen Begriffe auf Deutsch und Englisch vor (mindestens Habit, Erledigung, Rhythmus, Fenster/Zeitraum, Pause, Zusatz, Streak, Quote, Kalenderwoche) und die Regel für Versalien. Ich entscheide. Das Glossar steht danach als Abschnitt 4.8 in dieser Spezifikation.
+2. **Texttabelle:** Die KI legt alle Texte der App als Tabelle vor: Ort (Datei bzw. Bildschirm), Text jetzt, Vorschlag Deutsch, Vorschlag Englisch, Bemerkung. Dazu gehören VoiceOver Texte und Hinweise. Ich entscheide Zeile für Zeile.
+3. **Umsetzung:** erst danach Code und Katalog.
+
+**Umfang**
+- `Localizable.xcstrings` mit allen Texten auf Deutsch und Englisch. Texte in `Text(...)`, Buttons usw. landen automatisch im Katalog. Texte aus Hilfsfunktionen, die einen `String` liefern (z.B. `Rhythm`, `HabitCountText`, `HabitSnapshot+Text`, `PauseRange+Text`, `RelativeDay`), werden zu `String(localized:)` bzw. `LocalizedStringResource`.
+- **Einzahl und Mehrzahl** über den Katalog ("Vary by Plural"), keine eigenen `if` mehr (z.B. "1 Habit" / "n Habits", "Tag in Folge" / "Tage in Folge").
+- **Datum und Zahlen:** kein festes `de_DE` mehr. Monatsnamen, Wochentage, Datumsangaben und Prozent folgen der Sprache der App. Wochentagskürzel aus dem `Calendar` (seit Phase 14).
+- Die Datumszeile in Heute ("So · 11. Okt · KW 41") bekommt im Englischen eine passende Form, festgelegt in der Texttabelle.
+- **Sprache:** Zeile im Abschnitt Anzeige (5.5), Identifier `settings-language`.
+- Glossar als Abschnitt 4.8 in die Spezifikation, die überarbeiteten deutschen Texte in die betroffenen Abschnitte (z.B. 4.5.1).
+- **Tests:** Die Testpläne "Schnell" und "Komplett" laufen fest auf Deutsch (Region Deutschland), damit bestehende Tests mit deutschen Texten stabil bleiben. Neue Texte in Tests nur, wo kein Identifier passt.
+
+**Pflicht Testfälle**
+- Unit Test: Für 1 und 3 Habits, 1 und 3 Tage Streak sowie jede Rhythmus Zeile gibt es den richtigen deutschen und englischen Text (Englisch über eine Ressource mit englischer Locale).
+- Unit Test: Pausenzeitraum und relativer Tag ("Gestern" / "Yesterday") auf Deutsch und Englisch.
+- Unit Test: Der Katalog hat für jeden Schlüssel eine englische Übersetzung (kein Eintrag "needs review" oder leer).
+- Kein neuer UI Test.
+
+**Definition of Done**
+- [ ] Glossar und Texttabelle sind von mir freigegeben, bevor Code geändert wurde.
+- [ ] Mit iPhone auf Englisch (oder Hestia in iOS auf Englisch gestellt) ist die ganze App englisch, auch Datum, Monatsnamen und VoiceOver. Kein deutsches Wort bleibt übrig außer Habit Namen.
+- [ ] Mit Deutsch sieht die App aus wie freigegeben.
+- [ ] Die Zeile "Sprache" in den Einstellungen öffnet die iOS Einstellungen der App, dort lässt sich die Sprache wechseln.
+- [ ] Keine Texte sprechen mich mit "du" oder "Sie" an.
+- [ ] Eine Suche nach `de_DE` im Code findet nichts mehr.
