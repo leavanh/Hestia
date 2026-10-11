@@ -13,7 +13,7 @@
   },
   "testTargets" : [
     {
-      "parallelizable" : true,
+      "parallelizable" : false,
       "target" : {
         "containerPath" : "container:Habitus.xcodeproj",
         "identifier" : "A10000000000000000000011",
@@ -21,7 +21,7 @@
       }
     },
     {
-      "parallelizable" : true,
+      "parallelizable" : false,
       "target" : {
         "containerPath" : "container:Habitus.xcodeproj",
         "identifier" : "A10000000000000000000012",
