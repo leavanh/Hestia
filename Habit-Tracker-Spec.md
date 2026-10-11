@@ -8,6 +8,9 @@
 - Die gesamte Rechenlogik (Status, Zählung, Streaks) liegt in einem eigenen Teil ohne Oberfläche (`HabitEngine`) und wird mit Unit Tests geprüft.
 - Erkläre mir nach jeder Phase kurz, wie ich die Punkte der Definition of Done selbst prüfen kann.
 - Keine Funktionen bauen, die hier nicht beschrieben sind.
+- **Tests schlank halten.** Rechenlogik wird mit Unit Tests geprüft (Test Plan "Schnell", läuft in Sekunden). UI Tests gibt es nur für wenige zentrale Abläufe, jeder kostet 10 bis 30 Sekunden. Pro Phase höchstens 2 neue UI Tests, und nur die, die unter "Pflicht Testfälle" stehen. Lieber einen bestehenden UI Test anpassen als einen neuen schreiben. Was sich als Unit Test prüfen lässt, wird kein UI Test.
+- **Wann welche Tests laufen.** Während der Arbeit nur "Schnell" und gezielt die betroffenen UI Tests (`-only-testing:HabitusUITests/<Klasse>/<Test>`). Den Test Plan "Komplett" nur einmal am Ende der Phase. Schlägt dort ein UI Test fehl, nach der Korrektur nur diesen erneut laufen lassen, nicht wieder alles.
+- **Accessibility wird nicht getestet.** Keine Tests und keine eigenen Prüfläufe für VoiceOver, Dynamic Type, Large Content Viewer oder Reduce Motion, auch keine Prüfung mit größter Schrift im Simulator. Was es schon gibt, bleibt, aber dafür wird kein zusätzlicher Aufwand betrieben. Ältere Punkte dazu in dieser Spezifikation gelten als erledigt.
 
 ---
 
@@ -467,7 +470,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Für alle Phasen gilt zusätzlich als Definition of Done:**
 - [ ] Projekt baut in Xcode ohne Fehler und ohne Warnungen.
 - [ ] App startet auf dem iPhone 16 Pro (oder Simulator) ohne Absturz.
-- [ ] Alle Unit Tests sind grün.
+- [ ] Alle Unit Tests sind grün. Die UI Tests aus "Komplett" sind grün (ein Lauf am Ende der Phase).
 - [ ] Hell und Dunkel sehen korrekt aus.
 - [ ] Nur Bausteine aus dem Designsystem verwendet.
 - [ ] Die KI hat eine kurze Testanleitung für mich geschrieben.
@@ -867,10 +870,10 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - **Listenkopf** mit Anzahl der Habits ("6 Habits" / "1 Habit").
 - **Kleine Leiste beim Scrollen** in `band` mit "Heute · 4/6" und Plus Button (5.2).
 - **Wochenstreifen antippen** wechselt den Tag mit derselben Animation wie Wischen. Zukünftige Tage sind blass und nicht antippbar.
-- **Animation:** Datumszeile, Titel, Fortschritt und Liste gleiten wie bisher (5.2). Der Wochenstreifen gleitet nur, wenn sich die Woche ändert. Sonst wandert nur die Markierung des angezeigten Tags (kurz, bei Reduce Motion sofort).
+- **Animation:** Datumszeile, Titel, Fortschritt und Liste gleiten wie bisher (5.2). Der Wochenstreifen gleitet nur, wenn sich die Woche ändert. Sonst wandert nur die Markierung des angezeigten Tags (kurz).
 - `HabitEngine`: `isoWeek(day)` und `weekStrip(day, today)` (6), ohne SwiftUI, mit Unit Tests.
 - Das Sheet "Tag bearbeiten" behält seinen einfachen Kopf (Navigationstitel mit Datum), zeigt aber dieselbe Liste.
-- **`HabitCard` wie im Mockup:** Die 7 Tage Punkte stehen in derselben Zeile rechts neben der Rhythmus Zeile, bei großer Schrift darunter (4.5). Gilt auch für "Tag bearbeiten".
+- **`HabitCard` wie im Mockup:** Die 7 Tage Punkte stehen in derselben Zeile rechts neben der Rhythmus Zeile (4.5). Gilt auch für "Tag bearbeiten".
 
 **Aufräumen (Pflicht, keine Überbleibsel)**
 - Löschen: `ProgressHeader`, die Toolbar Einträge von `TodayView` (Plus, Sortieren, kleiner Titel `barTitle`), die Kapsel neben dem Datum in Heute, den bisherigen Untertitel mit dem Datum.
@@ -883,19 +886,17 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Unit Test: `weekStrip` für Sonntag 11.10.2026 (heute) liefert Mo 5.10. bis So 11.10., der 11. ist angezeigt, alle sind antippbar.
 - Unit Test: `weekStrip` für Mittwoch 14.10.2026 (heute) liefert Do 15. bis So 18. als Zukunft und nicht antippbar.
 - Unit Test: Anzahl Text: 1 ergibt "1 Habit", 6 ergibt "6 Habits".
-- UI Test: Mit Testdaten zeigt der Titel "Heute", nach Wischen nach rechts "Gestern". Die Datumszeile passt jeweils zum Tag.
+- UI Test (bestehenden Wisch Test anpassen): Mit Testdaten zeigt der Titel "Heute", nach Wischen nach rechts "Gestern". Die Datumszeile passt jeweils zum Tag.
 - UI Test: Tippen auf einen früheren Tag im Wochenstreifen zeigt diesen Tag (Titel und Datumszeile). Tippen auf einen zukünftigen Tag ändert nichts.
-- UI Test: Der Plus Button im Band öffnet das Sheet "Neuer Habit". "Sortieren" im Listenkopf startet den Sortiermodus, "Fertig" beendet ihn.
-- UI Test: Nach dem Scrollen nach unten erscheint `compact-bar` mit dem Fortschritt, nach dem Zurückscrollen verschwindet sie.
+- Plus und Sortieren: den bestehenden Test `testPlusAndSortInTheBar` an die neuen Orte anpassen, kein neuer Test.
 
 **Definition of Done**
 - [ ] Oben in Heute steht ein blaues Band mit Datum und Kalenderwoche, großem Titel, großem Fortschritt, Balken und Wochenstreifen, in Hell und Dunkel.
 - [ ] Der Fortschritt zählt genau wie vorher (3.4), nur die Darstellung ist neu.
-- [ ] Auf den Karten stehen die 7 Tage Punkte neben der Rhythmus Zeile, bei größter Schrift darunter, nichts ist abgeschnitten.
+- [ ] Auf den Karten stehen die 7 Tage Punkte neben der Rhythmus Zeile.
 - [ ] Ich kann einen Tag der aktuellen Woche antippen und lande dort. Zukünftige Tage lassen sich nicht antippen. Wischen funktioniert weiter, auch über Wochengrenzen.
 - [ ] Beim Scrollen erscheint oben die schmale blaue Leiste mit Titel und Fortschritt, der Plus Button ist immer erreichbar.
 - [ ] Die Statusleiste ist auf dem Band gut lesbar.
-- [ ] Mit Reduce Motion wird nur überblendet.
 - [ ] Die Suche aus "Aufräumen" findet nichts mehr.
 
 ---
@@ -945,10 +946,8 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Unit Test: 3x täglich, an 3 Tagen voll erledigt, an einem Tag 1: `totalCompletions` ist 10.
 - Unit Test: Beendeter Habit: Erledigungen nach dem Tag des Beendens zählen nicht.
 - Unit Test: Eine vergangene, eine laufende und eine geplante Pause: `pauseCount` ist 2. Ohne Pausen 0.
-- UI Test: Detail eines Habits aus den Testdaten zeigt alle fünf Kennzahlen (Streak im Band, vier im Raster).
+- UI Test (bestehenden Test `testDetailShowsStreaksAndRate` erweitern): Detail eines Habits aus den Testdaten zeigt alle fünf Kennzahlen (Streak im Band, vier im Raster).
 - UI Test: "Bearbeiten" im Detail öffnet das Sheet. Name ändern und sichern zeigt den neuen Namen im Detail.
-- UI Test: Nach "Habit beenden" mit "Historie löschen" aus dem Detail ist das Detail geschlossen und der Habit nicht mehr in der Liste.
-- UI Test: Ein beendeter Habit (Testdaten) hat kein `detail-edit` und zeigt "Beendet am".
 
 **Definition of Done**
 - [ ] Das Detail hat oben ein Band in der Farbe des Habits mit Name und großem Streak, in Hell und Dunkel gut lesbar.

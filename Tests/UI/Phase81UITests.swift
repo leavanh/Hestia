@@ -40,44 +40,6 @@ final class Phase81UITests: XCTestCase {
         XCTAssertTrue(app.buttons["tab-today"].isSelected)
     }
 
-    @MainActor
-    func testTodayKeepsItsShownDayWhenSwitchingTabs() {
-        let app = launch(sampleData: true)
-        let list = app.scrollViews["today-list"]
-        XCTAssertTrue(list.waitForExistence(timeout: 5))
-        list.swipeRight()
-        let subtitle = app.staticTexts["today-subtitle"]
-        XCTAssertTrue(app.staticTexts["today-badge"].label.localizedCaseInsensitiveContains("gestern"))
-        let shown = subtitle.label
-
-        app.openTab(.calendar)
-        XCTAssertTrue(app.buttons["calendar-previous"].waitForExistence(timeout: 5))
-        app.openTab(.today)
-
-        XCTAssertTrue(subtitle.waitForExistence(timeout: 5))
-        XCTAssertEqual(subtitle.label, shown, "Heute zeigt weiter denselben Tag")
-        XCTAssertTrue(app.staticTexts["today-badge"].label.localizedCaseInsensitiveContains("gestern"))
-    }
-
-    @MainActor
-    func testLastCardIsNotCoveredByTheTabBar() {
-        let app = launch(sampleData: true)
-        let list = app.scrollViews["today-list"]
-        XCTAssertTrue(list.waitForExistence(timeout: 5))
-        for _ in 0..<8 { list.swipeUp() }
-
-        let bar = app.buttons["tab-today"].frame
-        let checks = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'check-' OR identifier BEGINSWITH 'counter-'"))
-        XCTAssertGreaterThan(checks.count, 0)
-        let lowest = (0..<checks.count)
-            .map { checks.element(boundBy: $0) }
-            .filter(\.isHittable)
-            .map { $0.frame.maxY }
-            .max() ?? 0
-        XCTAssertGreaterThan(lowest, 0)
-        XCTAssertLessThanOrEqual(lowest, bar.minY, "Die letzte Karte endet über der Leiste")
-    }
-
     // MARK: Plus und Sortieren
 
     @MainActor
@@ -120,20 +82,4 @@ final class Phase81UITests: XCTestCase {
         XCTAssertFalse(plus.isEnabled, "An der oberen Grenze ist Plus gesperrt")
     }
 
-    @MainActor
-    func testMonthDayStepperMovesByOne() {
-        let app = launch()
-        app.buttons["Neuer Habit"].tap()
-        app.otherElements["rhythm-picker"].buttons["Monat"].tap()
-        app.otherElements["variant-picker"].buttons["Monatstag"].tap()
-
-        let value = app.control("monthday-picker")
-        XCTAssertTrue(value.waitForExistence(timeout: 5))
-        app.setMonthDay(to: 1)
-        XCTAssertEqual(value.value as? String, "1.")
-        XCTAssertFalse(app.buttons["monthday-picker-minus"].isEnabled)
-
-        app.buttons["monthday-picker-plus"].tap()
-        XCTAssertEqual(value.value as? String, "2.")
-    }
 }

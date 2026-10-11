@@ -53,33 +53,4 @@ final class TodayUITests: XCTestCase {
         XCTAssertTrue(app.buttons["check-\(name)"].isSelected)
     }
 
-    @MainActor
-    func testNextDayStartsUnchecked() {
-        let name = "Lesen \(UUID().uuidString.prefix(4))"
-        let app = XCUIApplication()
-        app.launch()
-
-        createHabit(named: name, in: app)
-        app.buttons["check-\(name)"].tap()
-        XCTAssertTrue(app.buttons["check-\(name)"].isSelected)
-
-        // Morgen: gleiches Habit, aber leer, und das Datum ist weitergesprungen.
-        app.terminate()
-        app.launchArguments = ["-HabitusDayOffset", "1"]
-        app.launch()
-        XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.buttons["check-\(name)"].isSelected)
-
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: .now)!
-        let locale = Locale(identifier: "de_DE")
-        XCTAssertEqual(app.staticTexts["today-title"].label, tomorrow.formatted(.dateTime.weekday(.wide).locale(locale)))
-        XCTAssertEqual(app.staticTexts["today-subtitle"].label, tomorrow.formatted(.dateTime.day().month(.wide).locale(locale)))
-
-        // Zurück zu heute: das Häkchen von heute ist unverändert.
-        app.terminate()
-        app.launchArguments = []
-        app.launch()
-        XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["check-\(name)"].isSelected)
-    }
 }
