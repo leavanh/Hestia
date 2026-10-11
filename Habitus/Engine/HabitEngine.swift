@@ -6,6 +6,12 @@ nonisolated struct DayCount: Equatable, Sendable {
     var count: Int
 }
 
+/// Zeitraum einer Pause, beide Tage eingeschlossen (Spezifikation 3.8).
+nonisolated struct PauseRange: Equatable, Sendable {
+    var start: Date
+    var end: Date
+}
+
 /// Alles, was die `HabitEngine` über einen Habit wissen muss, als reiner Wert.
 nonisolated struct HabitSnapshot: Equatable, Sendable {
     var rhythm: Rhythm
@@ -17,6 +23,10 @@ nonisolated struct HabitSnapshot: Equatable, Sendable {
     var monthDay: Int? = nil
     var createdAt: Date
     var counts: [DayCount]
+    /// Pausen, die für diesen Habit gelten (Spezifikation 3.8).
+    var pauses: [PauseRange] = []
+    /// Tag, an dem der Habit beendet wurde. Ab diesem Tag ist er nicht mehr fällig (Spezifikation 3.9).
+    var endedAt: Date? = nil
 }
 
 /// Ampelstatus eines Habits (Spezifikation 3.5).
@@ -36,6 +46,8 @@ nonisolated struct WindowProgress: Equatable, Sendable {
 nonisolated enum WeekDot: Equatable, Sendable {
     /// Wert des Tages geteilt durch Tagesziel, 0 bis 1. Tage vor der Erstellung haben 0.
     case fill(Double)
+    /// Pausierter Tag: kleiner grauer Strich statt Punkt.
+    case paused
 }
 
 /// Tagesfortschritt "5 von 16 · 31 %" (Spezifikation 3.4).
@@ -108,8 +120,32 @@ nonisolated struct HabitEngine: Sendable {
 
     /// Ob der Habit am Tag in "Heute" erscheint. Täglich, pro Woche und pro Monat sind jeden Tag
     /// fällig, feste Wochentage und fester Monatstag nur an ihren Tagen. Vor dem Erstelltag
-    /// existierte der Habit noch nicht.
+    /// existierte der Habit noch nicht, an pausierten Tagen und ab dem Tag des Beendens ist er nie fällig.
     func isDue(_ habit: HabitSnapshot, on day: Date) -> Bool {
+        isScheduled(habit, on: day) && !isPaused(habit, on: day) && !isEnded(habit, on: day)
+    }
+
+    /// Ob der Habit am Tag zwar fällig wäre, aber pausiert ist. Solche Habits stehen ausgegraut mit "Pausiert" am
+    /// Ende der Liste, zählen aber nicht im Fortschritt (Spezifikation 3.8).
+    func isShownAsPaused(_ habit: HabitSnapshot, on day: Date) -> Bool {
+        isScheduled(habit, on: day) && isPaused(habit, on: day) && !isEnded(habit, on: day)
+    }
+
+    /// Ob der Habit am Tag pausiert (Spezifikation 3.8).
+    func isPaused(_ habit: HabitSnapshot, on day: Date) -> Bool {
+        let day = startOfDay(day)
+        return habit.pauses.contains { startOfDay($0.start) <= day && day <= startOfDay($0.end) }
+    }
+
+    /// Ob der Habit am Tag schon beendet ist. Der Tag des Beendens selbst gilt als beendet, damit der Habit
+    /// sofort aus "Heute" verschwindet (Spezifikation 3.9).
+    func isEnded(_ habit: HabitSnapshot, on day: Date) -> Bool {
+        guard let endedAt = habit.endedAt else { return false }
+        return startOfDay(day) >= startOfDay(endedAt)
+    }
+
+    /// Ob der Rhythmus den Habit am Tag vorsieht, unabhängig von Pause und Beenden.
+    private func isScheduled(_ habit: HabitSnapshot, on day: Date) -> Bool {
         let day = startOfDay(day)
         guard day >= startOfDay(habit.createdAt) else { return false }
 
@@ -150,18 +186,36 @@ nonisolated struct HabitEngine: Sendable {
         }
     }
 
-    /// Summe der Erledigungen in den letzten `length` Tagen, die an `day` enden.
-    func windowSum(_ values: [Date: Int], endingOn day: Date, length: Int) -> Int {
-        (0..<max(length, 0)).reduce(0) { sum, offset in
-            guard let date = calendar.date(byAdding: .day, value: -offset, to: day) else { return sum }
-            return sum + (values[startOfDay(date)] ?? 0)
+    /// So weit zurück wird höchstens gesucht, wenn Pausentage übersprungen werden.
+    private static let maxLookbackDays = 20_000
+
+    /// Summe der Erledigungen in den letzten `length` Tagen, die an `day` enden. Tage, für die `isSkipped`
+    /// wahr ist (Pausentage), werden übersprungen: das Fenster sind dann die letzten `length` übrigen Tage.
+    func windowSum(
+        _ values: [Date: Int], endingOn day: Date, length: Int, skipping isSkipped: (Date) -> Bool = { _ in false }
+    ) -> Int {
+        var sum = 0
+        var counted = 0
+        var date = startOfDay(day)
+        var steps = 0
+        while counted < length, steps < Self.maxLookbackDays {
+            steps += 1
+            if !isSkipped(date) {
+                sum += values[date] ?? 0
+                counted += 1
+            }
+            guard let previous = calendar.date(byAdding: .day, value: -1, to: date) else { break }
+            date = startOfDay(previous)
         }
+        return sum
     }
 
     /// Stand im Fenster. `nil`, wenn der Rhythmus kein Fenster hat.
     func windowProgress(_ habit: HabitSnapshot, on day: Date) -> WindowProgress? {
         guard let length = windowLength(habit.rhythm) else { return nil }
-        let done = windowSum(cappedValues(habit), endingOn: startOfDay(day), length: length)
+        let done = windowSum(
+            cappedValues(habit), endingOn: startOfDay(day), length: length, skipping: { isPaused(habit, on: $0) }
+        )
         return WindowProgress(done: done, target: max(habit.targetCount, 1))
     }
 
@@ -222,15 +276,27 @@ nonisolated struct HabitEngine: Sendable {
         }
     }
 
-    /// Täglich: grün, wenn das Ziel heute oder am Tag davor erreicht ist. Kein Gelb.
+    /// Täglich: grün, wenn das Ziel heute oder am letzten nicht pausierten Tag davor erreicht ist. Kein Gelb.
     private func dailyStatus(_ habit: HabitSnapshot, on day: Date) -> HabitStatus {
         let target = dailyTarget(habit)
         if count(on: day, in: habit.counts) >= target { return .green }
 
-        // Heute erstellt: es gibt keinen Tag davor, der verpasst sein könnte.
-        guard let previous = calendar.date(byAdding: .day, value: -1, to: day),
-              previous >= startOfDay(habit.createdAt) else { return .green }
+        // Heute erstellt (oder alle Tage davor pausiert): es gibt keinen Tag davor, der verpasst sein könnte.
+        guard let previous = lastActiveDay(habit, before: day) else { return .green }
         return count(on: previous, in: habit.counts) >= target ? .green : .red
+    }
+
+    /// Der letzte nicht pausierte Tag vor `day`, nicht vor dem Erstelltag.
+    private func lastActiveDay(_ habit: HabitSnapshot, before day: Date) -> Date? {
+        let created = startOfDay(habit.createdAt)
+        var date = startOfDay(day)
+        for _ in 0..<Self.maxLookbackDays {
+            guard let previous = calendar.date(byAdding: .day, value: -1, to: date) else { return nil }
+            date = startOfDay(previous)
+            if date < created { return nil }
+            if !isPaused(habit, on: date) { return date }
+        }
+        return nil
     }
 
     /// Pro Woche / pro Monat: grün, solange das Fenster erfüllt bleibt. Gelb, wenn es ohne neue
@@ -241,16 +307,17 @@ nonisolated struct HabitEngine: Sendable {
         let warning = warningDays(habit.rhythm)
         let target = max(habit.targetCount, 1)
         let values = cappedValues(habit)
+        let skipPaused = { (date: Date) in isPaused(habit, on: date) }
 
-        if windowSum(values, endingOn: day, length: length) >= target {
+        if windowSum(values, endingOn: day, length: length, skipping: skipPaused) >= target {
             // Dasselbe Fenster, um `warning` Tage nach vorn geschoben: ohne neue Erledigungen
             // zählt nur noch, was in den letzten `length - warning` Tagen bis heute liegt.
-            let later = windowSum(values, endingOn: day, length: length - warning)
+            let later = windowSum(values, endingOn: day, length: length - warning, skipping: skipPaused)
             return later >= target ? .green : .yellow
         }
 
-        let created = startOfDay(habit.createdAt)
-        let daysSinceCreation = calendar.dateComponents([.day], from: created, to: day).day ?? 0
+        // Das erste Fenster sind die ersten `length` nicht pausierten Tage ab dem Erstelltag.
+        let daysSinceCreation = activeDays(habit, from: startOfDay(habit.createdAt), before: day, upTo: length)
         guard daysSinceCreation < length else { return .red }
         return daysSinceCreation >= length - warning ? .yellow : .green
     }
@@ -264,26 +331,44 @@ nonisolated struct HabitEngine: Sendable {
         return count(on: last, in: habit.counts) > 0 ? .green : .red
     }
 
-    /// Der letzte fällige Tag vor `day`, nicht vor dem Erstelltag. Zwischen zwei fälligen Tagen
-    /// liegen höchstens 31 Tage.
+    /// Der letzte fällige (also nicht pausierte) Tag vor `day`, nicht vor dem Erstelltag.
     private func lastDueDay(_ habit: HabitSnapshot, before day: Date) -> Date? {
-        for offset in 1...62 {
-            guard let date = calendar.date(byAdding: .day, value: -offset, to: day) else { return nil }
+        let created = startOfDay(habit.createdAt)
+        var date = startOfDay(day)
+        for _ in 0..<Self.maxLookbackDays {
+            guard let previous = calendar.date(byAdding: .day, value: -1, to: date) else { return nil }
+            date = startOfDay(previous)
+            if date < created { return nil }
             if isDue(habit, on: date) { return date }
         }
         return nil
     }
 
+    /// Anzahl der nicht pausierten Tage von `start` bis vor `end`, gezählt höchstens bis `limit`.
+    func activeDays(_ habit: HabitSnapshot, from start: Date, before end: Date, upTo limit: Int) -> Int {
+        var count = 0
+        var date = startOfDay(start)
+        let end = startOfDay(end)
+        while date < end, count < limit {
+            if !isPaused(habit, on: date) { count += 1 }
+            guard let next = calendar.date(byAdding: .day, value: 1, to: date) else { break }
+            date = startOfDay(next)
+        }
+        return count
+    }
+
     // MARK: 7 Tage Punkte (Spezifikation 3.6)
 
     /// Die letzten 7 Tage, links der älteste, rechts `day`. Tage vor der Erstellung haben keine
-    /// Erledigung und damit die Füllung 0.
+    /// Erledigung und damit die Füllung 0, pausierte Tage sind ein grauer Strich.
     func weekDots(_ habit: HabitSnapshot, on day: Date) -> [WeekDot] {
         let today = startOfDay(day)
         let target = Double(dailyTarget(habit))
+        let created = startOfDay(habit.createdAt)
 
         return (-6...0).map { offset in
             guard let date = calendar.date(byAdding: .day, value: offset, to: today) else { return .fill(0) }
+            if startOfDay(date) >= created, isPaused(habit, on: date) { return .paused }
             let value = Double(count(on: date, in: habit.counts))
             return .fill(min(max(value / target, 0), 1))
         }

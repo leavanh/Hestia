@@ -80,6 +80,7 @@ struct HabitDetailSheet: View {
             lastMonth: habit.statisticsDay(today: today, engine: engine),
             today: today,
             progress: { DayProgress(done: min(engine.count(on: $0, in: snapshot.counts), target), total: target) },
+            isPaused: { engine.isPaused(snapshot, on: $0) && engine.startOfDay($0) >= engine.startOfDay(snapshot.createdAt) },
             tint: habitColor.color,
             identifierPrefix: "habit-calendar"
         )

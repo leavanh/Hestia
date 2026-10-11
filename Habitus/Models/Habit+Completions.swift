@@ -22,7 +22,9 @@ extension Habit {
             weekdays: weekdays,
             monthDay: monthDay,
             createdAt: createdAt,
-            counts: dayCounts
+            counts: dayCounts,
+            pauses: pauses.map(\.range),
+            endedAt: endedAt
         )
     }
 

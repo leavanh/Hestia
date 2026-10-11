@@ -70,4 +70,12 @@ extension Habit {
             engine.isCompleted($0.snapshot, on: day)
         }
     }
+
+    /// Die Habits, die am Tag pausiert sind (und sonst fällig wären). Sie stehen in der Liste nach allen anderen,
+    /// in der gespeicherten Reihenfolge, und zählen nicht im Fortschritt.
+    static func pausedInTodayOrder(_ habits: [Habit], on day: Date, engine: HabitEngine) -> [Habit] {
+        habits.filter { $0.isAlive && engine.isShownAsPaused($0.snapshot, on: day) }.sorted {
+            $0.sortOrder != $1.sortOrder ? $0.sortOrder < $1.sortOrder : $0.createdAt < $1.createdAt
+        }
+    }
 }

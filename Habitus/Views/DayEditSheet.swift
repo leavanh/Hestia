@@ -15,17 +15,18 @@ struct DayEditSheet: View {
 
     var body: some View {
         let due = Habit.dueInTodayOrder(habits, on: day, engine: engine)
+        let paused = Habit.pausedInTodayOrder(habits, on: day, engine: engine)
 
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: Theme.sectionSpacing) {
                     ProgressHeader(progress: engine.dayProgress(due.map(\.snapshot), on: day))
                     VStack(spacing: Theme.spacing) {
-                        ForEach(due) { habit in
+                        ForEach(due + paused) { habit in
                             DayHabitCard(habit: habit, day: day) { editingHabit = habit }
                         }
                     }
-                    .animation(.smooth, value: due.map(\.id))
+                    .animation(.smooth, value: (due + paused).map(\.id))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(Theme.spacing)

@@ -61,6 +61,27 @@ enum DebugData {
         return habits
     }
 
+    /// Zwei Beispielpausen für Vorschauen und UI Tests: "Lesen" war von vorgestern bis gestern pausiert, "Sport"
+    /// hat eine geplante Pause ab übermorgen. Sucht die Habits über ihren Namen aus den Beispielhabits.
+    static func insertSamplePauses(
+        into context: ModelContext,
+        habits: [Habit],
+        now: Date = AppClock.now,
+        engine: HabitEngine = HabitEngine()
+    ) {
+        let today = engine.startOfDay(now)
+        func day(_ offset: Int) -> Date {
+            engine.calendar.date(byAdding: .day, value: offset, to: today).map(engine.startOfDay) ?? today
+        }
+        for (name, from, to) in [("Lesen", -2, -1), ("Sport", 2, 4)] {
+            guard let habit = habits.first(where: { $0.name == name }) else { continue }
+            let pause = Pause(startDay: day(from), endDay: day(to))
+            context.insert(pause)
+            pause.habits = [habit]
+        }
+        try? context.save()
+    }
+
     // MARK: Beispiele
 
     private typealias Entry = (daysAgo: Int, count: Int)

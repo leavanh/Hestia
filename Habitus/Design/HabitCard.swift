@@ -2,7 +2,8 @@ import SwiftUI
 
 /// Karte eines Habits: links Icon mit Statusmarke, Name, Rhythmus Zeile und 7 Tage Punkte, rechts Abhakkreis oder Counter.
 /// Festes Drücken (`Theme.editPressDuration`) auf die linke Seite ruft `onEdit` auf (auch als VoiceOver Aktion "Bearbeiten"),
-/// die rechte Seite bedient sich selbst. Dabei sinkt die Karte kurz ein und gibt einen leichten, beim Auslösen einen festen Impuls.
+/// die rechte Seite bedient sich selbst. Ein pausierter Habit ist ausgegraut, trägt die Kapsel "Pausiert" neben dem Namen
+/// und lässt sich nicht abhaken. Dabei sinkt die Karte kurz ein und gibt einen leichten, beim Auslösen einen festen Impuls.
 struct HabitCard<Control: View>: View {
     let name: String
     let iconName: String
@@ -10,6 +11,7 @@ struct HabitCard<Control: View>: View {
     let status: HabitStatus
     let rhythmText: String
     let dots: [WeekDot]
+    var isPaused = false
     let onEdit: () -> Void
     @ViewBuilder var control: Control
 
@@ -21,10 +23,18 @@ struct HabitCard<Control: View>: View {
     var body: some View {
         HStack(spacing: Theme.spacing) {
             HStack(spacing: Theme.spacing) {
-                HabitIconView(habitName: name, iconName: iconName, color: habitColor, status: status)
+                HabitIconView(habitName: name, iconName: iconName, color: habitColor, status: isPaused ? .green : status)
+                    .opacity(isPaused ? Theme.pausedOpacity : 1)
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(name)
-                        .font(.headline)
+                    HStack(spacing: 8) {
+                        Text(name)
+                            .font(.headline)
+                            .foregroundStyle(isPaused ? Color.secondary : Color.primary)
+                        if isPaused {
+                            DayBadge(text: "Pausiert", isToday: false)
+                                .accessibilityIdentifier("paused-\(name)")
+                        }
+                    }
                     Text(rhythmText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -55,6 +65,8 @@ struct HabitCard<Control: View>: View {
             .accessibilityAction(named: "Bearbeiten", onEdit)
 
             control
+                .disabled(isPaused)
+                .opacity(isPaused ? Theme.pausedOpacity : 1)
         }
         .glassCard()
         .scaleEffect(isPreviewing ? Theme.pressedCardScale : 1)
@@ -86,6 +98,13 @@ struct HabitCard<Control: View>: View {
                 dots: [.fill(0), .fill(1), .fill(0), .fill(0), .fill(1), .fill(0), .fill(0)], onEdit: {}
             ) {
                 CheckCircle(isChecked: false, color: HabitColor.violet.color) {}
+            }
+            HabitCard(
+                name: "Lesen", iconName: "book.fill", habitColor: .pink, status: .green,
+                rhythmText: "Täglich",
+                dots: [.fill(1), .fill(1), .paused, .paused, .paused, .paused, .paused], isPaused: true, onEdit: {}
+            ) {
+                CheckCircle(isChecked: false, color: HabitColor.pink.color) {}
             }
         }
         .padding()

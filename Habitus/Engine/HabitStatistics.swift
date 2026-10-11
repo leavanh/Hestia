@@ -81,6 +81,8 @@ extension HabitEngine {
     /// - Pro Woche / pro Monat: erfüllt, solange das Fenster des Tages das Ziel erreicht (Status grün oder
     ///   gelb). Im ersten Fenster nach der Erstellung ist ein unerfülltes Ziel noch nicht verpasst (3.5).
     /// - Ein heute nicht erfüllter Tag ist noch offen und wird nicht bewertet.
+    /// - Pausierte Tage und Tage ab dem Beenden werden übersprungen: sie unterbrechen keinen Streak, zählen nicht
+    ///   mit und gehören nicht zur Quote. Fenster überspringen Pausentage ebenfalls.
     private func evaluatedDays(_ habit: HabitSnapshot, through today: Date) -> [(day: Date, outcome: Outcome)] {
         let created = startOfDay(habit.createdAt)
         let values = cappedValues(habit)
@@ -90,8 +92,17 @@ extension HabitEngine {
 
         var result: [(day: Date, outcome: Outcome)] = []
         var day = created
+        /// Nicht pausierte Tage seit der Erstellung vor dem aktuellen Tag: so alt ist der Habit in Tagen,
+        /// die zählen (Pausentage zählen nicht mit).
+        var activeAge = 0
         while day <= today {
             defer { day = calendar.date(byAdding: .day, value: 1, to: day).map(startOfDay) ?? today.addingTimeInterval(1) }
+
+            // Pausierte Tage zählen nicht, ebenso Tage ab dem Beenden (Spezifikation 3.7, 3.8, 3.9).
+            if isPaused(habit, on: day) { continue }
+            let age = activeAge
+            activeAge += 1
+            if isEnded(habit, on: day) { continue }
 
             let outcome: Outcome?
             switch habit.rhythm {
@@ -101,10 +112,9 @@ extension HabitEngine {
                 outcome = isDue(habit, on: day) ? ((values[day] ?? 0) > 0 ? .met : .missed) : nil
             case .weekly, .monthly:
                 guard let length else { continue }
-                if windowSum(values, endingOn: day, length: length) >= windowTarget {
+                if windowSum(values, endingOn: day, length: length, skipping: { isPaused(habit, on: $0) }) >= windowTarget {
                     outcome = .met
                 } else {
-                    let age = calendar.dateComponents([.day], from: created, to: day).day ?? 0
                     outcome = age < length ? nil : .missed
                 }
             }

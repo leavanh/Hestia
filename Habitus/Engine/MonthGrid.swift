@@ -54,3 +54,12 @@ extension HabitEngine {
         return min(max(firstOfMonth(containing: moved), lower), upper)
     }
 }
+
+extension HabitEngine {
+    /// Ob an `day` alle Habits, die es dann gibt (erstellt, noch nicht beendet), pausieren. Dann ist der Tag im
+    /// Kalender grau (Spezifikation 3.8). Gibt es keinen solchen Habit, ist der Tag nicht pausiert.
+    func isEveryHabitPaused(_ habits: [HabitSnapshot], on day: Date) -> Bool {
+        let existing = habits.filter { startOfDay($0.createdAt) <= startOfDay(day) && !isEnded($0, on: day) }
+        return !existing.isEmpty && existing.allSatisfy { isPaused($0, on: day) }
+    }
+}

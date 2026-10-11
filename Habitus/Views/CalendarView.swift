@@ -50,6 +50,7 @@ struct CalendarView: View {
                         lastMonth: today,
                         today: today,
                         progress: { engine.dayProgress(snapshots, on: $0) },
+                        isPaused: { engine.isEveryHabitPaused(snapshots, on: $0) },
                         onSelect: { selectedDay = SelectedDay(day: $0) }
                     )
                     habitList

@@ -2,7 +2,8 @@ import SwiftData
 import SwiftUI
 
 /// Karte eines Habits für einen angezeigten Tag, mit Abhakkreis oder Counter. Heute und das Sheet
-/// "Tag bearbeiten" nutzen dieselbe Karte. Abgehakt wird für `day`.
+/// "Tag bearbeiten" nutzen dieselbe Karte. Abgehakt wird für `day`. Ist der Habit an dem Tag pausiert, ist die Karte
+/// ausgegraut und nicht bedienbar.
 struct DayHabitCard: View {
     @Environment(\.modelContext) private var context
 
@@ -25,6 +26,7 @@ struct DayHabitCard: View {
                 status: engine.status(snapshot, on: day),
                 rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: day)),
                 dots: engine.weekDots(snapshot, on: day),
+                isPaused: engine.isShownAsPaused(snapshot, on: day),
                 onEdit: onEdit
             ) {
                 control(snapshot: snapshot, color: habitColor.color)

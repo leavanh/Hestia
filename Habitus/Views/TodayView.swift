@@ -10,6 +10,8 @@ struct TodayView: View {
     /// Der Tag, den die Ansicht zeigt: heute oder ein vergangener Tag (Spezifikation 5.2).
     @State private var shownDay = AppClock.now
     @State private var isCreating = false
+    /// Sortiermodus: die offenen Habits lassen sich per Drag and Drop verschieben (Spezifikation 5.2).
+    @State private var isSorting = false
     @State private var editingHabit: Habit?
     /// Kante, von der der neue Tag hereingleitet (Wischen nach rechts = von links).
     @State private var slideEdge: Edge = .leading
@@ -27,49 +29,43 @@ struct TodayView: View {
         Habit.dueInTodayOrder(habits, on: shownDay, engine: engine)
     }
 
+    /// Habits, die am angezeigten Tag pausiert sind: ausgegraut am Ende der Liste.
+    private var pausedHabits: [Habit] {
+        Habit.pausedInTodayOrder(habits, on: shownDay, engine: engine)
+    }
+
     var body: some View {
         let due = dueHabits
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: Theme.sectionSpacing) {
-                    header(for: due)
-                        .dayEntrance(from: entranceEdge, index: 0)
-                    VStack(spacing: Theme.spacing) {
-                        ForEach(Array(due.enumerated()), id: \.element.id) { index, habit in
-                            DayHabitCard(habit: habit, day: shownDay) { editingHabit = habit }
-                                .dayEntrance(from: entranceEdge, index: index + 1)
-                        }
-                    }
-                    .animation(reduceMotion ? nil : .smooth, value: due.map(\.id))
+            Group {
+                if isSorting {
+                    HabitSortList(habits: habits, day: shownDay)
+                } else {
+                    dayScroll(for: due, paused: pausedHabits)
                 }
-                .padding(.horizontal, Theme.spacing)
-                .padding(.top, Theme.headerTopSpacing)
-                .padding(.bottom, Theme.spacing)
-                .offset(x: bounceOffset)
-                .id(engine.startOfDay(shownDay))
-                .transition(dayTransition)
             }
-            .accessibilityIdentifier("today-list")
             .background { GlassBackground() }
-            .simultaneousGesture(
-                DragGesture(minimumDistance: Theme.swipeDistance)
-                    .onEnded { swipe(by: $0.translation) }
-            )
-            .onScrollGeometryChange(for: Bool.self) { geometry in
-                geometry.contentOffset.y + geometry.contentInsets.top > Theme.barTitleScrollOffset
-            } action: { _, isScrolled in
-                showsBarTitle = isScrolled
-            }
-            .sensoryFeedback(.selection, trigger: engine.startOfDay(shownDay))
-            .scrollEdgeEffectStyle(.hard, for: .top)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    barTitle
+                    if !isSorting {
+                        barTitle
+                    }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Neuer Habit", systemImage: "plus") {
-                        isCreating = true
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(
+                        isSorting ? "Fertig" : "Sortieren",
+                        systemImage: isSorting ? "checkmark" : "arrow.up.arrow.down"
+                    ) {
+                        isSorting.toggle()
+                    }
+                    .accessibilityIdentifier("sort-toggle")
+                }
+                if !isSorting {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Neuer Habit", systemImage: "plus") {
+                            isCreating = true
+                        }
                     }
                 }
             }
@@ -88,6 +84,41 @@ struct TodayView: View {
                 showToday()
             }
         }
+    }
+
+    /// Die Tagesansicht: Kopfbereich und Liste, mit Wischen zum Wechseln des Tages.
+    private func dayScroll(for due: [Habit], paused: [Habit]) -> some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: Theme.sectionSpacing) {
+                header(for: due)
+                    .dayEntrance(from: entranceEdge, index: 0)
+                VStack(spacing: Theme.spacing) {
+                    ForEach(Array((due + paused).enumerated()), id: \.element.id) { index, habit in
+                        DayHabitCard(habit: habit, day: shownDay) { editingHabit = habit }
+                            .dayEntrance(from: entranceEdge, index: index + 1)
+                    }
+                }
+                .animation(reduceMotion ? nil : .smooth, value: (due + paused).map(\.id))
+            }
+            .padding(.horizontal, Theme.spacing)
+            .padding(.top, Theme.headerTopSpacing)
+            .padding(.bottom, Theme.spacing)
+            .offset(x: bounceOffset)
+            .id(engine.startOfDay(shownDay))
+            .transition(dayTransition)
+        }
+        .accessibilityIdentifier("today-list")
+        .simultaneousGesture(
+            DragGesture(minimumDistance: Theme.swipeDistance)
+                .onEnded { swipe(by: $0.translation) }
+        )
+        .onScrollGeometryChange(for: Bool.self) { geometry in
+            geometry.contentOffset.y + geometry.contentInsets.top > Theme.barTitleScrollOffset
+        } action: { _, isScrolled in
+            showsBarTitle = isScrolled
+        }
+        .sensoryFeedback(.selection, trigger: engine.startOfDay(shownDay))
+        .scrollEdgeEffectStyle(.hard, for: .top)
     }
 
     /// Beim Start, beim Zurückkehren in die App und um Mitternacht zeigt die Ansicht wieder heute, ohne Animation.

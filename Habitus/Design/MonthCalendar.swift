@@ -4,12 +4,15 @@ import SwiftUI
 /// dem Tagesfortschritt in `tint` eingefärbt: keine Farbe bei 0 %, dann zunehmend kräftiger bis 100 %. Zukünftige Tage
 /// sind blass und gesperrt. Der Monat wechselt mit den Pfeilen zwischen `firstMonth` und `lastMonth` (Spezifikation 5.4).
 /// Im Tab ist es die Akzentfarbe mit antippbaren Tagen, im Habit Detail die Habitfarbe ohne Antippen.
+/// Pausierte Tage sind grau statt eingefärbt.
 struct MonthCalendar: View {
     /// Ein Tag aus dem ersten und einer aus dem letzten Monat, zwischen denen man blättern kann.
     let firstMonth: Date
     let lastMonth: Date
     let today: Date
     let progress: (Date) -> DayProgress
+    /// Ob der Tag pausiert ist. Solche Tage sind grau und haben keine Einfärbung.
+    var isPaused: (Date) -> Bool = { _ in false }
     var tint: Color = Theme.accent
     var identifierPrefix = "calendar"
     /// `nil`, wenn die Tage nicht antippbar sind (Habit Detail).
@@ -75,14 +78,15 @@ struct MonthCalendar: View {
         let isFuture = engine.isFuture(day, today: today)
         let isToday = engine.startOfDay(day) == engine.startOfDay(today)
         let dayProgress = progress(day)
-        let opacity = isFuture ? 0 : Self.fillOpacity(for: dayProgress.fraction)
+        let isPausedDay = !isFuture && isPaused(day)
+        let opacity = isFuture || isPausedDay ? 0 : Self.fillOpacity(for: dayProgress.fraction)
 
         let label = Text("\(engine.calendar.component(.day, from: day))")
             .font(.subheadline.weight(isToday ? .bold : .regular))
             .foregroundStyle(opacity >= Theme.calendarOnAccentThreshold ? Theme.onAccent : Color.primary)
             .frame(width: Theme.calendarDaySize, height: Theme.calendarDaySize)
             .background {
-                Circle().fill(tint.opacity(opacity))
+                Circle().fill(isPausedDay ? Theme.paused.opacity(Theme.pausedDayOpacity) : tint.opacity(opacity))
             }
             .overlay {
                 if isToday {
@@ -107,7 +111,7 @@ struct MonthCalendar: View {
         }
         .frame(maxWidth: .infinity)
         .accessibilityLabel(day.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "de_DE"))))
-        .accessibilityValue(isFuture ? "" : value(for: dayProgress))
+        .accessibilityValue(isFuture ? "" : (isPausedDay ? "Pausiert" : value(for: dayProgress)))
         .accessibilityIdentifier("\(identifierPrefix)-day-\(Self.identifier(for: day, calendar: engine.calendar))")
     }
 

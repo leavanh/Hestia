@@ -13,7 +13,11 @@ struct HabitusApp: App {
             }
             // Startargument für Vorschauen: legt zusätzlich die Testdaten aus den Einstellungen an.
             if ProcessInfo.processInfo.arguments.contains("-HabitusSampleData") {
-                DebugData.insertSampleHabits(into: container.mainContext)
+                let habits = DebugData.insertSampleHabits(into: container.mainContext)
+                // Startargument für Vorschauen: dazu zwei Beispielpausen (eine vergangene, eine geplante).
+                if ProcessInfo.processInfo.arguments.contains("-HabitusSamplePauses") {
+                    DebugData.insertSamplePauses(into: container.mainContext, habits: habits)
+                }
             }
             #endif
             return container

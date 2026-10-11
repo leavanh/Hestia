@@ -58,6 +58,8 @@ enum Theme {
     static let swipeBounceDistance: CGFloat = 28
     /// Ab dieser Scrolltiefe steht der Titel von Heute klein in der Leiste.
     static let barTitleScrollOffset: CGFloat = 44
+    /// Höhe des grauen Strichs, der in `WeekDots` einen pausierten Tag zeigt.
+    static let pausedDashHeight: CGFloat = 2
     /// Durchmesser eines Tages in `MonthCalendar` und Abstand zwischen den Tagen.
     static let calendarDaySize: CGFloat = 40
     static let calendarDaySpacing: CGFloat = 6
@@ -70,6 +72,8 @@ enum Theme {
 
     /// Akzentfarbe für Fortschritt, der keinem Habit gehört (Fortschrittsring, Kalender).
     static let accent = Color.accentColor
+    /// Grau für pausierte Tage: Strich in `WeekDots`, Fläche eines Tages in `MonthCalendar`.
+    static let paused = Color(uiColor: .systemGray)
     /// Statusfarben, nur für die Statusmarke am Icon. Für grün gibt es keine Farbe.
     static let statusYellow = Color(uiColor: .systemYellow)
     static let statusRed = Color(uiColor: .systemRed)
@@ -94,6 +98,10 @@ enum Theme {
     static let calendarFillOpacity: ClosedRange<Double> = 0.15...0.9
     /// Ab dieser Deckkraft steht die Tageszahl in `onAccent` statt in der Textfarbe.
     static let calendarOnAccentThreshold: Double = 0.5
+    /// Deckkraft von Icon und Bedienelement eines pausierten Habits (Karte in Heute, Sheet "Neue Pause").
+    static let pausedOpacity: Double = 0.6
+    /// Deckkraft der grauen Fläche eines pausierten Tages in `MonthCalendar`.
+    static let pausedDayOpacity: Double = 0.3
     /// Deckkraft zukünftiger, gesperrter Tage in `MonthCalendar`.
     static let calendarFutureOpacity: Double = 0.35
     /// Deckkraft eines Bedienelements, das gerade nicht benutzbar ist (z.B. Minus bei 0).

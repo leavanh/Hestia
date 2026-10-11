@@ -59,7 +59,7 @@ Beim festen Monatstag gilt: Hat ein Monat weniger Tage (z.B. 31. im Februar), is
 
 - Täglich, pro Woche, pro Monat: jeden Tag.
 - Feste Wochentage und fester Monatstag: nur an den fälligen Tagen.
-- Nie, wenn der Habit heute pausiert oder beendet ist.
+- Nie, wenn der Habit heute pausiert oder beendet ist. Ein pausierter Habit, der sonst fällig wäre, steht trotzdem in der Liste (5.2), zählt aber nicht als fällig.
 
 ### 3.3 Abhaken
 
@@ -124,21 +124,21 @@ Präzisierung (Phase 5), wann ein Tag als erfüllt oder verpasst zählt:
 - Tage vor der Erstellung werden nicht gewertet. Wenn es keinen gewerteten Tag gibt, ist der Streak 0 und die Quote leer ("–").
 - **Beendete Habits:** Streaks und Quote werden bis zum Tag des Beendens gerechnet.
 - **Längster Streak** ist die größte Folge erfüllter Tage seit Erstellung und damit nie kleiner als der aktuelle.
-- Pausentage kommen erst mit Phase 6 hinzu.
+- **Pausentage** (Phase 6) werden übersprungen: sie unterbrechen keinen Streak, zählen nicht mit und gehören nicht zur Quote. Fenster und das erste Fenster nach der Erstellung zählen nur nicht pausierte Tage (3.5). Die Quote bleibt auf 30 Kalendertage bezogen, pausierte Tage darin entfallen.
+- **Beenden mit Historie** (Phase 6): Ab dem Tag des Beendens ist der Habit nicht mehr fällig. Tage davor bleiben mit ihrer Historie in Kalender, Statistik und in Heute an vergangenen Tagen.
 
 ### 3.8 Pausen
 
-- Eine Pause hat einen Zeitraum (von, bis, beide Tage eingeschlossen) und gilt für einen oder mehrere ausgewählte Habits.
-- Während der Pause: nicht in "Heute", zählt nicht im Tagesfortschritt, Tage zählen nicht in Status und Statistik.
-- Eine laufende Pause kann vorzeitig beendet werden (Enddatum = gestern).
+- Eine Pause hat einen Zeitraum (von, bis, beide Tage eingeschlossen) und gilt für einen oder mehrere ausgewählte Habits. Der Zeitraum darf auch in der Vergangenheit liegen: Die Tage werden dann rückwirkend nicht mehr gewertet.
+- Während der Pause: steht der Habit ausgegraut mit der Kapsel "Pausiert" am Ende der Liste in "Heute" (5.2), lässt sich nicht abhaken, zählt nicht im Tagesfortschritt, Tage zählen nicht in Status und Statistik.
+- Eine laufende Pause kann vorzeitig beendet werden (Enddatum = gestern). Bleibt dadurch kein Tag übrig (die Pause beginnt heute oder später), wird sie entfernt. Eine geplante Pause lässt sich so ebenfalls entfernen.
+- Im Kalender im Tab ist ein Tag grau, wenn alle Habits, die es an dem Tag gibt, pausiert sind. Im Habit Detail ist jeder pausierte Tag des Habits grau.
 
 ### 3.9 Beenden
 
-- Ein Habit kann beendet werden. Ab dann erscheint er nicht mehr in "Heute".
-- Im Kalender und in der Statistik bleibt er mit seiner Historie sichtbar.
-- Beendete Habits können wieder aktiviert werden.
-- Löschen ist nur bei **beendeten** Habits möglich (Einstellungen > Beendete Habits), nie bei aktiven. Es gibt vorher einen Bestätigungsdialog, der warnt, dass die Historie unwiderruflich gelöscht wird.
-- Beim Löschen werden der Habit, alle seine Erledigungen und seine Zuordnung zu Pausen entfernt. Eine Pause, die dadurch keinen Habit mehr hat, wird ebenfalls entfernt.
+- Ein Habit wird im Bearbeiten Sheet beendet ("Habit beenden"). Ein Dialog fragt dann genau eins: **Historie behalten** oder **Historie löschen** (oder Abbrechen). Es gibt keine weitere Entscheidung und nichts dazu in den Einstellungen.
+- **Historie behalten:** Der Habit erscheint ab diesem Tag nicht mehr in "Heute" (`endedAt` ist der Tag des Beendens). Im Kalender und in der Statistik bleibt er mit seiner Historie sichtbar. Ein Wiederaktivieren gibt es nicht.
+- **Historie löschen:** Der Habit, alle seine Erledigungen und seine Zuordnung zu Pausen werden entfernt. Eine Pause, die dadurch keinen Habit mehr hat, wird ebenfalls entfernt. Das ist unwiderruflich, der Dialog sagt das.
 
 ### 3.10 Ändern eines Habits
 
@@ -216,6 +216,7 @@ Auswahl aus ca. 30 kuratierten SF Symbols (z.B. figure.run, drop.fill, book.fill
 - Für den angezeigten Tag gelten Fälligkeit, Fortschritt, Abhaken, Status und 7 Tage Punkte so, als wäre dieser Tag heute. Tage vor der Erstellung eines Habits und pausierte Tage verhalten sich wie in Abschnitt 3 beschrieben.
 - Oben rechts: Plus Button für neuen Habit. Zeigt die Ansicht einen vergangenen Tag, steht in der Datumszeile rechts (auf einer Ebene mit Datum und Kapsel, nicht in der Leiste) ein Button "Heute >" mit kleinem Chevron, der (animiert, wie ein Wischen nach vorn) zu heute zurückspringt. Auf heute ist er nicht zu sehen. Oben links: Button "Sortieren".
 - Darunter eine einzige Liste mit `HabitCard`s, ohne Abschnitte und ohne Überschriften.
+- **Pausierte Habits** (3.8) stehen am Ende der Liste, nach den erledigten, in der gespeicherten Reihenfolge: Icon und Name ausgegraut, daneben die Kapsel "Pausiert" (wie im Sheet "Neue Pause"), Abhakkreis bzw. Counter ausgegraut und nicht bedienbar. Langes Drücken öffnet weiter das Bearbeiten Sheet. Sie zählen nicht im Fortschritt. Dasselbe gilt im Sheet "Tag bearbeiten" für den gewählten Tag.
 - **Reihenfolge:** Oben die offenen Habits, darunter die erledigten. Innerhalb beider Teile gilt die gespeicherte Reihenfolge (`sortOrder`, dann `createdAt`). Erledigt heißt: Am angezeigten Tag ist das Tagesziel erreicht, also Abhakkreis abgehakt bzw. Counter voll. Ein Wochen oder Monats Habit, dessen Fenster erfüllt ist, der am angezeigten Tag aber nicht abgehakt ist, bleibt oben. Wird ein Habit erledigt, rutscht er animiert nach unten, wird es wieder aufgehoben, rutscht er animiert zurück an seinen Platz.
 - **Bearbeiten:** Festes Drücken (ca. 0,6 s) auf die Karte (nicht auf Kreis/Counter) öffnet das Bearbeiten Sheet. Die Karte sinkt dabei ein und gibt ein haptisches Signal, beim Auslösen ein festeres. Einfaches Tippen auf die Karte tut nichts. Für VoiceOver gibt es auf der Karte die Aktion "Bearbeiten".
 - **Sortieren:** Im Sortiermodus Habits per Drag and Drop verschieben. Es gibt eine Reihenfolge für alle Habits, sie wird gespeichert. Auch im Sortiermodus stehen erledigte Habits unten. Verschieben lassen sich nur die offenen Habits, die erledigten sind im Sortiermodus nicht verschiebbar. Nach dem Verschieben bekommen die offenen Habits in ihrer neuen Reihenfolge die vorderen Plätze in `sortOrder`, die erledigten folgen dahinter in ihrer bisherigen Reihenfolge.
@@ -231,7 +232,7 @@ Felder in dieser Reihenfolge:
    - **Woche:** zweites Segmentfeld "Anzahl" / "Wochentage". Bei Anzahl ein Stepper ("2x pro Woche"), bei Wochentage 7 Kreise M D M D F S S.
    - **Monat:** zweites Segmentfeld "Anzahl" / "Monatstag". Bei Anzahl ein Stepper ("1x pro Monat"), bei Monatstag die Auswahl 1 bis 31.
    - Beim Bearbeiten eines bestehenden Habits sind Rhythmus und Variante passend vorausgewählt (z.B. Wochentage Habit: Woche + Wochentage).
-5. Nur beim Bearbeiten, ganz unten: "Habit beenden" (mit Bestätigung)
+5. Nur beim Bearbeiten, ganz unten: "Habit beenden" (Dialog: Historie behalten oder löschen, siehe 3.9)
 
 Es gibt keine Auswahl von Tagesgruppen (Morgens, Mittags, Abends). Alle Habits gelten ganztägig.
 
@@ -249,9 +250,9 @@ Speichern nur möglich, wenn Name nicht leer.
 
 ### 5.5 Einstellungen
 
-- **Pausen:** Liste laufender und geplanter Pausen. Button "Neue Pause": Sheet mit Mehrfachauswahl der Habits, Startdatum, Enddatum. Laufende Pause kann beendet werden.
-- **Beendete Habits:** Liste mit Optionen "Wieder aktivieren" und "Löschen" (mit Bestätigung, siehe 3.9).
-- **Entwickler** (nur in Debug Builds sichtbar): "Testdaten erzeugen" und "Alle Daten zurücksetzen".
+- **Pausen:** Liste der laufenden und geplanten Pausen ("Läuft", "Geplant"), vergangene stehen nicht darin. Button "Neue Pause": Sheet mit Zeitraum (Startdatum, Enddatum, auch in der Vergangenheit) und Mehrfachauswahl der aktiven Habits. Habits, die im gewählten Zeitraum schon pausiert sind, sind deutlich markiert (Kapsel "Pausiert", ausgegraut, mit dem Zeitraum darunter), lassen sich aber trotzdem auswählen. Laufende Pause kann beendet werden ("Pause beenden"), geplante entfernt ("Pause entfernen").
+- Beendete Habits haben keinen Platz in den Einstellungen (3.9).
+- **Entwickler** (nur in Debug Builds sichtbar): "Testdaten erzeugen" und "Alle Daten zurücksetzen". Startargumente für Vorschauen und UI Tests: `-HabitusSampleData` und dazu `-HabitusSamplePauses` (Lesen war vorgestern und gestern pausiert, Sport hat eine geplante Pause ab übermorgen).
 
 ---
 
@@ -561,22 +562,23 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Ziel:** Ich kann meine Habits verwalten.
 
 **Umfang**
-- Einstellungen > Pausen (3.8, 5.5).
+- Einstellungen > Pausen (3.8, 5.5), auch mit Startdatum in der Vergangenheit. Pausierte Habits stehen ausgegraut mit "Pausiert" am Ende von Heute.
 - Pausentage in Status, Fortschritt, Punkten (grauer Strich), Kalender (grau) und Statistik berücksichtigen.
-- Habit beenden im Bearbeiten Sheet, Einstellungen > Beendete Habits mit "Wieder aktivieren" und "Löschen" (3.9).
+- Habit beenden im Bearbeiten Sheet mit der Wahl "Historie behalten" oder "Historie löschen" (3.9). Keine Liste beendeter Habits in den Einstellungen.
 - Sortiermodus in Heute mit Drag and Drop, eine Reihenfolge für alle Habits über `sortOrder` (5.2). Nur offene Habits sind verschiebbar, erledigte bleiben unten (Phase 3.2).
-- Unit Tests: Fenster überspringen Pausentage, Streak wird durch Pause nicht unterbrochen, Löschen entfernt Habit, Erledigungen und Pausenzuordnung (leere Pausen verschwinden).
+- Unit Tests: Fenster überspringen Pausentage, Streak wird durch Pause nicht unterbrochen, Historie löschen entfernt Habit, Erledigungen und Pausenzuordnung (leere Pausen verschwinden).
 
 **Definition of Done**
-- [ ] Ich kann 2 Habits für 3 Tage pausieren, sie verschwinden aus Heute und aus dem Fortschritt.
-- [ ] Nach der Pause ist ein vorher grüner Wochen Habit weiterhin grün, wenn die Pause das Fenster sonst gesprengt hätte.
-- [ ] Eine laufende Pause lässt sich beenden.
-- [ ] Ein beendeter Habit ist weg aus Heute, aber im Kalender und Detail mit Historie da.
-- [ ] Wieder aktivieren funktioniert.
-- [ ] Ein beendeter Habit lässt sich nach Bestätigung löschen und ist danach auch in Kalender und Detail weg. Aktive Habits lassen sich nicht löschen.
-- [ ] Abbrechen im Bestätigungsdialog lässt den Habit unverändert.
-- [ ] Nach dem Löschen eines pausierten Habits ist die Pause ohne ihn weiter vorhanden, bzw. weg, wenn er der einzige war.
-- [ ] Neue Sortierung bleibt nach Neustart erhalten.
+- [x] Ich kann 2 Habits für 3 Tage pausieren. Sie stehen ausgegraut mit "Pausiert" am Ende von Heute und zählen nicht im Fortschritt.
+- [x] Nach der Pause ist ein vorher grüner Wochen Habit weiterhin grün, wenn die Pause das Fenster sonst gesprengt hätte.
+- [x] Eine laufende Pause lässt sich beenden.
+- [x] Beenden mit "Historie behalten": Der Habit ist weg aus Heute, aber im Kalender und Detail mit Historie da.
+- [x] Beenden mit "Historie löschen": Der Habit ist danach auch in Kalender und Detail weg.
+- [x] Abbrechen im Dialog lässt den Habit unverändert.
+- [x] In den Einstellungen gibt es keine Liste beendeter Habits.
+- [x] Ein Pausenzeitraum mit Startdatum in der Vergangenheit lässt sich anlegen. Schon pausierte Habits sind im Sheet deutlich markiert, aber auswählbar.
+- [x] Nach dem Löschen (Historie löschen) eines pausierten Habits ist die Pause ohne ihn weiter vorhanden, bzw. weg, wenn er der einzige war.
+- [x] Neue Sortierung bleibt nach Neustart erhalten.
 
 ---
 
