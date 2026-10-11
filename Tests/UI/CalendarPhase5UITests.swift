@@ -62,23 +62,4 @@ final class CalendarPhase5UITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["stat-total"].label, "48")
         XCTAssertEqual(app.staticTexts["stat-pauses"].label, "0")
     }
-
-    @MainActor
-    func testEditFromDetailShowsTheNewName() {
-        let app = launchCalendar()
-        openDetail(of: "Lesen", in: app)
-
-        app.buttons["detail-edit"].tap()
-        let nameField = app.textFields["name-field"]
-        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
-        nameField.tap()
-        nameField.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 10) + "Lesezeit")
-        app.buttons["Speichern"].tap()
-
-        XCTAssertTrue(app.scrollViews["habit-detail"].waitForExistence(timeout: 5))
-        let name = app.staticTexts["detail-name"]
-        XCTAssertTrue(name.waitForExistence(timeout: 5))
-        XCTAssertEqual(name.label, "Lesezeit")
-    }
-
 }

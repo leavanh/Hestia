@@ -112,10 +112,17 @@ struct MonthCalendar: View {
         let fillOpacity = isCompact && opacity == 0 && !isPausedDay ? Theme.dotEmptyOpacity : opacity
         let ringOutset = isCompact ? Theme.calendarCompactRingOutset : Theme.dotRingGap + Theme.strokeWidth
 
+        // Kompakt (Habit Detail) zeigt einen pausierten Tag wie `WeekDots` als kurzen waagrechten Strich.
+        let showsDash = isCompact && isPausedDay
         let square = Rectangle()
-            .fill(isPausedDay ? ink.opacity(Theme.pausedDayOpacity) : tint.opacity(fillOpacity))
+            .fill(isPausedDay ? (showsDash ? Color.clear : ink.opacity(Theme.pausedDayOpacity)) : tint.opacity(fillOpacity))
             .overlay {
-                if !isCompact {
+                if showsDash {
+                    Rectangle()
+                        .fill(ink.opacity(Theme.pausedOpacity))
+                        .frame(height: Theme.pausedDashHeight)
+                        .padding(.horizontal, Theme.calendarDashInset)
+                } else if !isCompact {
                     Text("\(engine.calendar.component(.day, from: day))")
                         .font(isToday ? Theme.Typography.metaMedium : Theme.Typography.meta)
                         .fixedControlTypeSize()

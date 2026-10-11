@@ -99,6 +99,8 @@ enum Theme {
     /// heute über das Quadrat hinausreicht (freier Rand von 1 pt plus Strich), damit er das Nachbarquadrat nicht berührt.
     static let calendarCompactSpacing: CGFloat = 3
     static let calendarCompactRingOutset: CGFloat = 2
+    /// Seitlicher Abstand des Strichs für einen pausierten Tag im kompakten Kalender (bei etwa 48 pt Kantenlänge).
+    static let calendarDashInset: CGFloat = 14
 
     // MARK: Marke
 

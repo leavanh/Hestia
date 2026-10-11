@@ -299,7 +299,7 @@ Systemleisten in Sheets (Abbrechen, Sichern, Fertig) bleiben Systembuttons, get�
 | `DayHeader` | Das Kopfband in Heute (5.2): Datumszeile, Titel, Fortschritt, `SegmentBar`, `WeekStrip`. Ersetzt `ProgressHeader` und den bisherigen Kopf. |
 | `SegmentBar` | Fortschritt als Reihe kurzer Balken (3 pt hoch, 3 pt Abstand), ein Balken pro Punkt (3.4), erledigte Punkte voll, offene mit 25 %. Bei mehr als 12 Punkten ein durchgehender Balken mit Füllung nach Prozent. Ersetzt `ProgressRing`. **Ab Phase 9.1 immer ein durchgehender Balken** (3 pt hoch, offener Teil mit 25 %, gefüllter Teil nach Prozent), unabhängig von der Anzahl der Punkte. Ändert sich der Fortschritt, wächst bzw. schrumpft die Füllung kurz animiert. |
 | `WeekStrip` | 7 Felder Mo bis So der Woche des angezeigten Tags (Rolle `label`). Der angezeigte Tag invertiert (Fläche `onBand`, Schrift `band`). Tage nach heute mit `calendarFutureOpacity` und nicht antippbar. Antippen eines anderen Tags wechselt dorthin (5.2). |
-| `MonthCalendar` | Wie bisher (Monat mit Pfeilen, Grenzen, Wochentagszeile), aber jeder Tag ist ein Quadrat mit der Tageszahl (Rolle `meta`, ohne Versalien). Monatsname in Rolle `meta`. Heute mit äußerem quadratischem Rahmen. Einfärbung, Pausen, Zukunft, Tippen wie bisher. Im Tab in `progress`, im Habit Detail in Habitfarbe. Ab Phase 11 gibt es im Habit Detail eine kompakte Darstellung wie im Mockup: Quadrate ohne Tageszahl mit 3 pt Abstand, heute mit Rahmen. VoiceOver liest jeden Tag weiter mit Datum und Erledigung. |
+| `MonthCalendar` | Wie bisher (Monat mit Pfeilen, Grenzen, Wochentagszeile), aber jeder Tag ist ein Quadrat mit der Tageszahl (Rolle `meta`, ohne Versalien). Monatsname in Rolle `meta`. Heute mit äußerem quadratischem Rahmen. Einfärbung, Pausen, Zukunft, Tippen wie bisher. Im Tab in `progress`, im Habit Detail in Habitfarbe. Ab Phase 11 gibt es im Habit Detail eine kompakte Darstellung wie im Mockup: Quadrate ohne Tageszahl mit 3 pt Abstand, heute mit Rahmen, pausierte Tage als kurzer waagrechter Strich wie in `WeekDots`. VoiceOver liest jeden Tag weiter mit Datum und Erledigung. |
 | `HabitStatRow` | Flache Zeile mit Haarlinie: `HabitIconView` ohne Statusmarke, Name, Rhythmus Zeile, rechts der aktuelle Streak als Zahl (Rolle `stat`, kleiner: 32 pt) mit "Tage" darunter (Rolle `meta`). Kein Flammensymbol. Antippen öffnet das Habit Detail. |
 | `StatValue` | Eine Kennzahl: großer Wert (Rolle `stat`), darunter die Beschriftung (Rolle `meta`). Ab Phase 11 steht im großen Wert nur die Zahl bzw. Prozentzahl, die Einheit gehört in die Beschriftung ("4" über "Längster Streak · Tage", nicht "4 Tage"). |
 | `StepperControl` (ab Phase 8.1) | Ersetzt den System `Stepper` und das Menü für den Monatstag im Sheet: Text links (Rolle `body`), rechts Taste "−", Wert, Taste "+" mit denselben Quadraten wie `CounterControl`, in `ink`. Gesperrte Taste an der Grenze mit `disabledOpacity`. VoiceOver als einstellbarer Wert (`accessibilityAdjustableAction`). Ab Phase 9.1 nicht mehr für den Monatstag (siehe `MonthDayPicker`). |
@@ -405,12 +405,12 @@ Speichern nur möglich, wenn Name nicht leer.
 - Tag antippen öffnet Sheet "Tag bearbeiten": dieselbe Liste wie "Heute" für diesen Tag, mit Abhaken und Counter. Zukünftige Tage sind nicht antippbar.
 - Darunter Liste aller Habits (aktive zuerst, dann beendete) mit aktuellem Streak.
 - **Habit Detail ab Phase 11** (ersetzt den nächsten Punkt): Habit antippen öffnet das Detail als Sheet. Oben ein randloses **Band in Habitfarbe** (Fläche `color`, Schrift `onColor`), wie das Kopfband in Heute, nur in der Farbe des Habits:
-  1. Zeile oben: links "Fertig" (schließt), rechts "Bearbeiten" (Variante `onBand`, also Fläche mit 20 % und Schrift in `onColor`, wie Plus und "Heute ›" im Kopfband von Heute). "Bearbeiten" öffnet das Sheet "Habit bearbeiten" (5.3) über dem Detail. Nach dem Sichern zeigt das Detail die neuen Werte. Nach "Historie löschen" schließen sich beide Sheets. Nach "Historie behalten" bleibt das Detail offen und zeigt den beendeten Habit. Bei einem beendeten Habit gibt es "Bearbeiten" nicht.
+  1. Oben rechts in der Leiste der **runde Haken** "Fertig" (Systembutton, `role: .confirm`, getönt in `onColor`), der das Sheet schließt. Die Leiste hat keinen Titel und keinen Hintergrund, das Band reicht darunter bis zum oberen Rand des Sheets. *(Phase 11 hatte "Fertig" und "Bearbeiten" als eckige Buttons im Band, ab Phase 11.2 ersetzt: sie passten nicht zu den runden Ecken des Sheets. Bearbeitet wird im Detail nicht, sondern wie bisher über langes Drücken in Heute.)* Nach "Historie behalten" im Bearbeiten Sheet (aus Heute) zeigt das Detail den beendeten Habit.
   2. Meta Zeile (Rolle `meta`): die Rhythmus Zeile (4.5.1, mit Zusatz). Bei beendeten Habits stattdessen "Beendet am 3. Okt".
   3. Name in Rolle `display`.
   4. Aktueller Streak groß (Rolle `numeral`), daneben "Tage in Folge" (Einzahl "Tag in Folge") in Rolle `meta`.
   
-  Darunter auf `background` ein Raster aus 2 × 2 Kennzahlen (`StatValue`), getrennt durch Haarlinien: **Quote 30 Tage** ("86 %" bzw. "–"), **Längster Streak**, **Erledigungen** (Summe aller Erledigungen, 3.7) und **Pausen** (Anzahl der Pausen, 3.7). Darunter der `MonthCalendar` in Habitfarbe in der kompakten Darstellung (4.5). **Ab Phase 11.1 stehen unter dem Band alle Texte, Haarlinien, Pfeile und Tageszahlen in der Habitfarbe** (`color`, Beschriftungen mit 70 %, Haarlinien mit 25 % bzw. 20 %) statt in `ink`; die Fläche bleibt `background`. Technisch überschreibt `inkOverride` (Environment) die Tinte von `StatValue`, `Hairline` und `MonthCalendar`. Kein Icon im Detail und keine Navigationsleiste: "Fertig" und "Bearbeiten" stehen im Band, es gibt also auch keine Liquid Glass Buttons im Detail.
+  Darunter auf `background` ein Raster aus 2 × 2 Kennzahlen (`StatValue`), getrennt durch Haarlinien: **Quote 30 Tage** ("86 %" bzw. "–"), **Längster Streak**, **Erledigungen** (Summe aller Erledigungen, 3.7) und **Pausen** (Anzahl der Pausen, 3.7). Darunter der `MonthCalendar` in Habitfarbe in der kompakten Darstellung (4.5). **Ab Phase 11.1 stehen unter dem Band alle Texte, Haarlinien, Pfeile und Tageszahlen in der Habitfarbe** (`color`, Beschriftungen mit 70 %, Haarlinien mit 25 % bzw. 20 %) statt in `ink`; die Fläche bleibt `background`. Technisch überschreibt `inkOverride` (Environment) die Tinte von `StatValue`, `Hairline` und `MonthCalendar`. Pausierte Tage zeigen im kompakten Kalender wie `WeekDots` einen kurzen waagrechten Strich in der Tinte mit Pausen Deckkraft statt einer Fläche (ab Phase 11.2). Kein Icon im Detail, keine Leiste mit Titel, nur der runde Haken.
 - *Bis Phase 10:* Habit antippen öffnet als Sheet das **Habit Detail**: Icon, Name, Rhythmus, eigener Monatskalender (nur dieser Habit, Tage mit Erledigung in Habitfarbe, bei Tagesziel größer 1 mit Teilfüllung), aktueller Streak, längster Streak, Quote 30 Tage (3.7). Der Monatskalender ist derselbe wie im Tab (siehe oben).
 - Unter dem Monatskalender im Tab steht die Habit Liste. Der ganze Tab scrollt senkrecht, der Kalender selbst wird nur mit den Pfeilen gewechselt.
 
@@ -984,15 +984,15 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 
 **Umfang**
 - Detail mit Band in Habitfarbe, Kennzahlen Raster und Kalender (5.4). Die Statusleiste ist auf dem Band lesbar.
-- "Bearbeiten" im Band öffnet das Sheet "Habit bearbeiten" über dem Detail, mit den Folgen aus 5.4 (Sichern, Historie behalten, Historie löschen). Bei beendeten Habits kein "Bearbeiten", stattdessen "Beendet am …" in der Meta Zeile.
-- **Keine Navigationsleiste** im Detail, "Fertig" und "Bearbeiten" im Band (5.4).
+- Das Sheet "Habit bearbeiten" öffnet sich nicht aus dem Detail *(ab Phase 11.2: gestrichen)*. Bei beendeten Habits steht "Beendet am …" in der Meta Zeile.
+- **Leiste ohne Titel und Hintergrund** im Detail, nur der runde Haken "Fertig" oben rechts (5.4).
 - **`StatValue`** zeigt nur die Zahl, die Einheit steht in der Beschriftung (4.5). Gilt auch für `HabitStatRow`.
 - **Kompakter Kalender** im Detail: Quadrate ohne Tageszahl wie im Mockup (4.5). Der Kalender im Tab behält die Tageszahlen.
 - Neue Kennzahlen **Erledigungen** und **Pausen** (3.7): `HabitStatistics` bekommt `totalCompletions` und `pauseCount`, berechnet in der `HabitEngine`, mit Unit Tests.
 
 **Aufräumen (Pflicht, keine Überbleibsel)**
 - Löschen: Kopf mit Icon im Detail, Navigationstitel "Habit Detail", der Abschnitt "Statistik" als Überschrift.
-- Identifier: `detail-name`, `detail-rhythm`, `stat-current-streak`, `stat-longest-streak`, `stat-rate-30` bleiben gleich. Neu: `stat-total`, `stat-pauses`, `detail-edit`.
+- Identifier: `detail-name`, `detail-rhythm`, `stat-current-streak`, `stat-longest-streak`, `stat-rate-30` bleiben gleich. Neu: `stat-total`, `stat-pauses`, `detail-done`.
 - UI Tests anpassen, die den Kopf mit Icon oder den Titel "Habit Detail" erwarten (u.a. `CalendarPhase5UITests`, `CalendarPhase51UITests`).
 
 **Pflicht Testfälle**
@@ -1000,16 +1000,16 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Unit Test: Beendeter Habit: Erledigungen nach dem Tag des Beendens zählen nicht.
 - Unit Test: Eine vergangene, eine laufende und eine geplante Pause: `pauseCount` ist 2. Ohne Pausen 0.
 - UI Test (bestehenden Test `testDetailShowsStreaksAndRate` erweitern): Detail eines Habits aus den Testdaten zeigt alle fünf Kennzahlen (Streak im Band, vier im Raster).
-- UI Test: "Bearbeiten" im Detail öffnet das Sheet. Name ändern und sichern zeigt den neuen Namen im Detail.
+- *(Ab Phase 11.2 entfällt:)* "Bearbeiten" im Detail.
 
 **Definition of Done**
 - [x] Das Detail hat oben ein Band in der Farbe des Habits mit Name und großem Streak, in Hell und Dunkel gut lesbar.
 - [x] Darunter stehen Quote 30 Tage, Längster Streak, Erledigungen und Pausen als große Zahlen ohne Einheit, darunter der kompakte Kalender in Habitfarbe.
-- [x] Im Detail gibt es keine Navigationsleiste und keinen Liquid Glass Button.
+- [x] Im Detail gibt es keine Leiste mit Titel, nur den runden Haken oben rechts *(Phase 11.2)*.
 - [x] Ich kann einen aktiven Habit aus dem Detail heraus bearbeiten und beenden. Ein beendeter Habit lässt sich dort nicht bearbeiten.
 - [x] Die Kennzahlen stimmen mit einem von Hand nachgerechneten Beispiel aus den Testdaten überein.
 
-*Geprüft im Simulator: Band in Habitfarbe in Hell und Dunkel gut lesbar, Kennzahlen von Hand nachgerechnet ("Lesen": 48 Erledigungen, 0 Pausen, 79 %; mit Beispielpausen 1 Pause und 81 %). Bearbeiten öffnet das Sheet über dem Detail, "Historie behalten" zeigt "Beendet am 11. Okt" ohne "Bearbeiten", "Historie löschen" schließt beide Sheets. Komplett-Lauf grün (21 UI Tests).*
+*Geprüft im Simulator: Band in Habitfarbe in Hell und Dunkel gut lesbar, Kennzahlen von Hand nachgerechnet ("Lesen": 48 Erledigungen, 0 Pausen, 79 %; mit Beispielpausen 1 Pause und 81 %). Komplett-Lauf grün. Ab Phase 11.1 und 11.2: durchgehend Habitfarbe unter dem Band, runder Haken statt Buttons im Band, Pausentage als Strich.*
 
 ---
 

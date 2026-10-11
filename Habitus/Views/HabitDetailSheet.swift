@@ -1,36 +1,42 @@
 import SwiftData
 import SwiftUI
 
-/// Habit Detail (Spezifikation 5.4, ab Phase 11): oben ein randloses Band in Habitfarbe mit "Fertig" und "Bearbeiten",
-/// Rhythmus Zeile (bei einem beendeten Habit "Beendet am …"), Name und aktuellem Streak. Darunter ein Raster aus vier
-/// Kennzahlen und der kompakte Monatskalender, alles in Habitfarbe. Es gibt keine Navigationsleiste und kein Icon.
+/// Habit Detail (Spezifikation 5.4, ab Phase 11): oben ein randloses Band in Habitfarbe mit Rhythmus Zeile (bei einem
+/// beendeten Habit "Beendet am …"), Name und aktuellem Streak. Darunter ein Raster aus vier Kennzahlen und der kompakte
+/// Monatskalender, alles in Habitfarbe. Die Leiste hat keinen Titel und keinen Hintergrund, nur oben rechts den runden
+/// Haken, der das Sheet schließt. Bearbeitet wird nicht im Detail.
 struct HabitDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     let habit: Habit
     let today: Date
 
-    @State private var isEditing = false
-
     private let engine = HabitEngine()
 
     var body: some View {
-        ScrollView {
-            // Ein eben gelöschter Habit kann hier noch einmal ankommen, bevor das Sheet geschlossen ist.
-            if habit.isAlive {
-                content
+        NavigationStack {
+            ScrollView {
+                // Ein eben gelöschter Habit kann hier noch einmal ankommen, bevor das Sheet geschlossen ist.
+                if habit.isAlive {
+                    content
+                }
+            }
+            .accessibilityIdentifier("habit-detail")
+            .background { PaperBackground() }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .scrollEdgeEffectHidden(true, for: .top)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Fertig", systemImage: "checkmark", role: .confirm) {
+                        dismiss()
+                    }
+                    .accessibilityIdentifier("detail-done")
+                    // Papier auf dem Band in Habitfarbe, damit der Haken nicht mit der blauen Systemtönung mischt.
+                    .tint(HabitColor(key: habit.colorKey).onColor)
+                }
             }
         }
-        .accessibilityIdentifier("habit-detail")
-        .background { PaperBackground() }
-        .sheet(isPresented: $isEditing, onDismiss: closeIfDeleted) {
-            HabitEditorSheet(habit: habit)
-        }
-    }
-
-    /// Nach "Historie löschen" im Bearbeiten Sheet schließt sich auch das Detail (Spezifikation 5.4).
-    private func closeIfDeleted() {
-        if !habit.isAlive { dismiss() }
     }
 
     private var content: some View {
@@ -56,14 +62,6 @@ struct HabitDetailSheet: View {
 
     private func band(snapshot: HabitSnapshot, habitColor: HabitColor, stats: HabitStatistics) -> some View {
         VStack(alignment: .leading, spacing: Theme.bandSpacing) {
-            HStack {
-                bandButton("Fertig", identifier: "detail-done", habitColor: habitColor) { dismiss() }
-                Spacer(minLength: Theme.spacing)
-                // Ein beendeter Habit lässt sich nicht mehr bearbeiten.
-                if habit.endedAt == nil {
-                    bandButton("Bearbeiten", identifier: "detail-edit", habitColor: habitColor) { isEditing = true }
-                }
-            }
             Text(metaLine(snapshot: snapshot))
                 .metaText()
                 .foregroundStyle(habitColor.onColor.opacity(0.8))
@@ -87,7 +85,6 @@ struct HabitDetailSheet: View {
             }
         }
         .padding(.horizontal, Theme.spacing)
-        .padding(.top, Theme.spacing)
         .padding(.bottom, Theme.spacing)
         .frame(maxWidth: .infinity, alignment: .leading)
         .foregroundStyle(habitColor.onColor)
@@ -102,16 +99,6 @@ struct HabitDetailSheet: View {
             return "Beendet am \(DayText.shortDate(endedAt, engine: engine))"
         }
         return snapshot.rhythmText(window: engine.windowProgress(snapshot, on: today))
-    }
-
-    private func bandButton(
-        _ title: String, identifier: String, habitColor: HabitColor, action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Text(title).labelText()
-        }
-        .buttonStyle(.hermes(.onBand, foreground: habitColor.onColor))
-        .accessibilityIdentifier(identifier)
     }
 
     // MARK: Kennzahlen
