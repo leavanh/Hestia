@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Eine Kennzahl: großer Wert in Rolle `stat`, darunter die Beschriftung in Rolle `meta`.
+/// Eine Kennzahl: großer Wert in Rolle `stat`, darunter die Beschriftung in Rolle `meta`. Im Wert steht nur die Zahl
+/// bzw. Prozentzahl, die Einheit gehört in die Beschriftung (Spezifikation 4.5).
 struct StatValue: View {
     let title: String
     let value: String
@@ -35,8 +36,8 @@ struct StatValue: View {
 
 #Preview {
     HStack {
-        StatValue(title: "Aktueller Streak", value: StatValue.daysText(5), identifier: "a")
-        StatValue(title: "Längster Streak", value: StatValue.daysText(12), identifier: "b")
+        StatValue(title: "Erledigungen", value: "5", identifier: "a")
+        StatValue(title: "Längster Streak · Tage", value: "12", identifier: "b")
         StatValue(title: "Quote 30 Tage", value: StatValue.rateText(67), identifier: "c")
     }
     .padding()

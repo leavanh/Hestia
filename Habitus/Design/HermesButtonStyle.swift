@@ -22,6 +22,8 @@ struct HermesButtonStyle: ButtonStyle {
     let variant: Variant
     /// Quadrat in Mindesthöhe ohne seitlichen Abstand, für Buttons mit nur einem Symbol (z.B. Plus in der Leiste).
     var isSquare = false
+    /// Schriftfarbe statt der der Variante, z.B. `onColor` auf dem Band in Habitfarbe im Detail.
+    var foregroundOverride: Color?
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -40,7 +42,8 @@ struct HermesButtonStyle: ButtonStyle {
     }
 
     private var foreground: Color {
-        switch variant {
+        if let foregroundOverride { return foregroundOverride }
+        return switch variant {
         case .primary: Theme.background
         case .quiet, .text: Theme.ink
         case .onBand: Theme.onBand
@@ -82,8 +85,10 @@ struct HermesButton: View {
 }
 
 extension ButtonStyle where Self == HermesButtonStyle {
-    static func hermes(_ variant: HermesButtonStyle.Variant, isSquare: Bool = false) -> HermesButtonStyle {
-        HermesButtonStyle(variant: variant, isSquare: isSquare)
+    static func hermes(
+        _ variant: HermesButtonStyle.Variant, isSquare: Bool = false, foreground: Color? = nil
+    ) -> HermesButtonStyle {
+        HermesButtonStyle(variant: variant, isSquare: isSquare, foregroundOverride: foreground)
     }
 }
 

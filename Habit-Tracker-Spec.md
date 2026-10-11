@@ -9,7 +9,7 @@
 - Erkläre mir nach jeder Phase kurz, wie ich die Punkte der Definition of Done selbst prüfen kann.
 - Keine Funktionen bauen, die hier nicht beschrieben sind.
 - **Tests schlank halten.** Rechenlogik wird mit Unit Tests geprüft (Test Plan "Schnell", läuft in Sekunden). UI Tests gibt es nur für wenige zentrale Abläufe, jeder kostet 10 bis 30 Sekunden. Pro Phase höchstens 2 neue UI Tests, und nur die, die unter "Pflicht Testfälle" stehen. Lieber einen bestehenden UI Test anpassen als einen neuen schreiben. Was sich als Unit Test prüfen lässt, wird kein UI Test.
-- **Wann welche Tests laufen.** Während der Arbeit nur "Schnell" und gezielt die betroffenen UI Tests (`-only-testing:HabitusUITests/<Klasse>/<Test>`). Den Test Plan "Komplett" nur einmal am Ende der Phase. Schlägt dort ein UI Test fehl, nach der Korrektur nur diesen erneut laufen lassen, nicht wieder alles.
+- **Wann welche Tests laufen.** Während der Arbeit nur "Schnell" und gezielt die betroffenen UI Tests (`-only-testing:HestiaUITests/<Klasse>/<Test>`). Den Test Plan "Komplett" nur einmal am Ende der Phase. Schlägt dort ein UI Test fehl, nach der Korrektur nur diesen erneut laufen lassen, nicht wieder alles.
 - **Accessibility wird nicht getestet.** Keine Tests und keine eigenen Prüfläufe für VoiceOver, Dynamic Type, Large Content Viewer oder Reduce Motion, auch keine Prüfung mit größter Schrift im Simulator. Was es schon gibt, bleibt, aber dafür wird kein zusätzlicher Aufwand betrieben. Ältere Punkte dazu in dieser Spezifikation gelten als erledigt.
 
 ---
@@ -253,7 +253,7 @@ Drei freie Schriften (SIL Open Font License 1.1, dürfen in die App eingebettet 
 
 - Alle Rollen nutzen `Font.custom(_:size:relativeTo:)`, damit Dynamic Type wirkt. In Ansichten wird nur noch `Theme.Typography` verwendet, keine `.font(.headline)` usw. mehr.
 - Laufweite und Versalien sind als Modifier gebündelt (z.B. `.labelStyle()` / `.metaStyle()` als View Extension), damit sie nicht an jeder Stelle einzeln stehen.
-- **Einbinden:** Die Schriftdateien (`.ttf`) liegen in `Habitus/Design/Fonts/` und werden beim Start registriert (`CTFontManagerRegisterFontsForURL`, einmalig, z.B. in `FontRegistry.registerAll()` beim App Start und in Previews). Das Projekt erzeugt seine Info.plist selbst (`GENERATE_INFOPLIST_FILE`), deshalb kein `UIAppFonts` Eintrag. Fehlt eine Schrift, meldet ein Debug Assert das sofort.
+- **Einbinden:** Die Schriftdateien (`.ttf`) liegen in `Hestia/Design/Fonts/` und werden beim Start registriert (`CTFontManagerRegisterFontsForURL`, einmalig, z.B. in `FontRegistry.registerAll()` beim App Start und in Previews). Das Projekt erzeugt seine Info.plist selbst (`GENERATE_INFOPLIST_FILE`), deshalb kein `UIAppFonts` Eintrag. Fehlt eine Schrift, meldet ein Debug Assert das sofort.
 - Die Systemschrift bleibt nur dort, wo das System sie selbst setzt (Systemleisten in Sheets, Alerts). Bis Phase 8.1 gehört auch die Tab Bar dazu, bis Phase 9.1 die Datumsauswahl im Sheet "Neue Pause".
 
 ### 4.4 Formen, Linien, Abstände
@@ -308,7 +308,7 @@ Systemleisten in Sheets (Abbrechen, Sichern, Fertig) bleiben Systembuttons, get�
 | `SegmentedChoice` | Segmentfeld mit 0,5 pt Rahmen in `ink`, Segmente in Rolle `label`, gewähltes Segment invertiert (Fläche `ink`, Schrift `background`). |
 | `WeekdayPicker` | 7 Quadrate M D M D F S S, gewählt invertiert. |
 | `ColorPicker` (Farbauswahl im Sheet) | 8 Quadrate (28 pt) in Habitfarbe, gewählt mit äußerem Rahmen in `ink`. |
-| `EmptyState` | Titel in Rolle `display` (kleiner: 40 pt), Erklärung in `body`, Button `primary`. |
+| `EmptyState` | Titel in Rolle `display` (kleiner: 40 pt), Erklärung in `body`, Button `primary`. Ab Phase 12 optional ein Stich (`EngravingImage`, dekorativ) über dem Titel, nur in Heute und Kalender (siehe Phase 12). |
 | `PauseRow` | Flache Zeile mit Haarlinie, Zeitraum in `title`, Habits in `meta`, Button rechts. |
 
 #### 4.5.1 Rhythmus Zeile
@@ -420,7 +420,8 @@ Speichern nur möglich, wenn Name nicht leer.
   - **Ab Phase 9.1:** Start und Enddatum als `DateRow` ("Von", "Bis") in Appschrift statt System Datumsauswahl. "Bis" lässt keinen Tag vor "Von" zu. Wird "Von" hinter "Bis" gelegt, rückt "Bis" auf denselben Tag.
   - **Ab Phase 9.1:** Über der Liste der Habits steht eine Zeile "Alle auswählen" (Variante `text`). Sind schon alle ausgewählt, heißt sie "Alle abwählen" und hebt die Auswahl auf. Einzelne Habits lassen sich danach wie bisher an und abwählen.
 - Beendete Habits haben keinen Platz in den Einstellungen (3.9).
-- **Entwickler** (nur in Debug Builds sichtbar): "Testdaten erzeugen" und "Alle Daten zurücksetzen". Startargumente für Vorschauen und UI Tests: `-HabitusSampleData` und dazu `-HabitusSamplePauses` (Lesen war vorgestern und gestern pausiert, Sport hat eine geplante Pause ab übermorgen).
+- **Entwickler** (nur in Debug Builds sichtbar): "Testdaten erzeugen" und "Alle Daten zurücksetzen". Startargumente für Vorschauen und UI Tests: `-HestiaSampleData` und dazu `-HestiaSamplePauses` (Lesen war vorgestern und gestern pausiert, Sport hat eine geplante Pause ab übermorgen).
+- **Fuß (ab Phase 12):** Ganz unten steht zentriert die Wortmarke `HESTIA / HABITS` (zweizeilig, Barlow Condensed Regular, Versalien, Farbe `inkSecondary`) und darunter die Version in Rolle `meta`. Sie ist der einzige Ort der Wortmarke in der App und kein Button.
 
 ---
 
@@ -1002,31 +1003,52 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - UI Test: "Bearbeiten" im Detail öffnet das Sheet. Name ändern und sichern zeigt den neuen Namen im Detail.
 
 **Definition of Done**
-- [ ] Das Detail hat oben ein Band in der Farbe des Habits mit Name und großem Streak, in Hell und Dunkel gut lesbar.
-- [ ] Darunter stehen Quote 30 Tage, Längster Streak, Erledigungen und Pausen als große Zahlen ohne Einheit, darunter der kompakte Kalender in Habitfarbe.
-- [ ] Im Detail gibt es keine Navigationsleiste und keinen Liquid Glass Button.
-- [ ] Ich kann einen aktiven Habit aus dem Detail heraus bearbeiten und beenden. Ein beendeter Habit lässt sich dort nicht bearbeiten.
-- [ ] Die Kennzahlen stimmen mit einem von Hand nachgerechneten Beispiel aus den Testdaten überein.
+- [x] Das Detail hat oben ein Band in der Farbe des Habits mit Name und großem Streak, in Hell und Dunkel gut lesbar.
+- [x] Darunter stehen Quote 30 Tage, Längster Streak, Erledigungen und Pausen als große Zahlen ohne Einheit, darunter der kompakte Kalender in Habitfarbe.
+- [x] Im Detail gibt es keine Navigationsleiste und keinen Liquid Glass Button.
+- [x] Ich kann einen aktiven Habit aus dem Detail heraus bearbeiten und beenden. Ein beendeter Habit lässt sich dort nicht bearbeiten.
+- [x] Die Kennzahlen stimmen mit einem von Hand nachgerechneten Beispiel aus den Testdaten überein.
+
+*Geprüft im Simulator: Band in Habitfarbe in Hell und Dunkel gut lesbar, Kennzahlen von Hand nachgerechnet ("Lesen": 48 Erledigungen, 0 Pausen, 79 %; mit Beispielpausen 1 Pause und 81 %). Bearbeiten öffnet das Sheet über dem Detail, "Historie behalten" zeigt "Beendet am 11. Okt" ohne "Bearbeiten", "Historie löschen" schließt beide Sheets. Komplett-Lauf grün (21 UI Tests).*
 
 ---
 
 ### Phase 12: Name, Logo und App Icon
 
-**Ziel:** Die App hat einen Namen, eine Wortmarke und ein App Icon im Hermes Stil.
+**Ziel:** Die App heißt Hestia und hat Wortmarke, App Icon, Startbildschirm und zwei Stiche in den Leerzuständen, alles im Hermes Stil.
 
 **Entschieden:**
-- **Name:** Hestia (Herdfeuer, das täglich gepflegt wird). Nur der Anzeigename ändert sich, Bundle Identifier, Modulname `Habitus` und Startargumente (`-HabitusResetData` usw.) bleiben.
-- **Bildmarke:** eine Flamme als Linolschnitt, Blau auf Papier. Quelle ist `Branding/flame-linocut-source.webp` (KI erzeugt, keine Lizenz nötig), `Branding/render_flame_icon.py` liest daraus die Maske und baut die drei Icons. Hell ist Blau auf Papier, dunkel Papier auf Nachtblau, getönt Weiß auf Schwarz. Die Flamme füllt etwa 86 % der Höhe (`FLAME_HEIGHT` 880, oben 46 px und unten 96 px Rand) und ist leicht aufgeraut (wellige Kante, kleine Fehlstellen, feste Seed), damit sie wie ein echter Abzug wirkt. Das ersetzt die frühere Idee mit Markenblau Fläche, weil die Schnitte als helle Linien auf Blau klein besser lesbar sind.
-- **Bildwelt:** noch offen. Ob gemeinfreie Stiche (z.B. Met Open Access, CC0) blau gerastert eingesetzt werden, und wenn ja, wo (z.B. in den Leerzuständen). Kandidaten: Met 371844 (Fackel zwischen Altar und Statuette), 402697 (Vestalin).
+- **Name:** Hestia (Herdfeuer, das täglich gepflegt wird). Es gibt noch keine echten Daten, deshalb wird alles umbenannt, nicht nur der Anzeigename:
+  - Bundle Identifier `de.vanheyden.Hestia`, `de.vanheyden.HestiaTests`, `de.vanheyden.HestiaUITests`. iOS behandelt das als neue App mit eigenem Datencontainer, Habits aus der alten App kommen nicht mit. Die alte App "Habitus" wird vom Gerät und aus dem Simulator gelöscht.
+  - Modul, Targets, Scheme, Testpläne, Projekt (`Hestia.xcodeproj`) und Ordner (`Hestia/`, Tests bleiben in `Tests/`) heißen `Hestia`, `HestiaTests`, `HestiaUITests`, die App Struktur `HestiaApp`.
+  - Startargumente `-HestiaResetData`, `-HestiaSampleData`, `-HestiaSamplePauses`, UserDefaults Schlüssel `HestiaDayOffset`. Alle UI Tests und Kommentare ziehen mit.
+  - Ältere Phasen in dieser Spezifikation nennen weiter `Habitus` (Verlauf), sie werden nicht umgeschrieben.
+- **Bildmarke:** eine Flamme als Linolschnitt, Blau auf Papier. Quelle ist `Branding/flame-linocut-source.webp` (KI erzeugt, keine Lizenz nötig), `Branding/render_flame_icon.py` liest daraus die Maske und baut die drei Icons. Hell ist Blau auf Papier, dunkel Papier auf Nachtblau, getönt Weiß auf Schwarz. Die Flamme füllt etwa 86 % der Höhe (`FLAME_HEIGHT` 880, oben 46 px und unten 96 px Rand) und ist leicht aufgeraut (wellige Kante, kleine Fehlstellen, feste Seed). Das ersetzt die frühere Idee mit Markenblau Fläche, weil die Schnitte als helle Linien auf Blau klein besser lesbar sind. **Größe und Proportionen des Icons bleiben, wie sie sind.**
+- **Wortmarke:** `HESTIA / HABITS`, zweizeilig wie "HERMES / AGENT" bei Hermes, in Barlow Condensed Regular, Versalien. In der App steht sie nur an einer Stelle: ganz unten in den Einstellungen (5.5).
+- **Startbildschirm:** Hintergrund in der Farbe `background`, mittig nur die Flamme (`Branding/flame-mark.png`, Höhe etwa 120 pt), kein Text. Hell Blau auf Papier, dunkel Papier auf Nachtblau, wie das Icon. Das ersetzt den generierten leeren Startbildschirm.
+- **Bildwelt:** zwei gemeinfreie Stiche (Met Open Access, CC0), blau gerastert, je einer in einem Leerzustand:
+  - **Heute ohne Habits:** Fackel zwischen Altar und Statuette (Met 371844).
+  - **Kalender ohne Daten:** Vestalin (Met 402697).
+  - Die Leerzustände in Einstellungen ("Keine Pausen") und im Sheet "Tag bearbeiten" bekommen kein Bild. Höchstens ein Bild pro Leerzustand.
+  - Das Bild steht über dem Titel, auf Inhaltsbreite im Seitenverhältnis des Stichs, höchstens etwa 200 pt hoch (Startwert, nach der ersten Sichtung anpassen). Es ist dekorativ und für VoiceOver ausgeblendet.
+  - Passt ein Stich nach der Sichtung nicht zum Hermes Stil (neben dem Linolschnitt der Flamme), entscheiden wir für diesen Stich einzeln, ob er bleibt.
 
-**Umfang (nach der Entscheidung)**
-- **Wortmarke:** Name in Barlow Condensed Regular, Versalien, zweizeilig gesetzt wie "HERMES / AGENT" bei Hermes. Als Vektor in `Branding/`. In der App höchstens an einer Stelle (z.B. Leerzustand Heute oder Einstellungen unten).
-- **App Icon:** Flamme in Markenblau `#0000F2` auf Papier `#F2F2F2`, Varianten hell, dunkel und getönt (`AppIcon-light/-dark/-tinted`). `Branding/render_flame_icon.py` erzeugt alle Varianten. *(Erledigt.)* `Branding/render_icon.py` und `habitus-mark.svg` gehören zum alten Wochenkreis Icon.
-- **Anzeigename:** `INFOPLIST_KEY_CFBundleDisplayName`. Bundle Identifier und Datenbank bleiben gleich, damit keine Daten verloren gehen.
-- **Bildwelt (falls gewählt):** Quellen mit Lizenz in `Branding/QUELLEN.md`. Rasterung und Einfärbung per Skript in `Branding/`, keine Bilder von Hand bearbeitet. Höchstens ein Bild pro Leerzustand, in `Assets.xcassets`.
+**Später (nicht in Phase 12):** Feuer als Zustand. Aus der eigenen Flammenmaske werden Stufen abgeleitet (Funke für einen neuen Habit, Glut für eine Pause, volle Flamme für einen langen Streak). Das widerspricht der Regel "Kein Flammensymbol" an den Streak Zahlen (4.5 `HabitStatRow`) und müsste dort neu entschieden werden.
+
+**Umfang**
+- **Umbenennung** wie oben (ein Schritt, mechanisch: Ordner und Projekt mit `git mv`, Targets, Scheme, Testpläne, Bundle Identifier, Startargumente, `@testable import Hestia`). `INFOPLIST_KEY_CFBundleDisplayName` bleibt `Hestia`. *(Anzeigename erledigt.)*
+- **App Icon:** Flamme in Markenblau `#0000F2` auf Papier `#F2F2F2`, Varianten hell, dunkel und getönt (`AppIcon-light/-dark/-tinted`). `Branding/render_flame_icon.py` erzeugt alle Varianten, der Pfad zum Asset Katalog dort wird auf `Hestia/` angepasst. *(Icons erledigt.)* `Branding/render_icon.py` und `habitus-mark.svg` gehören zum alten Wochenkreis Icon.
+- **Wortmarke:** Fuß der Einstellungen (5.5) als Text in Barlow Condensed Regular, kein Bild. Eine Vektorvorlage in `Branding/` ist optional.
+- **Startbildschirm:** Eintrag `UILaunchScreen` mit Bild und Hintergrundfarbe aus dem Asset Katalog (je hell und dunkel) statt `INFOPLIST_KEY_UILaunchScreen_Generation`.
+- **Bildwelt:** Quellen mit Objektnummer, Link und Lizenz in `Branding/QUELLEN.md` (die Lizenz wird vor dem Einsatz auf der Seite der Met geprüft). Rasterung und Einfärbung per Skript `Branding/render_engravings.py`, keine Bilder von Hand bearbeitet. Die fertigen Bilder (hell und dunkel) liegen in `Assets.xcassets`, `EngravingImage` zeigt sie in `EmptyState`.
 
 **Definition of Done**
-- [ ] Das neue App Icon ist auf dem Homescreen sichtbar, in Hell, Dunkel und getönt.
-- [ ] Unter dem Icon steht der gewählte Name.
-- [ ] Nach dem Update sind alle Habits und Erledigungen noch da.
-- [ ] Alle Bildquellen sind mit Lizenz dokumentiert.
+- [ ] Das App Icon ist auf dem Homescreen sichtbar, in Hell, Dunkel und getönt, in unveränderter Größe.
+- [ ] Unter dem Icon steht "Hestia".
+- [ ] Bundle Identifier, Projekt, Targets, Scheme, Testpläne, Ordner und Startargumente heißen Hestia. Eine Suche nach `Habitus` im Projekt (außer in dieser Spezifikation und den alten Dateien in `Branding/`) findet nichts mehr.
+- [ ] Die neue App startet auf einem Gerät ohne die alte App leer und ohne Absturz. Angelegte Habits sind nach einem Neustart noch da.
+- [ ] Der Startbildschirm zeigt die Flamme, in Hell und Dunkel, ohne weißen Blitz.
+- [ ] Ganz unten in den Einstellungen stehen `HESTIA / HABITS` und die Version, in Hell und Dunkel gut lesbar.
+- [ ] Heute ohne Habits zeigt die Fackel, der Kalender ohne Daten die Vestalin, in Hell und Dunkel. Andere Leerzustände haben kein Bild.
+- [ ] Alle Bildquellen sind mit Lizenz in `Branding/QUELLEN.md` dokumentiert.
+- [ ] Unit Tests und die UI Tests aus "Komplett" laufen mit den neuen Startargumenten grün.

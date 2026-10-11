@@ -232,4 +232,37 @@ struct HabitStatisticsTests {
         let habit = make(.weekly, done: [ago(10), ago(2)])
         #expect(rate(habit) == 10.0 / 30.0)
     }
+
+    // MARK: Erledigungen und Pausen (Phase 11)
+
+    @Test func totalCompletionsSumsAllCounts() {
+        // 3x täglich, an 3 Tagen voll erledigt (9) und an einem Tag 1: 10.
+        let habit = make(.daily, target: 3, counts: [(ago(1), 3), (ago(2), 3), (ago(3), 3), (ago(4), 1)])
+        #expect(engine.statistics(habit, on: monday).totalCompletions == 10)
+    }
+
+    @Test func totalCompletionsStopAfterTheEndDay() {
+        // Beendet am Tag vor 3 Tagen: Erledigungen am Tag des Beendens zählen noch, danach nicht mehr.
+        var habit = make(.daily, counts: [(ago(5), 1), (ago(4), 1), (ago(3), 1), (ago(2), 1), (ago(0), 1)])
+        habit.endedAt = ago(3)
+        #expect(engine.statistics(habit, on: monday).totalCompletions == 3)
+        #expect(engine.statistics(habit, on: ago(3)).totalCompletions == 3)
+    }
+
+    @Test func totalCompletionsIgnoreDaysBeforeCreationAndKeepPausedDays() {
+        var habit = make(.daily, created: ago(5), counts: [(ago(8), 1), (ago(4), 1), (ago(3), 1)])
+        habit.pauses = [PauseRange(start: ago(4), end: ago(3))]
+        #expect(engine.statistics(habit, on: monday).totalCompletions == 2)
+    }
+
+    @Test func pauseCountIncludesPastAndRunningButNotPlanned() {
+        var habit = make(.daily)
+        habit.pauses = [
+            PauseRange(start: ago(10), end: ago(8)),
+            PauseRange(start: ago(1), end: ago(-2)),
+            PauseRange(start: ago(-3), end: ago(-5)),
+        ]
+        #expect(engine.statistics(habit, on: monday).pauseCount == 2)
+        #expect(engine.statistics(make(.daily), on: monday).pauseCount == 0)
+    }
 }

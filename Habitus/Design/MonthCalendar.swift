@@ -25,6 +25,8 @@ struct MonthCalendar: View {
     var isDisabled: (Date) -> Bool = { _ in false }
     /// Der Monat, den der Kalender zuerst zeigt. Standard ist der letzte (`lastMonth`).
     var initialMonth: Date?
+    /// Kompakte Darstellung im Habit Detail: Quadrate ohne Tageszahl mit `calendarCompactSpacing` Abstand.
+    var isCompact = false
     /// `nil`, wenn die Tage nicht antippbar sind (Habit Detail).
     var onSelect: ((Date) -> Void)?
 
@@ -73,10 +75,11 @@ struct MonthCalendar: View {
                 .foregroundStyle(Theme.ink)
                 .buttonStyle(.plain)
             }
-            CalendarWeekdayHeader()
-            LazyVGrid(columns: CalendarWeekdayHeader.columns, spacing: Theme.calendarDaySpacing) {
+            CalendarWeekdayHeader(spacing: spacing)
+            LazyVGrid(columns: columns, spacing: spacing) {
                 ForEach(0..<grid.leadingBlanks, id: \.self) { _ in
-                    Color.clear.frame(height: Theme.calendarDaySize)
+                    Color.clear.aspectRatio(isCompact ? 1 : nil, contentMode: .fit)
+                        .frame(height: isCompact ? nil : Theme.calendarDaySize)
                 }
                 ForEach(grid.days, id: \.self) { day in
                     dayCell(day)
@@ -86,6 +89,14 @@ struct MonthCalendar: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    private var spacing: CGFloat {
+        isCompact ? Theme.calendarCompactSpacing : Theme.calendarDaySpacing
+    }
+
+    private var columns: [GridItem] {
+        CalendarWeekdayHeader.columns(spacing: spacing)
+    }
+
     private func dayCell(_ day: Date) -> some View {
         let isFuture = (engine.isFuture(day, today: today) && !allowsFuture) || isDisabled(day)
         let isSelected = selectedDay.map { engine.startOfDay($0) == engine.startOfDay(day) } ?? false
@@ -93,24 +104,36 @@ struct MonthCalendar: View {
         let dayProgress = progress(day)
         let isPausedDay = !isFuture && isPaused(day)
         let opacity = isSelected ? 1 : (isFuture || isPausedDay ? 0 : Self.fillOpacity(for: dayProgress.fraction))
+        // Ohne Tageszahl wäre ein Tag ohne Erledigung unsichtbar: er bekommt wie in `WeekDots` eine blasse Fläche.
+        let fillOpacity = isCompact && opacity == 0 && !isPausedDay ? Theme.dotEmptyOpacity : opacity
+        let ringOutset = isCompact ? Theme.calendarCompactRingOutset : Theme.dotRingGap + Theme.strokeWidth
 
-        let label = Text("\(engine.calendar.component(.day, from: day))")
-            .font(isToday ? Theme.Typography.metaMedium : Theme.Typography.meta)
-            .fixedControlTypeSize()
-            .foregroundStyle(opacity >= Theme.calendarOnFillThreshold ? Theme.background : Theme.ink)
-            .frame(width: Theme.calendarDaySize, height: Theme.calendarDaySize)
-            .background {
-                Rectangle().fill(isPausedDay ? Theme.ink.opacity(Theme.pausedDayOpacity) : tint.opacity(opacity))
-            }
+        let square = Rectangle()
+            .fill(isPausedDay ? Theme.ink.opacity(Theme.pausedDayOpacity) : tint.opacity(fillOpacity))
             .overlay {
-                if isToday {
-                    Rectangle()
-                        .strokeBorder(tint, lineWidth: Theme.strokeWidth)
-                        .padding(-(Theme.dotRingGap + Theme.strokeWidth))
+                if !isCompact {
+                    Text("\(engine.calendar.component(.day, from: day))")
+                        .font(isToday ? Theme.Typography.metaMedium : Theme.Typography.meta)
+                        .fixedControlTypeSize()
+                        .foregroundStyle(opacity >= Theme.calendarOnFillThreshold ? Theme.background : Theme.ink)
                 }
             }
-            .contentShape(Rectangle())
-            .opacity(isFuture ? Theme.calendarFutureOpacity : 1)
+        let label = Group {
+            if isCompact {
+                square.aspectRatio(1, contentMode: .fit)
+            } else {
+                square.frame(width: Theme.calendarDaySize, height: Theme.calendarDaySize)
+            }
+        }
+        .overlay {
+            if isToday {
+                Rectangle()
+                    .strokeBorder(tint, lineWidth: Theme.strokeWidth)
+                    .padding(-ringOutset)
+            }
+        }
+        .contentShape(Rectangle())
+        .opacity(isFuture ? Theme.calendarFutureOpacity : 1)
 
         return Group {
             if let onSelect {
@@ -155,13 +178,17 @@ struct MonthCalendar: View {
 
 /// Wochentagszeile Mo bis So unter dem Monatsnamen.
 struct CalendarWeekdayHeader: View {
+    var spacing: CGFloat = Theme.calendarDaySpacing
+
     /// Sieben gleich breite Spalten, auch für die Tage darunter.
-    static var columns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: Theme.calendarDaySpacing), count: 7)
+    static var columns: [GridItem] { columns(spacing: Theme.calendarDaySpacing) }
+
+    static func columns(spacing: CGFloat) -> [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: spacing), count: 7)
     }
 
     var body: some View {
-        LazyVGrid(columns: Self.columns, spacing: 0) {
+        LazyVGrid(columns: Self.columns(spacing: spacing), spacing: 0) {
             ForEach(DayText.weekdayNames, id: \.self) { weekday in
                 Text(weekday)
                     .labelText(small: true)

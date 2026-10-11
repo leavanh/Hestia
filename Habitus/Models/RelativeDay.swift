@@ -22,13 +22,17 @@ enum DayText {
 
     /// Datumszeile ohne Kalenderwoche: "So · 11. Okt".
     static func dateLine(_ day: Date, engine: HabitEngine) -> String {
+        "\(weekdayNames[engine.weekday(of: day) - 1]) · \(shortDate(day, engine: engine))"
+    }
+
+    /// Tag und Monat: "11. Okt".
+    static func shortDate(_ day: Date, engine: HabitEngine) -> String {
         let formatter = DateFormatter()
         formatter.locale = locale
         formatter.calendar = engine.calendar
         formatter.timeZone = engine.calendar.timeZone
         formatter.dateFormat = "d. LLL"
-        let date = formatter.string(from: day).replacingOccurrences(of: ".", with: "", options: [.anchored, .backwards])
-        return "\(weekdayNames[engine.weekday(of: day) - 1]) · \(date)"
+        return formatter.string(from: day).replacingOccurrences(of: ".", with: "", options: [.anchored, .backwards])
     }
 
     /// Datum mit Jahr: "11. Okt 2026".

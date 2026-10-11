@@ -95,6 +95,10 @@ enum Theme {
     /// Kantenlänge eines Tages in `MonthCalendar` und Abstand zwischen den Tagen.
     static let calendarDaySize: CGFloat = 40
     static let calendarDaySpacing: CGFloat = 6
+    /// Abstand der Quadrate in der kompakten Darstellung des Kalenders im Habit Detail und wie weit der Rahmen um
+    /// heute über das Quadrat hinausreicht (freier Rand von 1 pt plus Strich), damit er das Nachbarquadrat nicht berührt.
+    static let calendarCompactSpacing: CGFloat = 3
+    static let calendarCompactRingOutset: CGFloat = 2
 
     // MARK: Marke
 

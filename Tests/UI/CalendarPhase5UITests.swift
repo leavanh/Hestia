@@ -5,6 +5,8 @@ import XCTest
 /// Die Testdaten sind relativ zu heute aufgebaut. "Lesen" ist gestern erledigt, vorgestern nicht, davor in Blöcken
 /// von 4 Tagen mit einer Lücke alle 5 Tage. Heute ist offen. Das ergibt:
 /// aktueller Streak 1, längster Streak 4, Quote 30 Tage 23 von 29 bewerteten Tagen = 79 %.
+/// Dazu (Phase 11): 48 Erledigungen seit der Erstellung vor 60 Tagen (59 Tage ab vorgestern, davon 12 Lücken, plus
+/// gestern) und keine Pause.
 final class CalendarPhase5UITests: XCTestCase {
     override func setUp() {
         continueAfterFailure = false
@@ -53,9 +55,30 @@ final class CalendarPhase5UITests: XCTestCase {
 
         XCTAssertEqual(app.staticTexts["detail-name"].label, "Lesen")
         XCTAssertEqual(app.staticTexts["detail-rhythm"].label, "20 Min · Täglich")
-        XCTAssertEqual(app.staticTexts["stat-current-streak"].label, "1 Tag")
-        XCTAssertEqual(app.staticTexts["stat-longest-streak"].label, "4 Tage")
+        // Streak im Band, vier Kennzahlen im Raster. Im Wert steht nur die Zahl, die Einheit in der Beschriftung.
+        XCTAssertEqual(app.staticTexts["stat-current-streak"].label, "Aktueller Streak: 1 Tag")
+        XCTAssertEqual(app.staticTexts["stat-longest-streak"].label, "4")
         XCTAssertEqual(app.staticTexts["stat-rate-30"].label, "79 %")
+        XCTAssertEqual(app.staticTexts["stat-total"].label, "48")
+        XCTAssertEqual(app.staticTexts["stat-pauses"].label, "0")
+    }
+
+    @MainActor
+    func testEditFromDetailShowsTheNewName() {
+        let app = launchCalendar()
+        openDetail(of: "Lesen", in: app)
+
+        app.buttons["detail-edit"].tap()
+        let nameField = app.textFields["name-field"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.tap()
+        nameField.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 10) + "Lesezeit")
+        app.buttons["Speichern"].tap()
+
+        XCTAssertTrue(app.scrollViews["habit-detail"].waitForExistence(timeout: 5))
+        let name = app.staticTexts["detail-name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        XCTAssertEqual(name.label, "Lesezeit")
     }
 
 }

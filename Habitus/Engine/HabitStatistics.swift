@@ -9,6 +9,11 @@ nonisolated struct HabitStatistics: Equatable, Sendable {
     /// Anteil von 0 bis 1 der erfüllten unter den bewerteten Tagen der letzten 30 Tage. `nil`, wenn es
     /// keinen bewerteten Tag gibt (z.B. heute erstellt und noch nichts erledigt).
     var rate30: Double?
+    /// Summe aller Erledigungen von der Erstellung bis zum Statistiktag (Spezifikation 3.7), auch an Tagen, die
+    /// später rückwirkend pausiert wurden.
+    var totalCompletions: Int
+    /// Pausen, die am Statistiktag schon begonnen haben (laufende und vergangene), geplante nicht.
+    var pauseCount: Int
 
     /// Quote 30 Tage als ganze Prozent, gerundet. `nil`, wenn es noch keine Quote gibt.
     var ratePercent: Int? {
@@ -66,7 +71,34 @@ extension HabitEngine {
             ? nil
             : Double(recent.filter { $0.outcome == .met }.count) / Double(recent.count)
 
-        return HabitStatistics(currentStreak: current, longestStreak: longest, rate30: rate)
+        return HabitStatistics(
+            currentStreak: current,
+            longestStreak: longest,
+            rate30: rate,
+            totalCompletions: totalCompletions(habit, through: today),
+            pauseCount: pauseCount(habit, through: today)
+        )
+    }
+
+    /// Letzter Tag, der in die Statistik eingeht: `today`, bei einem beendeten Habit der Tag des Beendens.
+    private func lastStatisticsDay(_ habit: HabitSnapshot, today: Date) -> Date {
+        guard let endedAt = habit.endedAt else { return today }
+        return min(today, startOfDay(endedAt))
+    }
+
+    /// Summe aller Erledigungen (`count`) von der Erstellung bis zum Statistiktag, Pausen und Streaks unbeachtet.
+    func totalCompletions(_ habit: HabitSnapshot, through today: Date) -> Int {
+        let first = startOfDay(habit.createdAt)
+        let last = lastStatisticsDay(habit, today: startOfDay(today))
+        return habit.counts
+            .filter { first <= startOfDay($0.day) && startOfDay($0.day) <= last }
+            .reduce(0) { $0 + $1.count }
+    }
+
+    /// Anzahl der Pausen, die am Statistiktag schon begonnen haben.
+    func pauseCount(_ habit: HabitSnapshot, through today: Date) -> Int {
+        let last = lastStatisticsDay(habit, today: startOfDay(today))
+        return habit.pauses.filter { startOfDay($0.start) <= last }.count
     }
 
     private func isInRateWindow(_ day: Date, today: Date) -> Bool {
