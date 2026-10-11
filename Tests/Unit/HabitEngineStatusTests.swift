@@ -166,7 +166,9 @@ struct HabitEngineStatusTests {
         #expect(engine.count(on: monday, in: habit.counts) == 0)
         #expect(engine.points(habit, on: monday) == 1)
         #expect(engine.donePoints(habit, on: monday) == 1)
-        #expect(engine.dayProgress([habit], on: monday) == DayProgress(done: 1, total: 1))
+        // Ab Phase 13 steht der erfüllte, grüne Habit in Weitere und zählt nicht im Tagesfortschritt (3.4).
+        #expect(engine.section(habit, on: monday) == .other)
+        #expect(engine.dayProgress([habit], on: monday) == DayProgress(done: 0, total: 0))
     }
 
     @Test func monthlyFulfilledInWindowCountsAsDone() {
@@ -194,12 +196,12 @@ struct HabitEngineStatusTests {
 
     @Test func progressMixesAllRhythmsAndSkipsHabitsThatAreNotDue() {
         let water = make(.daily, target: 3, done: [monday])                         // 1 von 3
-        let sport = make(.weekly, target: 2, done: [ago(1), ago(3)])               // erfüllt: 1 von 1
+        let sport = make(.weekly, target: 2, done: [ago(1), ago(3)])               // erfüllt und grün: Weitere
         let yoga = make(.weekdays, weekdays: [1])                                   // fällig, offen: 0 von 1
         let rent = make(.monthDay, monthDay: 1)                                     // nicht fällig
         let tuesdayOnly = make(.weekdays, weekdays: [2], done: [monday])            // nicht fällig
         let progress = engine.dayProgress([water, sport, yoga, rent, tuesdayOnly], on: monday)
-        #expect(progress == DayProgress(done: 2, total: 5))
+        #expect(progress == DayProgress(done: 1, total: 4))
     }
 
     @Test func windowProgressCountsDaysInTheWindow() {

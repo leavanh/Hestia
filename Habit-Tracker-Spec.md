@@ -1152,12 +1152,14 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - UI Test (einer): Mit Testdaten ist Weitere zugeklappt, Tippen auf `other-habits-toggle` klappt auf, der Habit mit festem Wochentag ist zu sehen. Ihn abhaken ändert den Fortschritt im Band nicht.
 
 **Definition of Done**
-- [ ] In Heute stehen oben nur die Habits, die am Tag zu tun sind. Ein 1x pro Woche Habit, den ich diese Woche schon gemacht habe, steht in Weitere.
-- [ ] Weitere ist beim ersten Start zu, lässt sich auf und zuklappen und merkt sich das.
-- [ ] Ich kann einen Habit in Weitere abhaken, er bleibt dort, und der Fortschritt im Band ändert sich nicht.
-- [ ] Ein Habit, den ich in der Hauptliste abhake, bleibt am selben Tag in der Hauptliste.
-- [ ] Pausierte Habits stehen ausgegraut am Ende von Weitere.
-- [ ] Im Sheet "Tag bearbeiten" ist es genauso.
+- [x] In Heute stehen oben nur die Habits, die am Tag zu tun sind. Ein 1x pro Woche Habit, den ich diese Woche schon gemacht habe, steht in Weitere.
+- [x] Weitere ist beim ersten Start zu, lässt sich auf und zuklappen und merkt sich das.
+- [x] Ich kann einen Habit in Weitere abhaken, er bleibt dort, und der Fortschritt im Band ändert sich nicht.
+- [x] Ein Habit, den ich in der Hauptliste abhake, bleibt am selben Tag in der Hauptliste.
+- [x] Pausierte Habits stehen ausgegraut am Ende von Weitere.
+- [x] Im Sheet "Tag bearbeiten" ist es genauso.
+
+*Geprüft im Simulator (iPhone 18 Pro) mit Testdaten an einem Montag: Heute zeigt 11 Habits in der Hauptliste und 4/13 im Band, "Weitere · 5" ist beim ersten Start zu, Tippen klappt auf (Chevron nach unten) und zeigt Sport, Fenster putzen, Wäsche waschen, Blumen gießen und Rechnungen prüfen in gespeicherter Reihenfolge. Unit Tests (259) grün, darunter die Pflicht Testfälle in `OtherSectionTests`. Komplett-Lauf: alle 21 UI Tests grün, nachdem `testCreateCheckUncheckAndPersist` (wackelt, wie in Phase 12) und `Phase9UITests` einzeln wiederholt wurden. `Phase9UITests` las an einem Montag die Position des Wochenstreifens noch während er hereinfederte und wartet jetzt eine Sekunde. Bestehende Tests angepasst: erfüllte Wochen Habits stehen jetzt in Weitere (`HabitEngineStatusTests`, `TodayPhase33UITests`), `pausedInTodayOrder` ist durch `otherInSavedOrder` ersetzt. Hell und Dunkel nutzen nur bestehende Farbrollen, die Dunkelansicht wurde nicht gesondert angesehen. Pausierte Habits am Ende von Weitere und das Sheet "Tag bearbeiten" sind durch Unit Tests abgedeckt, aber nicht von Hand angesehen.*
 
 ---
 

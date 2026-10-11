@@ -26,14 +26,14 @@ struct TodayView: View {
 
     private let engine = HabitEngine()
 
-    /// Habits, die am angezeigten Tag fällig sind (Spezifikation 3.2): offene zuerst, dann erledigte.
+    /// Habits der Hauptliste am angezeigten Tag (Spezifikation 3.2): offene zuerst, dann erledigte.
     private var dueHabits: [Habit] {
-        Habit.dueInTodayOrder(habits, on: shownDay, engine: engine)
+        Habit.mainInTodayOrder(habits, on: shownDay, engine: engine)
     }
 
-    /// Habits, die am angezeigten Tag pausiert sind: ausgegraut am Ende der Liste.
-    private var pausedHabits: [Habit] {
-        Habit.pausedInTodayOrder(habits, on: shownDay, engine: engine)
+    /// Habits in Weitere am angezeigten Tag: gespeicherte Reihenfolge, pausierte ausgegraut am Ende.
+    private var otherHabits: [Habit] {
+        Habit.otherInSavedOrder(habits, on: shownDay, engine: engine)
     }
 
     /// Ob es noch keinen aktiven Habit gibt. Dann zeigt Heute statt der Liste den Leerzustand.
@@ -47,7 +47,7 @@ struct TodayView: View {
             if isSorting {
                 HabitSortList(habits: habits, day: shownDay) { isSorting = false }
             } else {
-                dayScroll(for: due, paused: pausedHabits)
+                dayScroll(for: due, other: otherHabits)
             }
         }
         .background { PaperBackground() }
@@ -69,9 +69,8 @@ struct TodayView: View {
 
     /// Die Tagesansicht: Kopfband, Listenkopf und Liste, mit Wischen zum Wechseln des Tages. Ist das Band aus dem
     /// Bild gescrollt, steht oben die kleine Leiste.
-    private func dayScroll(for due: [Habit], paused: [Habit]) -> some View {
+    private func dayScroll(for due: [Habit], other: [Habit]) -> some View {
         let progress = engine.dayProgress(due.map(\.snapshot), on: shownDay)
-        let rows = due + paused
         return ScrollView {
             VStack(spacing: 0) {
                 DayHeader(
@@ -87,9 +86,9 @@ struct TodayView: View {
                 )
                 .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { bandHeight = $0 }
                 VStack(alignment: .leading, spacing: 0) {
-                    listHeader(count: rows.count)
+                    listHeader(count: due.count)
                     ZStack(alignment: .top) {
-                        dayList(rows, isEmpty: hasNoActiveHabits && rows.isEmpty)
+                        dayList(due, other: other, isEmpty: hasNoActiveHabits && due.isEmpty && other.isEmpty)
                             .id(engine.startOfDay(shownDay))
                             .transition(dayTransition)
                     }
@@ -139,7 +138,7 @@ struct TodayView: View {
     }
 
     /// Die Karten des angezeigten Tags, ohne aktive Habits der Leerzustand. Sie federn nach dem Kopfband herein.
-    private func dayList(_ rows: [Habit], isEmpty: Bool) -> some View {
+    private func dayList(_ rows: [Habit], other: [Habit], isEmpty: Bool) -> some View {
         VStack(spacing: Theme.sectionSpacing) {
             if isEmpty {
                 EmptyState(
@@ -157,6 +156,9 @@ struct TodayView: View {
                     DayHabitCard(habit: habit, day: shownDay) { editingHabit = habit }
                         .dayEntrance(from: entranceEdge, index: index + 3)
                 }
+                OtherHabitsSection(
+                    habits: other, day: shownDay, entranceEdge: entranceEdge, entranceIndex: rows.count + 3
+                ) { editingHabit = $0 }
             }
             .animation(reduceMotion ? nil : .smooth, value: rows.map(\.id))
         }

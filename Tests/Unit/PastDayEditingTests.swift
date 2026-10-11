@@ -50,7 +50,7 @@ struct PastDayEditingTests {
         makeHabit("Noch nicht da", createdDaysAgo: 3)
 
         let habits = (try? context.fetch(FetchDescriptor<Habit>())) ?? []
-        let names = Habit.dueInTodayOrder(habits, on: lastWeek, engine: engine).map(\.name)
+        let names = Habit.mainInTodayOrder(habits, on: lastWeek, engine: engine).map(\.name)
         #expect(Set(names) == ["Täglich", "Genau dann"])
     }
 
@@ -59,10 +59,10 @@ struct PastDayEditingTests {
         let second = makeHabit("Zweiter")
         first.setCount(1, on: day(5), engine: engine, in: context)
 
-        let names = Habit.dueInTodayOrder([first, second], on: day(5), engine: engine).map(\.name)
+        let names = Habit.mainInTodayOrder([first, second], on: day(5), engine: engine).map(\.name)
         #expect(names == ["Zweiter", "Erster"])
         // Heute ist von der Erledigung an einem anderen Tag unberührt.
-        #expect(Habit.dueInTodayOrder([first, second], on: today, engine: engine).map(\.name).first == "Erster")
+        #expect(Habit.mainInTodayOrder([first, second], on: today, engine: engine).map(\.name).first == "Erster")
     }
 
     // MARK: Nachtragen

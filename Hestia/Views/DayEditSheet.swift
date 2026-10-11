@@ -14,14 +14,14 @@ struct DayEditSheet: View {
     private let engine = HabitEngine()
 
     var body: some View {
-        let due = Habit.dueInTodayOrder(habits, on: day, engine: engine)
-        let paused = Habit.pausedInTodayOrder(habits, on: day, engine: engine)
+        let due = Habit.mainInTodayOrder(habits, on: day, engine: engine)
+        let other = Habit.otherInSavedOrder(habits, on: day, engine: engine)
 
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: Theme.sectionSpacing) {
                     progressSummary(engine.dayProgress(due.map(\.snapshot), on: day))
-                    if due.isEmpty && paused.isEmpty {
+                    if due.isEmpty && other.isEmpty {
                         EmptyState(
                             title: "Nichts fällig",
                             message: "An diesem Tag gab es keinen fälligen Habit.",
@@ -29,11 +29,12 @@ struct DayEditSheet: View {
                         )
                     }
                     VStack(spacing: 0) {
-                        ForEach(due + paused) { habit in
+                        ForEach(due) { habit in
                             DayHabitCard(habit: habit, day: day) { editingHabit = habit }
                         }
+                        OtherHabitsSection(habits: other, day: day) { editingHabit = $0 }
                     }
-                    .animation(.smooth, value: (due + paused).map(\.id))
+                    .animation(.smooth, value: due.map(\.id))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(Theme.spacing)

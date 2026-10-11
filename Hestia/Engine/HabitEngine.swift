@@ -70,6 +70,14 @@ nonisolated struct DayProgress: Equatable, Sendable {
     }
 }
 
+/// Abschnitt von Heute, in dem ein Habit an einem Tag steht (Spezifikation 3.2).
+nonisolated enum DaySection: Equatable, Sendable {
+    /// Was am Tag zu tun ist. Nur diese Habits zählen im Tagesfortschritt.
+    case main
+    /// "Weitere": nicht dran, schon erfüllt oder pausiert.
+    case other
+}
+
 /// Ein Tag im Wochenstreifen von Heute (Spezifikation 5.2).
 nonisolated struct WeekStripDay: Equatable, Sendable {
     /// Tagesbeginn.
@@ -234,6 +242,30 @@ nonisolated struct HabitEngine: Sendable {
         return WindowProgress(done: done, target: max(habit.targetCount, 1))
     }
 
+    // MARK: Hauptliste und Weitere (Spezifikation 3.2)
+
+    /// Ob der Habit am Tag in der Hauptliste oder in Weitere steht. `nil`, wenn er dort nirgends steht (noch nicht
+    /// erstellt oder beendet). Pro Woche / pro Monat wird ohne die Erledigung des Tags gerechnet, damit ein Habit
+    /// beim Abhaken nie die Liste wechselt: Weitere, wenn das Ziel schon erfüllt und der Status grün ist.
+    func section(_ habit: HabitSnapshot, on day: Date) -> DaySection? {
+        let day = startOfDay(day)
+        guard day >= startOfDay(habit.createdAt), !isEnded(habit, on: day) else { return nil }
+        if isPaused(habit, on: day) { return .other }
+
+        switch habit.rhythm {
+        case .daily:
+            return .main
+        case .weekdays, .monthDay:
+            return isDue(habit, on: day) ? .main : .other
+        case .weekly, .monthly:
+            var withoutDay = habit
+            withoutDay.counts.removeAll { startOfDay($0.day) == day }
+            guard let window = windowProgress(withoutDay, on: day) else { return .main }
+            let isFulfilled = window.done >= window.target && status(withoutDay, on: day) == .green
+            return isFulfilled ? .other : .main
+        }
+    }
+
     // MARK: Tagesfortschritt (Spezifikation 3.4)
 
     /// Zielanzahl pro Tag: bei täglichen Habits die Anzahl, sonst 1.
@@ -266,9 +298,10 @@ nonisolated struct HabitEngine: Sendable {
         }
     }
 
-    /// Fortschritt über alle übergebenen Habits. Habits, die am Tag nicht fällig sind, zählen nicht mit.
+    /// Fortschritt über alle übergebenen Habits. Nur die Habits der Hauptliste zählen mit (`section`), Habits in
+    /// Weitere nie, auch nicht, wenn sie am Tag abgehakt werden.
     func dayProgress(_ habits: [HabitSnapshot], on day: Date) -> DayProgress {
-        habits.filter { isDue($0, on: day) }.reduce(DayProgress(done: 0, total: 0)) { progress, habit in
+        habits.filter { section($0, on: day) == .main }.reduce(DayProgress(done: 0, total: 0)) { progress, habit in
             DayProgress(
                 done: progress.done + donePoints(habit, on: day),
                 total: progress.total + points(habit, on: day)

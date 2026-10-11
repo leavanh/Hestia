@@ -26,7 +26,7 @@ struct DayHabitCard: View {
                 status: engine.status(snapshot, on: day),
                 rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: day)),
                 dots: engine.weekDots(snapshot, on: day),
-                isPaused: engine.isShownAsPaused(snapshot, on: day),
+                isPaused: engine.isPaused(snapshot, on: day),
                 onEdit: onEdit
             ) {
                 control(snapshot: snapshot, habitColor: habitColor)

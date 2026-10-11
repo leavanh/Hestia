@@ -13,6 +13,8 @@ final class TodayPhase33UITests: XCTestCase {
         app.launchArguments = ["-HestiaResetData", "-HestiaSampleData"]
         app.launch()
         XCTAssertTrue(app.staticTexts["Lesen"].waitForExistence(timeout: 5))
+        // "Sport" ist erfüllt und grün und steht deshalb in Weitere.
+        app.control("other-habits-toggle").tap()
 
         let expected = [
             "Lesen": "Grün", "Sport": "Grün", "Joggen": "Gelb", "Meditieren": "Rot", "Gitarre üben": "Rot",

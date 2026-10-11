@@ -22,7 +22,7 @@ enum DebugData {
     /// - täglich: Lesen und Vitamine grün, Meditieren rot, Wasser trinken zählt hoch
     /// - pro Woche: Sport grün, Joggen gelb, Gitarre üben rot
     /// - pro Monat: Fenster putzen grün, Pflanzen düngen gelb, Auto waschen rot
-    /// - feste Wochentage: Tagebuch grün und Yoga rot (beide heute fällig), Wäsche waschen erst morgen
+    /// - feste Wochentage: Tagebuch grün und Yoga rot (beide heute fällig), Wäsche waschen erst morgen, Blumen gießen erst übermorgen
     /// - fester Monatstag: Miete überweisen grün (heute fällig), Rechnungen prüfen nur am 1.
     @discardableResult
     static func insertSampleHabits(
@@ -149,6 +149,8 @@ enum DebugData {
             fixedDays("Tagebuch", "pencil", .blue, weekdays: [todayWeekday, weekday(plus: 3)].sorted()),
             fixedDays("Yoga", "figure.yoga", .violet, weekdays: [todayWeekday, weekday(plus: 4)].sorted(), skipMostRecent: true),
             fixedDays("Wäsche waschen", "house.fill", .teal, weekdays: [weekday(plus: 1)]),
+            // Nie heute fällig (übermorgen), damit "Weitere" mit Testdaten nicht leer ist.
+            fixedDays("Blumen gießen", "leaf.fill", .blue, weekdays: [weekday(plus: 2)]),
             // Fester Monatstag
             fixedDays("Miete überweisen", "creditcard.fill", .green, monthDay: dayOfMonth),
             fixedDays("Rechnungen prüfen", "envelope.fill", .orange, monthDay: 1),

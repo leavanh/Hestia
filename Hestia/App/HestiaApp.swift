@@ -15,6 +15,7 @@ struct HestiaApp: App {
             // Startargument für UI Tests: beginnt mit leerem Datenbestand.
             if ProcessInfo.processInfo.arguments.contains("-HestiaResetData") {
                 try DebugData.resetAll(in: container.mainContext)
+                UserDefaults.standard.removeObject(forKey: OtherHabitsSection.expandedKey)
             }
             // Startargument für Vorschauen: legt zusätzlich die Testdaten aus den Einstellungen an.
             if ProcessInfo.processInfo.arguments.contains("-HestiaSampleData") {

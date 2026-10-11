@@ -67,19 +67,19 @@ extension Habit {
         }
     }
 
-    /// Die Habits, die an `day` in der Liste erscheinen (Spezifikation 3.2), in der Reihenfolge von Heute.
-    /// Heute, der Kalender und das Sheet "Tag bearbeiten" zeigen damit dieselbe Liste.
-    static func dueInTodayOrder(_ habits: [Habit], on day: Date, engine: HabitEngine) -> [Habit] {
-        inTodayOrder(habits.filter { $0.isAlive && engine.isDue($0.snapshot, on: day) }) {
+    /// Die Habits der Hauptliste an `day` (Spezifikation 3.2), in der Reihenfolge von Heute. Heute, der Kalender
+    /// und das Sheet "Tag bearbeiten" zeigen damit dieselbe Liste.
+    static func mainInTodayOrder(_ habits: [Habit], on day: Date, engine: HabitEngine) -> [Habit] {
+        inTodayOrder(habits.filter { $0.isAlive && engine.section($0.snapshot, on: day) == .main }) {
             engine.isCompleted($0.snapshot, on: day)
         }
     }
 
-    /// Die Habits, die am Tag pausiert sind (und sonst fällig wären). Sie stehen in der Liste nach allen anderen,
-    /// in der gespeicherten Reihenfolge, und zählen nicht im Fortschritt.
-    static func pausedInTodayOrder(_ habits: [Habit], on day: Date, engine: HabitEngine) -> [Habit] {
-        habits.filter { $0.isAlive && engine.isShownAsPaused($0.snapshot, on: day) }.sorted {
-            $0.sortOrder != $1.sortOrder ? $0.sortOrder < $1.sortOrder : $0.createdAt < $1.createdAt
-        }
+    /// Die Habits im Abschnitt Weitere an `day` in der gespeicherten Reihenfolge, die pausierten am Ende. Erledigte
+    /// rutschen hier nicht nach unten. Sie zählen nicht im Fortschritt.
+    static func otherInSavedOrder(_ habits: [Habit], on day: Date, engine: HabitEngine) -> [Habit] {
+        let other = inSavedOrder(habits.filter { $0.isAlive && engine.section($0.snapshot, on: day) == .other })
+        let isPaused = { (habit: Habit) in engine.isPaused(habit.snapshot, on: day) }
+        return other.filter { !isPaused($0) } + other.filter(isPaused)
     }
 }

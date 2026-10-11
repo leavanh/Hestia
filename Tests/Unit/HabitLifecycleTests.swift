@@ -157,8 +157,8 @@ struct HabitLifecycleTests {
 
         #expect([c, a, b].map(\.sortOrder) == [0, 1, 2])
         // In Heute steht er trotzdem weiter unten, die neue Reihenfolge gilt aber für alle Tage.
-        #expect(Habit.dueInTodayOrder([a, b, c], on: today, engine: engine).map(\.name) == ["A", "B", "C"])
-        #expect(Habit.dueInTodayOrder([a, b, c], on: date(11), engine: engine).map(\.name) == ["C", "A", "B"])
+        #expect(Habit.mainInTodayOrder([a, b, c], on: today, engine: engine).map(\.name) == ["A", "B", "C"])
+        #expect(Habit.mainInTodayOrder([a, b, c], on: date(11), engine: engine).map(\.name) == ["C", "A", "B"])
     }
 
     @Test func pausedAndNotDueHabitsKeepTheirRelativeSlotsWhenNotMoved() throws {
@@ -206,8 +206,8 @@ struct HabitLifecycleTests {
         Habit.saveOrder(all: all, shown: [p2, c, a, p1, b], in: context)
 
         // Offen, erledigt, pausiert: jede Gruppe folgt der neuen Reihenfolge.
-        #expect(Habit.dueInTodayOrder(all, on: today, engine: engine).map(\.name) == ["C", "B", "A"])
-        #expect(Habit.pausedInTodayOrder(all, on: today, engine: engine).map(\.name) == ["P2", "P1"])
+        #expect(Habit.mainInTodayOrder(all, on: today, engine: engine).map(\.name) == ["C", "B", "A"])
+        #expect(Habit.otherInSavedOrder(all, on: today, engine: engine).map(\.name) == ["P2", "P1"])
     }
 
     @Test func ordersTiesByCreationDateWhenSavingFromDefaultSortOrders() throws {
@@ -227,16 +227,16 @@ struct HabitLifecycleTests {
         ended.end(on: date(12), engine: engine, in: context)
         let all = [paused, ended, active]
 
-        // Nicht fällig, also nicht im Fortschritt, aber in der Liste am Ende.
-        #expect(Habit.dueInTodayOrder(all, on: date(12), engine: engine).map(\.name) == ["Aktiv"])
-        #expect(Habit.pausedInTodayOrder(all, on: date(12), engine: engine).map(\.name) == ["Pausiert"])
+        // Nicht fällig, also nicht im Fortschritt, aber in Weitere.
+        #expect(Habit.mainInTodayOrder(all, on: date(12), engine: engine).map(\.name) == ["Aktiv"])
+        #expect(Habit.otherInSavedOrder(all, on: date(12), engine: engine).map(\.name) == ["Pausiert"])
         #expect(engine.dayProgress(all.map(\.snapshot), on: date(12)).total == 1)
         // Am Tag davor war noch keiner pausiert, der Beendete war noch da.
-        #expect(Habit.dueInTodayOrder(all, on: date(11), engine: engine).count == 3)
-        #expect(Habit.pausedInTodayOrder(all, on: date(11), engine: engine).isEmpty)
+        #expect(Habit.mainInTodayOrder(all, on: date(11), engine: engine).count == 3)
+        #expect(Habit.otherInSavedOrder(all, on: date(11), engine: engine).isEmpty)
     }
 
-    @Test func pausedListKeepsTheSavedOrderAndSkipsHabitsNotScheduledThatDay() throws {
+    @Test func otherListKeepsTheSavedOrderWithPausedHabitsAtTheEnd() throws {
         let second = makeHabit("Zweiter", sortOrder: 1)
         let first = makeHabit("Erster", sortOrder: 0)
         // Nur montags (12. Oktober 2026 ist ein Montag), pausiert vom 12. bis 14.
@@ -244,13 +244,21 @@ struct HabitLifecycleTests {
             name: "Montags", iconName: "drop.fill", colorKey: HabitColor.teal.rawValue,
             rhythm: .weekdays, weekdays: [1], sortOrder: 2, createdAt: date(1)
         )
+        // Nur dienstags, nicht pausiert: steht am Montag in Weitere, vor den pausierten.
+        let tuesday = Habit(
+            name: "Dienstags", iconName: "drop.fill", colorKey: HabitColor.teal.rawValue,
+            rhythm: .weekdays, weekdays: [2], sortOrder: 3, createdAt: date(1)
+        )
         context.insert(monday)
+        context.insert(tuesday)
         try makePause(12, 14, habits: [second, first, monday])
+        let all = [second, first, monday, tuesday]
 
-        #expect(Habit.pausedInTodayOrder([second, first, monday], on: date(12), engine: engine).map(\.name)
+        #expect(Habit.otherInSavedOrder(all, on: date(12), engine: engine).map(\.name)
+            == ["Dienstags", "Erster", "Zweiter", "Montags"])
+        // Dienstag: der Montags Habit ist pausiert und steht deshalb auch dort am Ende von Weitere.
+        #expect(Habit.otherInSavedOrder(all, on: date(13), engine: engine).map(\.name)
             == ["Erster", "Zweiter", "Montags"])
-        // Dienstag: der Montags Habit ist ohnehin nicht fällig und steht auch nicht als pausiert da.
-        #expect(Habit.pausedInTodayOrder([second, first, monday], on: date(13), engine: engine).map(\.name)
-            == ["Erster", "Zweiter"])
+        #expect(Habit.mainInTodayOrder(all, on: date(13), engine: engine).map(\.name) == ["Dienstags"])
     }
 }

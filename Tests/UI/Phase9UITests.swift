@@ -61,7 +61,9 @@ final class Phase9UITests: XCTestCase {
         XCTAssertTrue(mondayButton.exists, "Der Wochenstreifen zeigt die Woche des angezeigten Tags")
         XCTAssertFalse(mondayButton.isSelected)
 
-        let stripX = mondayButton.frame.minX
+        // Nach dem Wischen federn Kopf und Streifen noch herein: erst die Ruhelage messen.
+        Thread.sleep(forTimeInterval: 1.0)
+        let stripX = app.buttons[identifier(for: monday)].frame.minX
         mondayButton.tap()
         XCTAssertTrue(waitForShownDay(monday, in: app), "Tippen auf Montag zeigt diesen Tag")
         // Innerhalb der Woche bleibt der Streifen stehen, nur die Markierung wandert. Er ist nicht versetzt oder ausgeblendet.
