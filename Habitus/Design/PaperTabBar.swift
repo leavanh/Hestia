@@ -83,6 +83,7 @@ struct PaperTabBar: View {
                 }
             }
             .contentShape(Rectangle())
+            .accessibilityHidden(true)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(tab.title)

@@ -9,6 +9,8 @@ struct HabitSortList: View {
 
     let habits: [Habit]
     let day: Date
+    /// Beendet den Sortiermodus. "Fertig" steht oben links, wo in Heute vorher "Sortieren" stand.
+    let onDone: () -> Void
 
     private let engine = HabitEngine()
 
@@ -20,6 +22,13 @@ struct HabitSortList: View {
 
         List {
             Section {
+                HermesButton("Fertig", variant: .text, action: onDone)
+                    .fixedSize()
+                    .accessibilityIdentifier("sort-toggle")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .moveDisabled(true)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Sortieren")
                         .displayText()

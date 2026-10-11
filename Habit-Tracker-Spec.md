@@ -820,7 +820,8 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
   - Sortieren als Text "Sortieren" bzw. im Sortiermodus "Fertig" (Variante `text`, Rolle `label`), ohne Symbol.
   - Plus als Quadrat (Variante `secondary`, Fläche `ink` mit 14 %, Plus Symbol in `ink`), VoiceOver "Neuer Habit".
   - Identifier (`sort-toggle` usw.) bleiben gleich.
-  - In Phase 9 ziehen beide in Kopfband und Listenkopf um (5.2). Bis dahin bleiben sie an ihrem Platz in der Leiste.
+  - Abweichung: Beide stehen nicht mehr in der Navigationsleiste, sondern im Inhalt von Heute, Sortieren links und Plus rechts über dem Kopfbereich. Grund: Die Leiste behielt nach einem Wechsel zwischen Hell und Dunkel bei laufender App ihre Farben nicht. Im Sortiermodus steht "Fertig" oben links in der Liste. In Phase 9 ziehen beide in Kopfband und Listenkopf um (5.2).
+- **Scrollkante in Heute:** Die harte Scrollkante aus Phase 3.2 (`scrollEdgeEffectStyle(.hard)`) entfällt, Heute nutzt die Standardkante. Grund: Mit der harten Kante aktualisierte sich die Statusleiste beim Wechsel zwischen Hell und Dunkel bei laufender App nicht.
 - Dasselbe gilt für alle anderen Buttons in der Navigationsleiste eines Tabs, falls vorhanden (Kalender, Einstellungen). Sheets behalten ihre Systemleisten (4.4).
 - **Fehler: Navigationsleiste im falschen Modus.** Nach dem Wechsel zwischen Hell und Dunkel bleibt die Leiste in Heute in der Farbe des Modus beim Start (z.B. hell im dunklen Modus). Ursache ist vermutlich `UIColor(Theme.background)` in `NavigationAppearance`, das die Farbe beim Start fest auflöst. Die Farben für UIKit (Hintergrund, Titel, Tönung) müssen als dynamische `UIColor` aus `Theme` kommen, damit sie dem Modus folgen.
 - **`StepperControl`** (4.5) statt System `Stepper` (Anzahl bei Täglich, Woche, Monat) und statt Menü für den Monatstag im Sheet (5.3). Identifier `target-stepper` und `monthday-picker` bleiben am Baustein, die Tasten bekommen `<Identifier>-minus` und `<Identifier>-plus`.
@@ -845,13 +846,13 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Definition of Done**
 - [x] Unten steht eine flache Leiste mit Haarlinie, ohne Glas und ohne Schweben. Der gewählte Tab hat oben einen Strich.
 - [x] Plus und Sortieren in Heute haben keine Glasfläche mehr.
-- [ ] Außerhalb von Sheets ist nirgends Liquid Glass zu sehen.
-- [ ] Wechsel zwischen Hell und Dunkel bei laufender App: Leisten und Hintergründe wechseln sofort mit, nirgends bleibt eine helle Fläche im dunklen Modus.
+- [x] Außerhalb von Sheets ist nirgends Liquid Glass zu sehen.
+- [x] Wechsel zwischen Hell und Dunkel bei laufender App: Leisten und Hintergründe wechseln sofort mit, nirgends bleibt eine helle Fläche im dunklen Modus.
 - [x] Im Sheet gibt es keinen System Stepper und kein Menü mehr, Anzahl und Monatstag haben quadratische Tasten.
-- [ ] Der Kalender im Tab ist in Hell und Dunkel blau eingefärbt.
+- [x] Der Kalender im Tab ist in Hell und Dunkel blau eingefärbt.
 - [x] Beim Tabwechsel bleibt der Zustand jedes Tabs erhalten.
 - [x] Die letzte Zeile jeder Liste ist über der Leiste erreichbar.
-- [ ] Bei größter Schriftgröße bricht kein Tab Label um, mit VoiceOver sind die drei Tabs und der gewählte Tab klar erkennbar.
+- [x] Bei größter Schriftgröße bricht kein Tab Label um, mit VoiceOver sind die drei Tabs und der gewählte Tab klar erkennbar. *Einschränkung: Der VoiceOver Teil wurde nicht mit VoiceOver selbst geprüft. Der Accessibility Baum zeigt die ausgeblendete System Tab Bar weiterhin, und "Tab 1 von 3" ist nicht bestätigt. Die Einschränkung hat die Nutzerin akzeptiert.*
 - [x] Die Suche aus "Aufräumen" findet nichts mehr.
 
 ---

@@ -45,7 +45,7 @@ struct TodayView: View {
         NavigationStack {
             Group {
                 if isSorting {
-                    HabitSortList(habits: habits, day: shownDay)
+                    HabitSortList(habits: habits, day: shownDay) { isSorting = false }
                 } else {
                     dayScroll(for: due, paused: pausedHabits)
                 }
@@ -57,29 +57,6 @@ struct TodayView: View {
                     if !isSorting {
                         barTitle
                     }
-                }
-                ToolbarItem(placement: .topBarLeading) {
-                    HermesButton(isSorting ? "Fertig" : "Sortieren", variant: .text) {
-                        isSorting.toggle()
-                    }
-                    .fixedSize()
-                    .disabled(hasNoActiveHabits && !isSorting)
-                    .accessibilityIdentifier("sort-toggle")
-                }
-                .sharedBackgroundVisibility(.hidden)
-                if !isSorting {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            isCreating = true
-                        } label: {
-                            Image(systemName: "plus")
-                                .font(Theme.Typography.symbol)
-                                .fixedControlTypeSize()
-                        }
-                        .buttonStyle(.hermes(.quiet, isSquare: true))
-                        .accessibilityLabel("Neuer Habit")
-                    }
-                    .sharedBackgroundVisibility(.hidden)
                 }
             }
             .sheet(isPresented: $isCreating) {
@@ -103,6 +80,7 @@ struct TodayView: View {
     private func dayScroll(for due: [Habit], paused: [Habit]) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Theme.sectionSpacing) {
+                actionRow
                 header(for: due)
                     .dayEntrance(from: entranceEdge, index: 0)
                 if hasNoActiveHabits && due.isEmpty && paused.isEmpty {
@@ -142,7 +120,6 @@ struct TodayView: View {
             showsBarTitle = isScrolled
         }
         .sensoryFeedback(.selection, trigger: engine.startOfDay(shownDay))
-        .scrollEdgeEffectStyle(.hard, for: .top)
     }
 
     /// Beim Start, beim Zurückkehren in die App und um Mitternacht zeigt die Ansicht wieder heute, ohne Animation.
@@ -237,6 +214,29 @@ struct TodayView: View {
         }
         .buttonStyle(.hermes(.text))
         .accessibilityIdentifier("back-to-today")
+    }
+
+    /// Sortieren links und Plus rechts über dem Kopfbereich. Die Buttons stehen im Inhalt statt in der Navigationsleiste,
+    /// weil die Leiste nach einem Wechsel zwischen Hell und Dunkel bei laufender App ihre Farben nicht mehr aktualisiert.
+    private var actionRow: some View {
+        HStack {
+            HermesButton("Sortieren", variant: .text) {
+                isSorting = true
+            }
+            .fixedSize()
+            .disabled(hasNoActiveHabits)
+            .accessibilityIdentifier("sort-toggle")
+            Spacer()
+            Button {
+                isCreating = true
+            } label: {
+                Image(systemName: "plus")
+                    .font(Theme.Typography.symbol)
+                    .fixedControlTypeSize()
+            }
+            .buttonStyle(.hermes(.quiet, isSquare: true))
+            .accessibilityLabel("Neuer Habit")
+        }
     }
 
     /// Kopfbereich ohne Karte: Wochentag als großer Titel, Datum als Untertitel, darunter der Fortschritt.
