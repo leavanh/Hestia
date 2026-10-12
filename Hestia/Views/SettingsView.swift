@@ -13,7 +13,10 @@ struct SettingsView: View {
                     CalendarSection()
                     DisplaySection()
                     #if DEBUG && targetEnvironment(simulator)
-                    DeveloperSection()
+                    // Startargument für Store Screenshots: ohne Entwicklerbereich.
+                    if !ProcessInfo.processInfo.arguments.contains("-HestiaHideDeveloper") {
+                        DeveloperSection()
+                    }
                     #endif
                     Footer()
                 }
