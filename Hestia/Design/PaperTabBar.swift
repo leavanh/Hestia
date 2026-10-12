@@ -25,10 +25,9 @@ enum AppTab: String, CaseIterable, Identifiable {
     var identifier: String { "tab-\(rawValue)" }
 }
 
-/// Eigene flache Tab Bar statt der des Systems (Spezifikation 4.5 und 5.1): volle Breite, Fläche `background`, oben eine
-/// Haarlinie. Der gewählte Tab steht in `ink` mit einem 2 pt Strich an der Oberkante, die anderen in `inkSecondary`.
-/// Beim Wechsel gleitet der Strich zum neuen Tab.
-/// Kein Glas, kein Schatten.
+/// Eigene Tab Bar statt der des Systems, als schwebende Liquid Glass Leiste: eine Kapsel mit Abstand zum Rand, der
+/// gewählte Tab liegt auf einer eigenen Glaskapsel, die beim Wechsel zum neuen Tab gleitet. Der gewählte Tab steht in
+/// `ink`, die anderen in `inkSecondary`.
 struct PaperTabBar: View {
     @Binding var selection: AppTab
     /// Wird mit dem Tab aufgerufen, wenn der gerade gewählte Tab nochmals angetippt wird.
@@ -37,22 +36,19 @@ struct PaperTabBar: View {
     @Namespace private var indicator
 
     var body: some View {
-        HStack(spacing: 0) {
-            ForEach(AppTab.allCases) { tab in
-                item(tab)
+        GlassEffectContainer {
+            HStack(spacing: 0) {
+                ForEach(AppTab.allCases) { tab in
+                    item(tab)
+                }
             }
+            .padding(Theme.textSpacing)
+            .glassEffect(.clear.interactive(), in: .capsule)
         }
-        // Der Strich gleitet zum neuen Tab, Symbol und Label wechseln die Farbe weich mit.
+        // Die Glaskapsel gleitet zum neuen Tab, Symbol und Label wechseln die Farbe weich mit.
         .animation(.easeInOut(duration: Theme.tabChangeDuration), value: selection)
-        .background {
-            Theme.background
-                .ignoresSafeArea(edges: .bottom)
-        }
-        .overlay(alignment: .top) {
-            Rectangle()
-                .fill(Theme.hairline)
-                .frame(height: Theme.hairlineWidth)
-        }
+        .padding(.horizontal, Theme.spacing)
+        .padding(.bottom, Theme.textSpacing)
         .accessibilityElement(children: .contain)
         .accessibilityAddTraits(.isTabBar)
     }
@@ -77,18 +73,16 @@ struct PaperTabBar: View {
             }
             .fixedControlTypeSize()
             .foregroundStyle(isSelected ? Theme.ink : Theme.inkSecondary)
-            .padding(.top, Theme.inlineSpacing)
-            .padding(.bottom, Theme.textSpacing)
+            .padding(.vertical, Theme.textSpacing)
             .frame(maxWidth: .infinity, minHeight: Theme.buttonMinHeight)
-            .overlay(alignment: .top) {
+            .background {
                 if isSelected {
-                    Rectangle()
-                        .fill(Theme.ink)
-                        .frame(height: Theme.tabIndicatorHeight)
+                    Capsule()
+                        .fill(Theme.ink.opacity(Theme.fillOpacity))
                         .matchedGeometryEffect(id: "indicator", in: indicator)
                 }
             }
-            .contentShape(Rectangle())
+            .contentShape(Capsule())
             .accessibilityHidden(true)
         }
         .buttonStyle(.plain)

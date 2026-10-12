@@ -28,13 +28,15 @@ struct HabitDetailSheet: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .scrollEdgeEffectHidden(true, for: .top)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Fertig", systemImage: "checkmark", role: .confirm) {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
                         dismiss()
+                    } label: {
+                        Image(systemName: "checkmark")
                     }
+                    .accessibilityLabel("Fertig")
+                    .tint(.white)
                     .accessibilityIdentifier("detail-done")
-                    // Papier auf dem Band in Habitfarbe, damit der Haken nicht mit der blauen Systemtönung mischt.
-                    .tint(HabitColor(key: habit.colorKey).onColor)
                 }
             }
         }

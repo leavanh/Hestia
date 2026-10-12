@@ -34,12 +34,15 @@ struct RootView: View {
         TabView(selection: $selection) {
             Tab(AppTab.today.title, systemImage: AppTab.today.systemImage, value: AppTab.today) {
                 TodayView().environment(\.tabReselectCount, reselectCounts[.today, default: 0])
+                    .toolbarVisibility(.hidden, for: .tabBar)
             }
             Tab(AppTab.calendar.title, systemImage: AppTab.calendar.systemImage, value: AppTab.calendar) {
                 CalendarView().environment(\.tabReselectCount, reselectCounts[.calendar, default: 0])
+                    .toolbarVisibility(.hidden, for: .tabBar)
             }
             Tab(AppTab.settings.title, systemImage: AppTab.settings.systemImage, value: AppTab.settings) {
                 SettingsView().environment(\.tabReselectCount, reselectCounts[.settings, default: 0])
+                    .toolbarVisibility(.hidden, for: .tabBar)
             }
         }
         .toolbarVisibility(.hidden, for: .tabBar)
