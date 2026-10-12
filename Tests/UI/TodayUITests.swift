@@ -89,7 +89,11 @@ final class TodayUITests: XCTestCase {
         XCTAssertTrue(rhythm.waitForExistence(timeout: 5))
         XCTAssertTrue(rhythm.label.localizedCaseInsensitiveContains("20 Min"), "Rhythmus Zeile zeigt den Zusatz: \(rhythm.label)")
 
+        app.staticTexts[name].tap()
+        XCTAssertFalse(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 1.5), "Tippen öffnet kein Sheet")
+
         app.staticTexts[name].press(forDuration: 1.5)
+        XCTAssertTrue(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 5), "Langes Drücken öffnet das Sheet")
         XCTAssertTrue(app.textFields["detail-field"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.textFields["detail-field"].value as? String, "20 Min", "Bearbeiten zeigt den Zusatz im Feld")
 

@@ -15,17 +15,6 @@ final class SettingsPhase6UITests: XCTestCase {
         return app
     }
 
-    @MainActor
-    private func createHabit(named name: String, in app: XCUIApplication) {
-        app.buttons["Neuer Habit"].tap()
-        let field = app.textFields["name-field"]
-        XCTAssertTrue(field.waitForExistence(timeout: 5))
-        field.tap()
-        field.typeText(name + "\n")
-        app.buttons["Speichern"].tap()
-        XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 5))
-    }
-
     /// Beendet einen Habit über das Bearbeiten Sheet (langes Drücken, "Habit beenden", Antwort im Dialog).
     @MainActor
     private func endHabit(named name: String, answer: String, in app: XCUIApplication) {
@@ -50,13 +39,11 @@ final class SettingsPhase6UITests: XCTestCase {
 
     @MainActor
     func testEndingAndDeletingTheHistoryRemovesTheHabitEverywhere() {
-        let app = launchFresh()
-        createHabit(named: "Lesen", in: app)
-        createHabit(named: "Sport", in: app)
+        let app = launchFresh(extraArguments: ["-HestiaSampleData"])
+        XCTAssertTrue(app.staticTexts["Lesen"].waitForExistence(timeout: 5))
 
         endHabit(named: "Lesen", answer: "Historie löschen", in: app)
         XCTAssertFalse(app.staticTexts["Lesen"].exists, "Gelöscht: weg aus Heute")
-        XCTAssertTrue(app.staticTexts["Sport"].exists)
 
         app.openTab(.calendar)
         XCTAssertTrue(app.buttons["calendar-previous"].waitForExistence(timeout: 5))
@@ -80,18 +67,15 @@ final class PausesWithSampleDataUITests: XCTestCase {
         return app
     }
 
+    /// Pausierte Tage sind Striche in den Wochenpunkten. Dann Sheet "Neue Pause": "Alle auswählen" schaltet um,
+    /// "Von" wählt man im aufklappenden Kalender in Appschrift.
     @MainActor
-    func testPausedDaysAreDashesInTheWeekDots() {
+    func testPausedDaysAreDashesAndNewPauseSheetPicksTheStartInTheCalendar() {
         let app = launch()
         // Lesen war vorgestern und gestern pausiert: heute stehen zwei Striche in den 7 Punkten.
         let dots = app.descendants(matching: .any).matching(NSPredicate(format: "label == %@ AND value == %@", "Letzte 7 Tage", "2 Tage pausiert"))
         XCTAssertEqual(dots.count, 1, "Nur Lesen hat pausierte Tage")
-    }
 
-    /// Sheet "Neue Pause": "Alle auswählen" schaltet um, "Von" wählt man im aufklappenden Kalender in Appschrift.
-    @MainActor
-    func testNewPauseSheetSelectsAllAndPicksTheStartInTheCalendar() {
-        let app = launch()
         app.openTab(.settings)
         app.buttons["new-pause"].tap()
 

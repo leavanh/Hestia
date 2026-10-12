@@ -55,7 +55,7 @@ final class TodayPhase31UITests: XCTestCase {
     // MARK: Tag wechseln
 
     @MainActor
-    func testSwipingOnTheListChangesTheDay() {
+    func testSwipingChangesTheDayAndCheckingOnAPastDayDoesNotChangeToday() {
         let app = launchFresh(extraArguments: ["-HestiaSampleData"])
         let list = app.scrollViews["today-list"]
         XCTAssertTrue(list.waitForExistence(timeout: 5))
@@ -73,13 +73,7 @@ final class TodayPhase31UITests: XCTestCase {
 
         list.swipeLeft()
         assertShownDay(plus: 0, in: app, "Über heute hinaus geht es nicht")
-    }
 
-    @MainActor
-    func testCheckingOnAPastDayDoesNotChangeToday() {
-        let app = launchFresh(extraArguments: ["-HestiaSampleData"])
-        let list = app.scrollViews["today-list"]
-        XCTAssertTrue(list.waitForExistence(timeout: 5))
         // Beispieldaten: "Meditieren" ist weder heute noch gestern erledigt.
         XCTAssertFalse(app.buttons["check-Meditieren"].isSelected)
         let todayProgress = app.staticTexts["progress-text"].label

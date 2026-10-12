@@ -24,6 +24,8 @@ final class Phase81UITests: XCTestCase {
         XCTAssertTrue(app.tabButton(.today).waitForExistence(timeout: 5))
         XCTAssertTrue(app.tabButton(.today).isSelected)
         XCTAssertFalse(app.tabButton(.calendar).isSelected)
+        XCTAssertTrue(app.staticTexts["today-empty"].waitForExistence(timeout: 5), "Heute ohne Habits")
+        XCTAssertFalse(app.buttons["sort-toggle"].isEnabled, "Ohne Habits gibt es nichts zu sortieren")
 
         app.openTab(.calendar)
         XCTAssertTrue(app.staticTexts["calendar-empty"].waitForExistence(timeout: 5))
