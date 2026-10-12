@@ -19,6 +19,7 @@ struct HestiaApp: App {
                 UserDefaults.standard.removeObject(forKey: SettingsKey.appearance)
                 UserDefaults.standard.removeObject(forKey: SettingsKey.firstWeekday)
                 UserDefaults.standard.removeObject(forKey: SettingsKey.periods)
+                UserDefaults.standard.removeObject(forKey: SettingsKey.showStatusMark)
             }
             // Startargument für Vorschauen: legt zusätzlich die Testdaten aus den Einstellungen an.
             if ProcessInfo.processInfo.arguments.contains("-HestiaSampleData") {
@@ -39,6 +40,7 @@ struct HestiaApp: App {
         WindowGroup {
             RootView()
                 .modifier(AppSettingsModifier())
+                .task { await TipStore.finishUpdates() }
         }
         .modelContainer(container)
     }

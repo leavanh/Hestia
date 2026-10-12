@@ -2,13 +2,15 @@ import SwiftUI
 
 /// Quadratische Kachel (36 pt) mit Fläche `tint` und Symbol in `color`. Bei Status gelb oder rot sitzt oben rechts
 /// eine quadratische Statusmarke, die die Kachel leicht überlappt und durch einen freien Rand von ihr abgesetzt ist.
-/// Bei grün gibt es keine Marke, der Status bleibt für VoiceOver und Tests trotzdem als Wert verfügbar.
+/// Bei grün gibt es keine Marke (und in den Einstellungen lässt sich die Marke ganz ausblenden), der Status bleibt für VoiceOver und Tests trotzdem als Wert verfügbar.
 /// Ohne `status` (Habit Liste, Detail, Sheet "Neue Pause") ist das Icon reine Zierde und für VoiceOver ausgeblendet.
 struct HabitIconView: View {
     let habitName: String
     let iconName: String
     let color: HabitColor
     var status: HabitStatus?
+
+    @AppStorage(SettingsKey.showStatusMark) private var statusMark = StatusMarkSetting.show
 
     var body: some View {
         Image(systemName: iconName)
@@ -64,8 +66,10 @@ struct HabitIconView: View {
         }
     }
 
+    /// Keine Marke, wenn sie in den Einstellungen ausgeblendet ist. Status und VoiceOver Angabe bleiben.
     private var badgeColor: Color? {
-        switch status {
+        guard statusMark == .show else { return nil }
+        return switch status {
         case .green, nil: nil
         case .yellow: Theme.statusYellow
         case .red: Theme.statusRed

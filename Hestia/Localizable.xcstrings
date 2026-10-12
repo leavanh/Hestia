@@ -546,6 +546,23 @@
         }
       }
     },
+    "Anzeigen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show"
+          }
+        }
+      }
+    },
     "aufgeklappt" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -559,6 +576,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "expanded"
+          }
+        }
+      }
+    },
+    "Ausblenden" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide"
           }
         }
       }
@@ -733,6 +767,23 @@
         }
       }
     },
+    "Danke!" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danke!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thank you!"
+          }
+        }
+      }
+    },
     "Darstellung" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -763,6 +814,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The habit will no longer appear in Today. Keep its history in Calendar and statistics, or delete it? Deleted history cannot be restored."
+          }
+        }
+      }
+    },
+    "Der Kauf hat nicht geklappt." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Kauf hat nicht geklappt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The purchase did not go through."
           }
         }
       }
@@ -1034,6 +1102,23 @@
         }
       }
     },
+    "Gelbe oder rote Marke am Icon, wenn ein Habit Aufmerksamkeit braucht." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelbe oder rote Marke am Icon, wenn ein Habit Aufmerksamkeit braucht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yellow or red mark on the icon when a habit needs attention."
+          }
+        }
+      }
+    },
     "Geld" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1085,6 +1170,23 @@
         }
       }
     },
+    "Gerade nicht verfügbar" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerade nicht verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Currently unavailable"
+          }
+        }
+      }
+    },
     "Gesicht" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1115,6 +1217,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Yesterday"
+          }
+        }
+      }
+    },
+    "Groß" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Groß"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Large"
           }
         }
       }
@@ -1391,6 +1510,23 @@
         }
       }
     },
+    "Hestia bewerten" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hestia bewerten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rate Hestia"
+          }
+        }
+      }
+    },
     "Hestia Habits" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1404,6 +1540,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hestia Habits"
+          }
+        }
+      }
+    },
+    "Hestia ist kostenlos, ohne Werbung und ohne Konto. Wer die Entwicklung unterstützen möchte, kann ein Trinkgeld geben. Es schaltet nichts frei." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hestia ist kostenlos, ohne Werbung und ohne Konto. Wer die Entwicklung unterstützen möchte, kann ein Trinkgeld geben. Es schaltet nichts frei."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hestia is free, without ads and without an account. Anyone who wants to support development can leave a tip. It does not unlock anything."
+          }
+        }
+      }
+    },
+    "Hestia unterstützen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hestia unterstützen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support Hestia"
           }
         }
       }
@@ -1646,6 +1816,23 @@
         }
       }
     },
+    "Klein" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klein"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Small"
+          }
+        }
+      }
+    },
     "Kopf" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1812,6 +1999,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select at least one weekday."
+          }
+        }
+      }
+    },
+    "Mittel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mittel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medium"
           }
         }
       }
@@ -2258,6 +2462,23 @@
         }
       }
     },
+    "Schließen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
     "Schreiben" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2559,6 +2780,40 @@
       },
       "shouldTranslate" : false
     },
+    "Trinkgeld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trinkgeld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip"
+          }
+        }
+      }
+    },
+    "Unterstützen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unterstützen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support"
+          }
+        }
+      }
+    },
     "Version %@ (%@)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2572,6 +2827,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version %@ (%@)"
+          }
+        }
+      }
+    },
+    "Vielen Dank für die Unterstützung von Hestia." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vielen Dank für die Unterstützung von Hestia."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thank you for supporting Hestia."
           }
         }
       }

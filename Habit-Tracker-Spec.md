@@ -301,14 +301,14 @@ Werte, die nur zum Glas Design gehörten (z.B. `cornerRadius` 24, `iconBackgroun
 
 Systemleisten in Sheets (Abbrechen, Sichern, Fertig) bleiben Systembuttons, getönt in `ink`. Ihr Liquid Glass Aussehen wird akzeptiert, weil Sheets nur kurz zu sehen sind. Eigene Glasflächen gibt es nicht.
 
-**Ab Phase 8.1 kein Liquid Glass außerhalb von Sheets:** Die Tab Bar ist eine eigene flache Leiste (`PaperTabBar`, 4.5). Buttons in der Navigationsleiste eines Tabs (z.B. Plus und Sortieren in Heute) haben keine Glasfläche (`sharedBackgroundVisibility(.hidden)`) und nutzen `HermesButtonStyle`.
+**Ab Phase 8.1 kein Liquid Glass außerhalb von Sheets, Ausnahme Tab Bar:** Die Tab Bar ist die des Systems (5.1) und bleibt so, wie das System sie zeichnet. Buttons in der Navigationsleiste eines Tabs (z.B. Plus und Sortieren in Heute) haben keine Glasfläche (`sharedBackgroundVisibility(.hidden)`) und nutzen `HermesButtonStyle`.
 
 ### 4.5 Bausteine (einmal bauen, überall nutzen)
 
 | Baustein | Inhalt |
 |---|---|
 | `PaperBackground` | Fläche `background` für alle Bildschirme und Sheets. Ersetzt `GlassBackground`. |
-| `PaperTabBar` (ab Phase 8.1) | Eigene Tab Bar statt der des Systems (5.1). Volle Breite bis zum unteren Rand, Fläche `background`, oben eine Haarlinie. Drei gleich breite Felder mit SF Symbol (Schnitt regular, 20 pt) und Label in Rolle `label`. Gewählter Tab in `ink` mit einem 2 pt Strich in `ink` an der Oberkante des Felds, die anderen in `inkSecondary`. Keine Fläche, kein Glas, kein Schatten. |
+| Tab Bar | Die Tab Bar des Systems (`TabView`), ohne eigene Gestaltung. Einzige Anpassung: neutrale Tönung (`.tint(.primary)`, Schwarz bzw. Weiß) statt `ink`, damit die Leiste nicht blau ist. Der Inhalt der Tabs behält `ink` als Tönung. |
 | `PaperSection` | Abschnitt mit Überschrift in Rolle `meta` und darunter dem Inhalt, oben eine Haarlinie. Keine Karte. Ersetzt `GlassSection` und `glassCard()`. |
 | `HabitCard` | Flache Zeile ohne Karte, oben eine Haarlinie. Links `HabitIconView`, daneben Name (Rolle `title`), darunter die Rhythmus Zeile (4.5.1) und in derselben Zeile rechts daneben die 7 Tage Punkte (ab Phase 9, wie im Mockup; reicht der Platz bei großer Schrift nicht, stehen die Punkte darunter), rechts `CheckBox` oder `CounterControl`. Kein weiterer Text. Langes Drücken, Einsinken und VoiceOver Aktion wie bisher. |
 | `CheckBox` | Quadrat 36 pt mit 1 pt Rand in Habitfarbe. Abgehakt: gefüllt mit Habitfarbe, Häkchen in `onColor`. Ersetzt `CheckCircle`. |
@@ -398,6 +398,9 @@ Die App gibt es auf Deutsch (Entwicklungssprache) und Englisch, alle Texte stehe
 | Kalenderwoche | KW 41 | W41 |
 | Weitere | Weitere | Others |
 | Beenden | Habit beenden, Historie | End habit, history |
+| Unterstützen (ab Phase 18.1) | Hestia unterstützen · Trinkgeld · Klein · Mittel · Groß | Support Hestia · Tip · Small · Medium · Large |
+| Bewerten (ab Phase 18.1) | Hestia bewerten | Rate Hestia |
+| Statusmarke (ab Phase 18.1) | Statusmarke · Anzeigen · Ausblenden | Status mark · Show · Hide |
 
 **Regeln**
 - **Versalien:** Im Code und im Katalog steht jeder Text normal geschrieben, die Versalien entstehen in der Ansicht (Rollen `label` und `meta`, 4.3).
@@ -421,14 +424,14 @@ Die vollständige Zuordnung Deutsch zu Englisch steht im Katalog selbst.
 
 Ab Phase 8: Die Tab Bar bleibt die des Systems, getönt in `ink`. Hintergrund der Bildschirme ist `PaperBackground`. *(Ab Phase 8.1 ersetzt durch den nächsten Absatz.)*
 
-**Ab Phase 8.1:** Die Tab Bar ist `PaperTabBar` (4.5), die System Tab Bar ist ausgeblendet.
+**Ab Phase 18.1:** Die Tab Bar ist die des Systems (`TabView`) mit neutraler Tönung (4.5). Die frühere eigene Leiste `PaperTabBar` entfällt.
 - Reihenfolge, Namen und Symbole wie oben. Jeder Tab behält beim Wechsel seinen Zustand (Scrollposition, angezeigter Tag, Monat im Kalender), wie bisher mit `TabView`.
 - Der Inhalt jedes Tabs scrollt vollständig über der Leiste, die letzte Zeile wird nicht verdeckt. Sheets liegen über der Leiste.
 - Tippen auf den gerade gewählten Tab scrollt dessen Inhalt nach oben.
 - Die Labels wachsen mit Dynamic Type höchstens bis `Theme.maxCircleTypeSize` und brechen nie um. Bei Barrierefreiheitsgrößen zeigt langes Drücken auf einen Tab das Label groß an (Large Content Viewer), wie bei der System Tab Bar.
 - VoiceOver liest jeden Tab als Tab mit Namen, der gewählte ist als ausgewählt markiert, die Leiste meldet "Tab 1 von 3" usw.
-- Identifier: `tab-today`, `tab-calendar`, `tab-settings`.
-- **Wechsel animiert (ab Phase 9.1):** Der 2 pt Strich in der `PaperTabBar` gleitet zum neuen Tab, Symbol und Label wechseln die Farbe weich mit. Der neue Inhalt blendet ein und gleitet dabei ein kleines Stück (ca. 12 pt) aus der Richtung des Tabs herein (Tab weiter rechts: von rechts, weiter links: von links). Kurz (ca. 0,25 s) und weich, ohne Federn. Der Zustand jedes Tabs bleibt wie bisher erhalten. Tippen auf den gewählten Tab scrollt nur nach oben, ohne Übergang. Bei Reduce Motion nur Überblenden.
+- Identifier: `tab-today`, `tab-calendar`, `tab-settings` (per `accessibilityIdentifier` am `Tab`, in UI Tests über `app.tabBars.buttons[...]`).
+- **Wechsel animiert (ab Phase 9.1):** Die Auswahl in der Leiste wechselt mit der Animation des Systems. Der neue Inhalt blendet ein und gleitet dabei ein kleines Stück (ca. 12 pt) aus der Richtung des Tabs herein (Tab weiter rechts: von rechts, weiter links: von links). Kurz (ca. 0,25 s) und weich, ohne Federn. Der Zustand jedes Tabs bleibt wie bisher erhalten. Tippen auf den gewählten Tab scrollt nur nach oben, ohne Übergang. Bei Reduce Motion nur Überblenden.
 
 ### 5.2 Heute
 
@@ -563,7 +566,7 @@ Das Modell wurde in Phase 1 vollständig angelegt. In Phase 10 kommt `detail` an
 - ab Phase 15: Die `HabitEngine` bekommt Zeiträume (rollierend, Kalender) und Wochenbeginn als Eigenschaften, wie den Kalender. Alle Fensterberechnungen (`windowProgress`, `donePoints`, `status`, Streaks, Quote) gehen über eine Stelle, die je nach Zeitraum das rollierende Fenster oder den Kalenderzeitraum liefert. Ansichten erzeugen die Engine mit den aktuellen Einstellungen, ändert sich eine, rechnen sie neu.
 - Nimmt das "heutige" Datum immer als Parameter entgegen, damit Tests mit festen Daten möglich sind.
 
-**Einstellungen (ab Phase 14)** liegen nicht in SwiftData, sondern in UserDefaults (`@AppStorage`): `HestiaAppearance` (system, light, dark), `HestiaFirstWeekday` (automatic, monday, sunday) und ab Phase 15 `HestiaPeriods` (rolling, calendar). Fehlt ein Wert, gilt die Voreinstellung. Die Sprache speichert iOS selbst.
+**Einstellungen (ab Phase 14)** liegen nicht in SwiftData, sondern in UserDefaults (`@AppStorage`): `HestiaAppearance` (system, light, dark), `HestiaFirstWeekday` (automatic, monday, sunday) ab Phase 15 `HestiaPeriods` (rolling, calendar) und ab Phase 18.1 `HestiaShowStatusMark` (show, hide). Fehlt ein Wert, gilt die Voreinstellung. Die Sprache speichert iOS selbst.
 
 ---
 
@@ -921,7 +924,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Ziel:** Außerhalb von Sheets gibt es kein Liquid Glass mehr. Unten steht eine flache Leiste im Hermes Stil, und Plus und Sortieren in Heute haben keine Glasfläche. Dazu werden die Stellen behoben, die bei der Durchsicht der Screenshots nach Phase 8 aufgefallen sind.
 
 **Umfang**
-- **`PaperTabBar`** (4.5, 5.1): eigene flache Tab Bar mit Haarlinie oben und 2 pt Strich über dem gewählten Tab. Die System Tab Bar wird ausgeblendet, `TabView` bleibt für den Zustand der Tabs. Die Auswahl liegt in einem kleinen Enum (z.B. `AppTab`).
+- **Tab Bar** (4.5, 5.1): die des Systems, neutral getönt. Die Auswahl liegt in einem kleinen Enum (`AppTab`).
 - Inhalt, Sheets, Scrollen nach oben beim erneuten Tippen, Dynamic Type, Large Content Viewer und VoiceOver wie in 5.1.
 - **Plus und Sortieren in Heute:** Die Toolbar Einträge bekommen keine Glasfläche mehr (`sharedBackgroundVisibility(.hidden)`) und nutzen `HermesButtonStyle`:
   - Sortieren als Text "Sortieren" bzw. im Sortiermodus "Fertig" (Variante `text`, Rolle `label`), ohne Symbol.
@@ -1018,7 +1021,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - **Alle Habits sortieren** (5.2): Im Sortiermodus stehen alle aktiven Habits, auch erledigte, pausierte und am Tag nicht fällige, und alle lassen sich verschieben. Außerhalb des Sortiermodus bleiben erledigte unten und pausierte am Ende. Die Reihenfolge wird wie bisher in `sortOrder` gespeichert. Die Logik für die neue Reihenfolge liegt ohne Oberfläche (z.B. in `Habit.saveOrder` bzw. einer reinen Funktion daneben) und wird mit Unit Tests geprüft.
 - **Wochenstreifen ohne Verzögerung** (5.2): Beim Wischen durch die Tage erschien der Wochenstreifen bisher spürbar später als der Rest, weil er als drittes Glied der Kaskade (`dayEntrance` mit `index` 2) verzögert hereinfedert. Er gleitet jetzt gleichzeitig und gleich schnell wie Datumszeile und Titel, ohne Kaskade. Die Markierung des Tags wandert ebenso ohne Verzögerung. Datumszeile, Titel, Fortschritt und Liste behalten ihre Animation.
 - **Kleine Leiste beim Scrollen höher** (5.2): Bisher endete der Plus Button fast mit der Unterkante der Leiste und wirkte abgeschnitten. Die Leiste bekommt oben und unten mehr Innenabstand, Titel und Plus Button stehen mittig mit Luft.
-- **Übergang zwischen den Tabs** (5.1): Strich in der `PaperTabBar` gleitet zum neuen Tab, der Inhalt blendet mit kleinem Versatz aus der Richtung des Tabs ein (4.7).
+- **Übergang zwischen den Tabs** (5.1): Die Leiste animiert wie vom System, der Inhalt blendet mit kleinem Versatz aus der Richtung des Tabs ein (4.7).
 
 **Aufräumen (Pflicht, keine Überbleibsel)**
 - Löschen: Fall `segments` in `SegmentBarModel` samt Darstellung, `Theme.segmentBarMaxSegments` und `Theme.segmentBarSpacing`, falls danach unbenutzt. Kommentare in `SegmentBar.swift` anpassen.
@@ -1443,10 +1446,12 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Kein Kauf im UI Test (StoreKit Dialoge sind im UI Test unzuverlässig), den Kauf prüfe ich von Hand im Simulator.
 
 **Definition of Done**
-- [ ] In den Einstellungen gibt es den Abschnitt "Hestia" mit "Hestia unterstützen" (und "Hestia bewerten", sobald die App ID da ist).
-- [ ] Das Sheet zeigt Klein, Mittel und Groß mit Preisen. Im Simulator kann ich ein Trinkgeld kaufen und sehe danach "Danke!".
-- [ ] Mit Statusmarke "Ausblenden" ist am Icon nirgends mehr eine gelbe oder rote Marke zu sehen, mit "Anzeigen" wieder wie bisher. Die Wahl bleibt nach einem Neustart erhalten.
-- [ ] Der Screenshot der Einstellungen ist erneuert.
+- [x] In den Einstellungen gibt es den Abschnitt "Hestia" mit "Hestia unterstützen" (und "Hestia bewerten", sobald die App ID da ist).
+- [ ] Das Sheet zeigt Klein, Mittel und Groß mit Preisen. Im Simulator kann ich ein Trinkgeld kaufen und sehe danach "Danke!". *(Das Sheet mit den drei Stufen ist per UI Test belegt, den Kauf selbst prüfe ich von Hand: Scheme Hestia im Simulator starten, die StoreKit Datei `Hestia/Store.storekit` ist im Debug Schema eingetragen.)*
+- [x] Mit Statusmarke "Ausblenden" ist am Icon nirgends mehr eine gelbe oder rote Marke zu sehen, mit "Anzeigen" wieder wie bisher. Die Wahl bleibt nach einem Neustart erhalten.
+- ~~Der Screenshot der Einstellungen ist erneuert.~~ *Bewusst weggelassen, die Store Screenshots werden nicht neu gemacht.*
+
+*Stand (Simulator iPhone 18 Pro): neuer Abschnitt "Hestia" in den Einstellungen mit "Hestia unterstützen" (Sheet `SupportSheet`, `TipStore` mit StoreKit 2, Käufe werden sofort abgeschlossen, `Transaction.updates` läuft ab App Start). "Hestia bewerten" ist ausgeblendet, solange `ReviewLink.appID` leer ist. Statusmarke ein/aus im Abschnitt Anzeige (`HestiaShowStatusMark`), `-HestiaResetData` setzt sie zurück. `Store.storekit` liegt im Debug Schema und ist vom App Target ausgenommen (nicht im Release). Neu: `SupportTests` (URL, Produkt IDs), `Phase14UITests` erweitert. Unit Tests (307) und alle 24 UI Tests grün. Screenshots wurden bewusst nicht neu gemacht; echter Kauf nicht von mir geprüft.*
 
 ---
 

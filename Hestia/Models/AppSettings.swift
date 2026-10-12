@@ -5,6 +5,7 @@ enum SettingsKey {
     static let appearance = "HestiaAppearance"
     static let firstWeekday = "HestiaFirstWeekday"
     static let periods = "HestiaPeriods"
+    static let showStatusMark = "HestiaShowStatusMark"
 }
 
 extension Periods {
@@ -44,6 +45,19 @@ enum AppearanceSetting: String, CaseIterable {
         case .system: nil
         case .light: .light
         case .dark: .dark
+        }
+    }
+}
+
+/// Statusmarke am Icon (Spezifikation 5.5, Phase 18.1). Blendet nur die Marke aus, nie den Status. Gespeichert wird `rawValue`.
+enum StatusMarkSetting: String, CaseIterable {
+    case show
+    case hide
+
+    var title: String {
+        switch self {
+        case .show: localized("Anzeigen")
+        case .hide: localized("Ausblenden")
         }
     }
 }

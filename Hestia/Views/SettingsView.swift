@@ -1,7 +1,7 @@
 import SwiftData
 import SwiftUI
 
-/// Einstellungen (Spezifikation 5.5): Pausen, Kalender, Anzeige, in Debug Builds im Simulator der
+/// Einstellungen (Spezifikation 5.5): Pausen, Kalender, Anzeige, Hestia, in Debug Builds im Simulator der
 /// Entwicklerbereich und ganz unten der Fuß.
 struct SettingsView: View {
     var body: some View {
@@ -12,6 +12,7 @@ struct SettingsView: View {
                     PausesSection()
                     CalendarSection()
                     DisplaySection()
+                    HestiaSection()
                     #if DEBUG && targetEnvironment(simulator)
                     // Startargument für Store Screenshots: ohne Entwicklerbereich.
                     if !ProcessInfo.processInfo.arguments.contains("-HestiaHideDeveloper") {
@@ -69,6 +70,7 @@ private struct CalendarSection: View {
 /// Einstellungen > Anzeige: Darstellung System, Hell oder Dunkel (Phase 14).
 private struct DisplaySection: View {
     @AppStorage(SettingsKey.appearance) private var appearance = AppearanceSetting.system
+    @AppStorage(SettingsKey.showStatusMark) private var statusMark = StatusMarkSetting.show
     @Environment(\.openURL) private var openURL
 
     var body: some View {
@@ -84,6 +86,19 @@ private struct DisplaySection: View {
                 )
                 .accessibilityIdentifier("settings-appearance")
                 languageRow
+                Text("Statusmarke")
+                    .bodyText()
+                    .padding(.top, Theme.inlineSpacing)
+                SegmentedChoice(
+                    options: StatusMarkSetting.allCases,
+                    selection: $statusMark,
+                    title: \.title,
+                    id: { "settings-status-mark-\($0.rawValue)" }
+                )
+                .accessibilityIdentifier("settings-status-mark")
+                Text("Gelbe oder rote Marke am Icon, wenn ein Habit Aufmerksamkeit braucht.")
+                    .metaText()
+                    .foregroundStyle(Theme.inkSecondary)
             }
         }
     }
@@ -113,6 +128,46 @@ private struct DisplaySection: View {
         .buttonStyle(.plain)
         .padding(.top, Theme.inlineSpacing)
         .accessibilityIdentifier("settings-language")
+    }
+}
+
+/// Einstellungen > Hestia (Phase 18.1): Hestia bewerten (erst mit App ID) und Hestia unterstützen (Sheet mit Trinkgeld).
+private struct HestiaSection: View {
+    @Environment(\.openURL) private var openURL
+    @State private var isSupporting = false
+
+    var body: some View {
+        PaperSection(title: "Hestia") {
+            if let reviewURL = ReviewLink.url() {
+                row("Hestia bewerten", symbol: "arrow.up.right", identifier: "settings-rate") {
+                    openURL(reviewURL)
+                }
+            }
+            row("Hestia unterstützen", symbol: "chevron.right", identifier: "settings-support") {
+                isSupporting = true
+            }
+        }
+        .sheet(isPresented: $isSupporting) {
+            SupportSheet()
+        }
+    }
+
+    private func row(_ title: LocalizedStringKey, symbol: String, identifier: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: Theme.controlSpacing) {
+                Text(title)
+                    .bodyText()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Image(systemName: symbol)
+                    .font(Theme.Typography.symbolSmall)
+                    .accessibilityHidden(true)
+            }
+            .foregroundStyle(Theme.ink)
+            .frame(minHeight: Theme.controlSize)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(identifier)
     }
 }
 

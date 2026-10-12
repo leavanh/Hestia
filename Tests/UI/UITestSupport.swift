@@ -1,6 +1,6 @@
 import XCTest
 
-/// Die drei Tabs der eigenen Tab Bar (`PaperTabBar`), angesteuert über ihre Bezeichner `tab-today` usw.
+/// Die drei Tabs der Tab Bar, angesteuert über ihre Bezeichner `tab-today` usw.
 enum TabID: String {
     case today, calendar, settings
 
@@ -11,7 +11,7 @@ extension XCUIApplication {
     /// Tippt in der Tab Bar auf den Tab.
     @MainActor
     func openTab(_ tab: TabID) {
-        buttons[tab.identifier].tap()
+        tabBars.buttons[tab.identifier].tap()
     }
 
     /// Ein Baustein mit Bezeichner, egal welchen Typ ihn XCTest meldet (z.B. `StepperControl`).

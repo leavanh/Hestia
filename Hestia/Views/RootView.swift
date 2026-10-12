@@ -1,9 +1,9 @@
 import SwiftData
 import SwiftUI
 
-/// Die drei Tabs mit eigener Tab Bar (`PaperTabBar`). `TabView` hält nur den Zustand der Tabs, seine Leiste ist
-/// ausgeblendet (Spezifikation 5.1). Beim Wechsel blendet der neue Inhalt kurz ein und gleitet dabei ein kleines Stück
-/// aus der Richtung des Tabs herein (Tab weiter rechts: von rechts), bei Reduce Motion nur überblenden.
+/// Die drei Tabs mit der Tab Bar des Systems, in neutraler Tönung statt Blau (Spezifikation 5.1). Beim Wechsel blendet der
+/// neue Inhalt kurz ein und gleitet dabei ein kleines Stück aus der Richtung des Tabs herein (Tab weiter rechts: von
+/// rechts), bei Reduce Motion nur überblenden.
 struct RootView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var selection = AppTab.today
@@ -20,7 +20,10 @@ struct RootView: View {
         Binding(
             get: { selection },
             set: { new in
-                guard new != selection else { return }
+                guard new != selection else {
+                    reselectCounts[new, default: 0] += 1
+                    return
+                }
                 let tabs = AppTab.allCases
                 direction = (tabs.firstIndex(of: new) ?? 0) > (tabs.firstIndex(of: selection) ?? 0) ? 1 : -1
                 selection = new
@@ -29,24 +32,29 @@ struct RootView: View {
     }
 
     var body: some View {
+        TabView(selection: selectionBinding) {
+            Tab(AppTab.today.title, systemImage: AppTab.today.systemImage, value: AppTab.today) {
+                slideIn(TodayView().environment(\.tabReselectCount, reselectCounts[.today, default: 0]))
+            }
+            .accessibilityIdentifier(AppTab.today.identifier)
+            Tab(AppTab.calendar.title, systemImage: AppTab.calendar.systemImage, value: AppTab.calendar) {
+                slideIn(CalendarView().environment(\.tabReselectCount, reselectCounts[.calendar, default: 0]))
+            }
+            .accessibilityIdentifier(AppTab.calendar.identifier)
+            Tab(AppTab.settings.title, systemImage: AppTab.settings.systemImage, value: AppTab.settings) {
+                slideIn(SettingsView().environment(\.tabReselectCount, reselectCounts[.settings, default: 0]))
+            }
+            .accessibilityIdentifier(AppTab.settings.identifier)
+        }
+        // Die Leiste ist neutral getönt (Schwarz bzw. Weiß), der Inhalt der Tabs behält `ink`.
+        .tint(.primary)
+    }
+
+    /// Lässt den Inhalt eines Tabs beim Wechsel einblenden und ein Stück aus Richtung des Tabs hereingleiten.
+    private func slideIn<Content: View>(_ content: Content) -> some View {
         // Vorab gelesen, weil die Closure des `keyframeAnimator` nicht auf dem Main Actor läuft.
         let slideOffset = reduceMotion ? 0 : Theme.tabSlideOffset * direction
-        TabView(selection: $selection) {
-            Tab(AppTab.today.title, systemImage: AppTab.today.systemImage, value: AppTab.today) {
-                TodayView().environment(\.tabReselectCount, reselectCounts[.today, default: 0])
-                    .toolbarVisibility(.hidden, for: .tabBar)
-            }
-            Tab(AppTab.calendar.title, systemImage: AppTab.calendar.systemImage, value: AppTab.calendar) {
-                CalendarView().environment(\.tabReselectCount, reselectCounts[.calendar, default: 0])
-                    .toolbarVisibility(.hidden, for: .tabBar)
-            }
-            Tab(AppTab.settings.title, systemImage: AppTab.settings.systemImage, value: AppTab.settings) {
-                SettingsView().environment(\.tabReselectCount, reselectCounts[.settings, default: 0])
-                    .toolbarVisibility(.hidden, for: .tabBar)
-            }
-        }
-        .toolbarVisibility(.hidden, for: .tabBar)
-        .keyframeAnimator(initialValue: Transition(), trigger: selection) { content, value in
+        return content.tint(Theme.ink).keyframeAnimator(initialValue: Transition(), trigger: selection) { content, value in
             content
                 .opacity(1 - value.progress)
                 .offset(x: value.progress * slideOffset)
@@ -56,12 +64,6 @@ struct RootView: View {
                 CubicKeyframe(0, duration: Theme.tabChangeDuration)
             }
         }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            PaperTabBar(selection: selectionBinding) { tab in
-                reselectCounts[tab, default: 0] += 1
-            }
-        }
-        .tint(Theme.ink)
     }
 }
 

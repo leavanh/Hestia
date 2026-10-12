@@ -21,23 +21,23 @@ final class Phase81UITests: XCTestCase {
     @MainActor
     func testTabBarSwitchesBetweenTheThreeTabs() {
         let app = launch()
-        XCTAssertTrue(app.buttons["tab-today"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["tab-today"].isSelected)
-        XCTAssertFalse(app.buttons["tab-calendar"].isSelected)
+        XCTAssertTrue(app.tabBars.buttons["tab-today"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.tabBars.buttons["tab-today"].isSelected)
+        XCTAssertFalse(app.tabBars.buttons["tab-calendar"].isSelected)
 
         app.openTab(.calendar)
         XCTAssertTrue(app.staticTexts["calendar-empty"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["tab-calendar"].isSelected)
-        XCTAssertFalse(app.buttons["tab-today"].isSelected)
+        XCTAssertTrue(app.tabBars.buttons["tab-calendar"].isSelected)
+        XCTAssertFalse(app.tabBars.buttons["tab-today"].isSelected)
 
         app.openTab(.settings)
         XCTAssertTrue(app.staticTexts["no-pauses"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["tab-settings"].isSelected)
-        XCTAssertFalse(app.buttons["tab-calendar"].isSelected)
+        XCTAssertTrue(app.tabBars.buttons["tab-settings"].isSelected)
+        XCTAssertFalse(app.tabBars.buttons["tab-calendar"].isSelected)
 
         app.openTab(.today)
         XCTAssertTrue(app.staticTexts["today-empty"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["tab-today"].isSelected)
+        XCTAssertTrue(app.tabBars.buttons["tab-today"].isSelected)
     }
 
     // MARK: Plus und Sortieren

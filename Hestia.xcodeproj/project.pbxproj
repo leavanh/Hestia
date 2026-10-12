@@ -34,6 +34,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Store.storekit,
 			);
 			target = A10000000000000000000010 /* Hestia */;
 		};

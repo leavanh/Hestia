@@ -1,0 +1,77 @@
+{
+  "identifier": "4654CB71-6BF5-4A78-B9A6-5907ACA0E71D",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "2385A365-EDF9-48A6-A576-9B455ED49A43",
+      "localizations": [
+        {
+          "description": "Unterstützt die Entwicklung von Hestia.",
+          "displayName": "Kleines Trinkgeld",
+          "locale": "de"
+        },
+        {
+          "description": "Supports the development of Hestia.",
+          "displayName": "Small tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "de.vanheyden.Hestia.tip.small",
+      "referenceName": "Trinkgeld klein",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "5.99",
+      "familyShareable": false,
+      "internalID": "E12B10EB-5B2B-433E-9219-DEEEA2EBCB8E",
+      "localizations": [
+        {
+          "description": "Unterstützt die Entwicklung von Hestia.",
+          "displayName": "Mittleres Trinkgeld",
+          "locale": "de"
+        },
+        {
+          "description": "Supports the development of Hestia.",
+          "displayName": "Medium tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "de.vanheyden.Hestia.tip.medium",
+      "referenceName": "Trinkgeld mittel",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "9.99",
+      "familyShareable": false,
+      "internalID": "DE903FFE-A6B2-438F-B467-F10657F0E24B",
+      "localizations": [
+        {
+          "description": "Unterstützt die Entwicklung von Hestia.",
+          "displayName": "Großes Trinkgeld",
+          "locale": "de"
+        },
+        {
+          "description": "Supports the development of Hestia.",
+          "displayName": "Large tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "de.vanheyden.Hestia.tip.large",
+      "referenceName": "Trinkgeld groß",
+      "type": "Consumable"
+    }
+  ],
+  "settings": {
+    "_failTransactionsEnabled": false,
+    "_locale": "de_DE",
+    "_storefront": "DEU",
+    "_askToBuyEnabled": false
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 4,
+    "minor": 0
+  }
+}

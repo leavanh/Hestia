@@ -5,7 +5,7 @@ private struct ReselectCountKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    /// Zählt, wie oft der Tab dieser Ansicht erneut angetippt wurde, während er schon gewählt war (`PaperTabBar`).
+    /// Zählt, wie oft der Tab dieser Ansicht erneut angetippt wurde, während er schon gewählt war (System Tab Bar).
     var tabReselectCount: Int {
         get { self[ReselectCountKey.self] }
         set { self[ReselectCountKey.self] = newValue }

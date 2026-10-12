@@ -88,8 +88,6 @@ enum Theme {
     /// Beim Wechsel zwischen den Tabs gleitet der neue Inhalt um so viel herein, in dieser Zeit.
     static let tabSlideOffset: CGFloat = 12
     static let tabChangeDuration: Double = 0.25
-    /// Höhe des Strichs über dem gewählten Tab in `PaperTabBar`.
-    static let tabIndicatorHeight: CGFloat = 2
     /// Höhe des Strichs, der in `WeekDots` einen pausierten Tag zeigt.
     static let pausedDashHeight: CGFloat = 1
     /// Kantenlänge eines Tages in `MonthCalendar` und Abstand zwischen den Tagen.
