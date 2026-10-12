@@ -1,8 +1,8 @@
 import SwiftData
 import SwiftUI
 
-/// Einstellungen (Spezifikation 5.5): Pausen, Kalender, Anzeige, Über, in Debug Builds der Entwicklerbereich und ganz
-/// unten der Fuß.
+/// Einstellungen (Spezifikation 5.5): Pausen, Kalender, Anzeige, Über, in Debug Builds im Simulator der
+/// Entwicklerbereich und ganz unten der Fuß.
 struct SettingsView: View {
     var body: some View {
         NavigationStack {
@@ -13,7 +13,7 @@ struct SettingsView: View {
                     CalendarSection()
                     DisplaySection()
                     AboutSection()
-                    #if DEBUG
+                    #if DEBUG && targetEnvironment(simulator)
                     DeveloperSection()
                     #endif
                     Footer()
@@ -208,7 +208,7 @@ private struct PausesSection: View {
             if listed.isEmpty {
                 EmptyState(
                     title: "Keine Pausen",
-                    message: "Keine laufenden oder geplanten Pausen. Tage, an denen ein Habit nicht möglich ist, zählen mit einer Pause nicht mit.",
+                    message: "Keine laufenden oder geplanten Pausen. Pausierte Tage zählen nicht mit und unterbrechen keinen Streak.",
                     identifier: "no-pauses",
                     showsHairline: false
                 )
@@ -234,8 +234,9 @@ private struct PausesSection: View {
     }
 }
 
-#if DEBUG
-/// Einstellungen > Entwickler: Testdaten erzeugen und alle Daten zurücksetzen. Nur in Debug Builds.
+#if DEBUG && targetEnvironment(simulator)
+/// Einstellungen > Entwickler: Testdaten erzeugen und alle Daten zurücksetzen. Nur in Debug Builds im Simulator,
+/// nicht auf dem iPhone.
 private struct DeveloperSection: View {
     @Environment(\.modelContext) private var context
 

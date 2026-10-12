@@ -1640,19 +1640,19 @@
         }
       }
     },
-    "Keine laufenden oder geplanten Pausen. Tage, an denen ein Habit nicht möglich ist, zählen mit einer Pause nicht mit." : {
+    "Keine laufenden oder geplanten Pausen. Pausierte Tage zählen nicht mit und unterbrechen keinen Streak." : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keine laufenden oder geplanten Pausen. Tage, an denen ein Habit nicht möglich ist, zählen mit einer Pause nicht mit."
+            "value" : "Keine laufenden oder geplanten Pausen. Pausierte Tage zählen nicht mit und unterbrechen keinen Streak."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No running or planned pauses. Days when a habit isn't possible don't count during a pause."
+            "value" : "No current or planned pauses. Paused days don't count and don't break a streak."
           }
         }
       }
