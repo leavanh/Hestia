@@ -1,7 +1,7 @@
 import SwiftData
 import SwiftUI
 
-/// Die drei Tabs mit der Tab Bar des Systems, in neutraler Tönung statt Blau (Spezifikation 5.1). Beim Wechsel blendet der
+/// Die drei Tabs mit der Tab Bar des Systems, in `ink` getönt (Spezifikation 5.1). Beim Wechsel blendet der
 /// neue Inhalt kurz ein und gleitet dabei ein kleines Stück aus der Richtung des Tabs herein (Tab weiter rechts: von
 /// rechts), bei Reduce Motion nur überblenden.
 struct RootView: View {
@@ -46,15 +46,14 @@ struct RootView: View {
             }
             .accessibilityIdentifier(AppTab.settings.identifier)
         }
-        // Die Leiste ist neutral getönt (Schwarz bzw. Weiß), der Inhalt der Tabs behält `ink`.
-        .tint(.primary)
+        .tint(Theme.ink)
     }
 
     /// Lässt den Inhalt eines Tabs beim Wechsel einblenden und ein Stück aus Richtung des Tabs hereingleiten.
     private func slideIn<Content: View>(_ content: Content) -> some View {
         // Vorab gelesen, weil die Closure des `keyframeAnimator` nicht auf dem Main Actor läuft.
         let slideOffset = reduceMotion ? 0 : Theme.tabSlideOffset * direction
-        return content.tint(Theme.ink).keyframeAnimator(initialValue: Transition(), trigger: selection) { content, value in
+        return content.keyframeAnimator(initialValue: Transition(), trigger: selection) { content, value in
             content
                 .opacity(1 - value.progress)
                 .offset(x: value.progress * slideOffset)

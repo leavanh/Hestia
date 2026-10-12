@@ -308,7 +308,7 @@ Systemleisten in Sheets (Abbrechen, Sichern, Fertig) bleiben Systembuttons, get�
 | Baustein | Inhalt |
 |---|---|
 | `PaperBackground` | Fläche `background` für alle Bildschirme und Sheets. Ersetzt `GlassBackground`. |
-| Tab Bar | Die Tab Bar des Systems (`TabView`), ohne eigene Gestaltung. Einzige Anpassung: neutrale Tönung (`.tint(.primary)`, Schwarz bzw. Weiß) statt `ink`, damit die Leiste nicht blau ist. Der Inhalt der Tabs behält `ink` als Tönung. |
+| Tab Bar | Die Tab Bar des Systems (`TabView`), ohne eigene Gestaltung. Einzige Anpassung: Tönung in `ink` (`.tint(Theme.ink)`), der gewählte Tab ist also blau. |
 | `PaperSection` | Abschnitt mit Überschrift in Rolle `meta` und darunter dem Inhalt, oben eine Haarlinie. Keine Karte. Ersetzt `GlassSection` und `glassCard()`. |
 | `HabitCard` | Flache Zeile ohne Karte, oben eine Haarlinie. Links `HabitIconView`, daneben Name (Rolle `title`), darunter die Rhythmus Zeile (4.5.1) und in derselben Zeile rechts daneben die 7 Tage Punkte (ab Phase 9, wie im Mockup; reicht der Platz bei großer Schrift nicht, stehen die Punkte darunter), rechts `CheckBox` oder `CounterControl`. Kein weiterer Text. Langes Drücken, Einsinken und VoiceOver Aktion wie bisher. |
 | `CheckBox` | Quadrat 36 pt mit 1 pt Rand in Habitfarbe. Abgehakt: gefüllt mit Habitfarbe, Häkchen in `onColor`. Ersetzt `CheckCircle`. |
@@ -424,7 +424,7 @@ Die vollständige Zuordnung Deutsch zu Englisch steht im Katalog selbst.
 
 Ab Phase 8: Die Tab Bar bleibt die des Systems, getönt in `ink`. Hintergrund der Bildschirme ist `PaperBackground`. *(Ab Phase 8.1 ersetzt durch den nächsten Absatz.)*
 
-**Ab Phase 18.1:** Die Tab Bar ist die des Systems (`TabView`) mit neutraler Tönung (4.5). Die frühere eigene Leiste `PaperTabBar` entfällt.
+**Ab Phase 18.1:** Die Tab Bar ist die des Systems (`TabView`) mit Tönung in `ink` (4.5). Die frühere eigene Leiste `PaperTabBar` entfällt.
 - Reihenfolge, Namen und Symbole wie oben. Jeder Tab behält beim Wechsel seinen Zustand (Scrollposition, angezeigter Tag, Monat im Kalender), wie bisher mit `TabView`.
 - Der Inhalt jedes Tabs scrollt vollständig über der Leiste, die letzte Zeile wird nicht verdeckt. Sheets liegen über der Leiste.
 - Tippen auf den gerade gewählten Tab scrollt dessen Inhalt nach oben.
@@ -924,7 +924,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Ziel:** Außerhalb von Sheets gibt es kein Liquid Glass mehr. Unten steht eine flache Leiste im Hermes Stil, und Plus und Sortieren in Heute haben keine Glasfläche. Dazu werden die Stellen behoben, die bei der Durchsicht der Screenshots nach Phase 8 aufgefallen sind.
 
 **Umfang**
-- **Tab Bar** (4.5, 5.1): die des Systems, neutral getönt. Die Auswahl liegt in einem kleinen Enum (`AppTab`).
+- **Tab Bar** (4.5, 5.1): die des Systems, in `ink` getönt. Die Auswahl liegt in einem kleinen Enum (`AppTab`).
 - Inhalt, Sheets, Scrollen nach oben beim erneuten Tippen, Dynamic Type, Large Content Viewer und VoiceOver wie in 5.1.
 - **Plus und Sortieren in Heute:** Die Toolbar Einträge bekommen keine Glasfläche mehr (`sharedBackgroundVisibility(.hidden)`) und nutzen `HermesButtonStyle`:
   - Sortieren als Text "Sortieren" bzw. im Sortiermodus "Fertig" (Variante `text`, Rolle `label`), ohne Symbol.
