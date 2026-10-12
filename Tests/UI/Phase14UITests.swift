@@ -1,6 +1,6 @@
 import XCTest
 
-/// Prüft die Definition of Done von Phase 14 direkt in der Oberfläche: Wochenbeginn und "Über Hestia".
+/// Prüft die Definition of Done von Phase 14 direkt in der Oberfläche: Wochenbeginn. Die Einstellungen haben keinen Abschnitt "Über" mehr (Phase 17).
 /// Der Test startet mit leerem Datenbestand und zurückgesetzten Einstellungen (`-HestiaResetData`).
 final class Phase14UITests: XCTestCase {
     override func setUp() {
@@ -8,7 +8,7 @@ final class Phase14UITests: XCTestCase {
     }
 
     @MainActor
-    func testFirstWeekdaySundayAndAboutSheet() {
+    func testFirstWeekdaySundayAndNoAboutSection() {
         let app = XCUIApplication()
         app.launchArguments = ["-HestiaResetData"]
         app.launch()
@@ -25,12 +25,8 @@ final class Phase14UITests: XCTestCase {
         XCTAssertTrue(strip.element(boundBy: 0).label.hasPrefix("Sonntag"), "Das erste Feld des Wochenstreifens ist ein Sonntag")
 
         app.openTab(.settings)
-        let about = app.control("settings-about")
-        for _ in 0..<6 where !about.isHittable { app.swipeUp() }
-        about.tap()
-        XCTAssertTrue(app.control("about-font-Barlow Condensed").waitForExistence(timeout: 5))
-        app.buttons["about-done"].tap()
-        XCTAssertTrue(app.control("settings-about").waitForExistence(timeout: 5))
-        XCTAssertFalse(app.control("about-font-Barlow Condensed").exists)
+        for _ in 0..<6 { app.swipeUp() }
+        XCTAssertFalse(app.control("settings-about").exists, "Kein Abschnitt Über")
+        XCTAssertFalse(app.staticTexts["Über Hestia"].exists)
     }
 }

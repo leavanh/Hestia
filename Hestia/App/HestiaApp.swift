@@ -10,7 +10,7 @@ struct HestiaApp: App {
 
     private let container: ModelContainer = {
         do {
-            let container = try ModelContainer(for: Habit.self, Completion.self, Pause.self)
+            let container = try ModelContainer.hestia()
             #if DEBUG
             // Startargument für UI Tests: beginnt mit leerem Datenbestand.
             if ProcessInfo.processInfo.arguments.contains("-HestiaResetData") {

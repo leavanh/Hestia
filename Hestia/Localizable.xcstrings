@@ -659,23 +659,6 @@
         }
       }
     },
-    "Bilder" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bilder"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Images"
-          }
-        }
-      }
-    },
     "Bis" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1776,23 +1759,6 @@
         }
       }
     },
-    "Lizenztext nicht in der App enthalten." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lizenztext nicht in der App enthalten."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "License text not included in the app."
-          }
-        }
-      }
-    },
     "Malen" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2320,23 +2286,6 @@
         }
       }
     },
-    "Schriften" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schriften"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fonts"
-          }
-        }
-      }
-    },
     "Sobald in Heute Habits angelegt und abgehakt sind, färben sich hier die Tage und Streaks erscheinen." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2620,40 +2569,6 @@
         }
       },
       "shouldTranslate" : false
-    },
-    "Über" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Über"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "About"
-          }
-        }
-      }
-    },
-    "Über Hestia" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Über Hestia"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "About Hestia"
-          }
-        }
-      }
     },
     "Version %@ (%@)" : {
       "extractionState" : "manual",

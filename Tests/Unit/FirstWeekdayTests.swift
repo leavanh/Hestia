@@ -75,9 +75,11 @@ struct FirstWeekdayTests {
         #expect(AppearanceSetting.dark.colorScheme == .dark)
     }
 
-    @Test func aboutLicensesAreInTheBundle() {
-        for font in AboutFont.all {
-            #expect(font.licenseText.contains("SIL OPEN FONT LICENSE"), "Lizenz für \(font.name) fehlt")
+    @Test func fontLicensesAreInTheBundle() {
+        for file in ["OFL-BarlowCondensed", "OFL-Antonio", "OFL-GeistMono"] {
+            let url = Bundle.main.url(forResource: file, withExtension: "txt")
+            let text = url.flatMap { try? String(contentsOf: $0, encoding: .utf8) } ?? ""
+            #expect(text.contains("SIL OPEN FONT LICENSE"), "Lizenz \(file) fehlt")
         }
     }
 }

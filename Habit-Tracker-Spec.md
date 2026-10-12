@@ -501,16 +501,13 @@ Speichern nur möglich, wenn Name nicht leer.
 - Beendete Habits haben keinen Platz in den Einstellungen (3.9).
 - **Entwickler** (nur in Debug Builds im Simulator sichtbar, ab Phase 16.1 nicht mehr auf dem iPhone): "Testdaten erzeugen" und "Alle Daten zurücksetzen". Startargumente für Vorschauen und UI Tests: `-HestiaSampleData` und dazu `-HestiaSamplePauses` (Lesen war vorgestern und gestern pausiert, Sport hat eine geplante Pause ab übermorgen).
 - **Fuß (ab Phase 12):** Ganz unten steht linksbündig die Wortmarke `HESTIA / HABITS` (zweizeilig, Barlow Condensed Regular, 56 pt, Versalien, Farbe `inkSecondary`) und darunter die Version in Rolle `meta`. Sie ist der einzige Ort der Wortmarke in der App und kein Button. **Ab Phase 14:** Rechts neben der Wortmarke steht klein dieselbe Figur wie in Heute ohne Habits (die Vestalin, 5.2), 80 pt hoch und damit etwas niedriger als die zwei Zeilen der Wortmarke, mit der Grundlinie von "HABITS" ausgerichtet. Sie ist dekorativ und für VoiceOver ausgeblendet.
-- **Aufbau ab Phase 14** (von oben nach unten): Titel "Einstellungen", Abschnitt **Pausen** (wie bisher), Abschnitt **Kalender** (Wochenbeginn, ab Phase 15 Zeiträume), Abschnitt **Anzeige** (Darstellung, ab Phase 16 Sprache), Abschnitt **Über**, in Debug Builds im Simulator **Entwickler**, ganz unten der Fuß. Alle Abschnitte sind `PaperSection`, es gibt keine neuen Bausteine.
+- **Aufbau ab Phase 14** (von oben nach unten): Titel "Einstellungen", Abschnitt **Pausen** (wie bisher), Abschnitt **Kalender** (Wochenbeginn, ab Phase 15 Zeiträume), Abschnitt **Anzeige** (Darstellung, ab Phase 16 Sprache), in Debug Builds im Simulator **Entwickler**, ganz unten der Fuß. Alle Abschnitte sind `PaperSection`, es gibt keine neuen Bausteine.
 - **Darstellung (ab Phase 14):** `SegmentedChoice` mit "System", "Hell", "Dunkel", Voreinstellung "System". Die Wahl gilt sofort für die ganze App samt Sheets (`.preferredColorScheme` an der Wurzel, `nil` bei System). Gespeichert in UserDefaults (`@AppStorage`, Schlüssel `HestiaAppearance`). Der Startbildschirm folgt weiter dem System, das lässt iOS nicht anders zu.
 - **Wochenbeginn (ab Phase 14):** `SegmentedChoice` mit "Automatisch", "Montag", "Sonntag", Voreinstellung "Automatisch". Automatisch übernimmt den ersten Wochentag aus den Systemeinstellungen (`Locale.current`, iOS: Allgemein › Sprache & Region › Erster Wochentag). Gespeichert in UserDefaults (Schlüssel `HestiaFirstWeekday`).
   - Bei rollierenden Zeiträumen ändert der Wochenbeginn **nur die Anzeige**, nie die Rechnung. Status, Streaks und Quoten bleiben gleich. Ab Phase 15 legt er bei Zeiträumen "Kalender" auch fest, wann eine Woche für die Rechnung beginnt (3.5).
   - Er gilt für: Wochenstreifen in Heute (5.2), Wochentagszeile und Raster im `MonthCalendar` (Tab, Detail, `DateRow`), Reihenfolge der 7 Quadrate im `WeekdayPicker` (5.3), Reihenfolge der Tage in der Rhythmus Zeile (4.5.1, z.B. "SO · MI" statt "MI · SO"). Gespeichert bleibt `weekdays` unverändert (1 = Montag bis 7 = Sonntag).
   - **Kalenderwoche:** Bei Montag ist sie wie bisher die ISO Kalenderwoche. Bei einem anderen Wochenbeginn zählt sie Wochen ab diesem Tag mit der ISO Regel für die erste Woche (mindestens 4 Tage im neuen Jahr). So gehört jeder Tag im Wochenstreifen zur selben KW wie die Datumszeile.
-- **Über (ab Phase 14):** Zeile "Über Hestia" im Abschnitt Über, Tippen öffnet ein Sheet (Titel "Über", Systembutton "Fertig"). Inhalt:
-  - **Schriften:** je eine Zeile für Barlow Condensed, Antonio und Geist Mono mit Urheber und "SIL Open Font License 1.1". Tippen auf eine Zeile zeigt im Sheet den vollen Lizenztext aus der mitgelieferten Datei (`OFL-*.txt`, Rolle `body`, scrollbar).
-  - **Bilder** (nur wenn die Stiche aus Phase 12 in der App sind): je eine Zeile mit Titel des Stichs, "The Metropolitan Museum of Art", "CC0".
-  - Version und Wortmarke stehen nicht im Sheet, sondern weiter im Fuß.
+- **Über (Phase 14 bis 16, ab Phase 17 entfernt):** Die App hat kein "Über" mehr, weder Abschnitt noch Sheet. Schriften und Bildquellen stehen in der README und in `Branding/QUELLEN.md`, die Lizenzdateien `OFL-*.txt` liegen weiter im App Bundle.
 - **Zeiträume (ab Phase 15):** `SegmentedChoice` mit "Rollierend" und "Kalender", Voreinstellung "Rollierend" (wie bisher). Darunter in Rolle `meta` eine Zeile, die die gewählte Variante erklärt: "Die letzten 7 bzw. 30 Tage" oder "Die laufende Woche bzw. der laufende Monat". Gilt für alle Habits mit Rhythmus pro Woche und pro Monat (3.5). Gespeichert in UserDefaults (Schlüssel `HestiaPeriods`). Ein Wechsel rechnet Status, Streaks und Quoten auch für die Vergangenheit neu (wie 3.10), gespeicherte Erledigungen ändern sich nicht.
 - **Sprache (ab Phase 16):** Zeile "Sprache" im Abschnitt Anzeige, rechts die aktuelle Sprache der App in ihrem eigenen Namen ("Deutsch", "English"), dahinter ein Pfeil nach außen. Tippen öffnet die Seite der App in den iOS Einstellungen (`UIApplication.openSettingsURLString`), dort wählt man die Sprache. Es gibt keinen eigenen Umschalter in der App. iOS zeigt die Sprachwahl erst, wenn die App mehr als eine Sprache mitbringt.
 
@@ -519,6 +516,8 @@ Speichern nur möglich, wenn Name nicht leer.
 ## 6. Datenmodell (SwiftData)
 
 Das Modell wurde in Phase 1 vollständig angelegt. In Phase 10 kommt `detail` an `Habit` dazu (leichte Migration, Feld mit Standardwert). In Phase 3.1 entfallen `timeSlots` und `sortIndex`, neu ist `sortOrder`. Das ist eine leichte Migration (Feld entfernt, Feld mit Standardwert hinzugefügt), vorhandene Habits und Erledigungen bleiben erhalten.
+
+**Ab Phase 17 ist das Modell versioniert:** `HestiaSchemaV1` (`VersionedSchema` mit `Habit`, `Completion`, `Pause`) und `HestiaMigrationPlan` ohne Stufen, in `Hestia/Models/HestiaSchema.swift`. Die App öffnet ihre Datenbank über `ModelContainer.hestia()`. **Jede spätere Änderung am Modell kommt als neue Version (`HestiaSchemaV2` usw.) mit einer Migrationsstufe**, sonst gehen nach einem Update Daten verloren.
 
 **Habit**
 - `id: UUID`
@@ -1377,11 +1376,15 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Kein neuer UI Test.
 
 **Definition of Done**
-- [ ] In den Einstellungen gibt es kein "Über" mehr.
+- [x] In den Einstellungen gibt es kein "Über" mehr.
 - [ ] Meine Habits auf dem iPhone sind nach dem Update auf diese Version noch alle da.
-- [ ] Die Datenbank liegt im App-Ordner und ist nicht vom Backup ausgenommen (per Unit Test geprüft, der Simulator kann kein iCloud-Backup wiederherstellen).
+- [x] Die Datenbank liegt im App-Ordner und ist nicht vom Backup ausgenommen (per Unit Test geprüft, der Simulator kann kein iCloud-Backup wiederherstellen).
 - [ ] Ein Archiv (Product › Archive) mit dem Team meines Freundes baut und lässt sich in Xcode ohne Fehler prüfen ("Validate App").
 - [ ] Die README ist auf GitHub öffentlich lesbar, mit Datenschutz, Support und Buy-Me-a-Coffee-Link.
+
+*Stand (Simulator iPhone 18 Pro): Über entfernt (`AboutSheet.swift`, Abschnitt in den Einstellungen, fünf Katalogtexte), `Phase14UITests` prüft, dass es keinen Abschnitt "Über" gibt. Neu: `PrivacyInfo.xcprivacy` (kein Tracking, keine Daten, UserDefaults mit `CA92.1`; sonst keine Required Reason APIs im Code), `ITSAppUsesNonExemptEncryption = NO`, `HestiaSchemaV1` mit `HestiaMigrationPlan`. Neue `SchemaMigrationTests`: ein ohne Schema Version angelegter Bestand (Habits, Erledigungen, Pausen) öffnet mit V1 ohne Verlust, die Datenbank liegt in Application Support und ist nicht vom Backup ausgenommen, Manifest und Verschlüsselungsangabe sind im Bundle. Unit Tests (304) grün. Release Build für iOS baut ohne Warnungen, Entwicklercode liegt hinter `#if DEBUG`, Version 1.0 (1). Die README liegt im Repository.*
+
+*Offen, braucht Dinge von außen: (1) Signing auf das Team des Freundes (Team ID von ihm, derzeit steht `68SBFGA64J` im Projekt) und danach Product › Archive mit "Validate App". (2) Prüfen, dass das GitHub Repository öffentlich ist. (3) Ob die Habits auf meinem iPhone nach dem Update noch da sind, kann nur ich dort sehen; der Test deckt den Bestandsfall ab.*
 
 ---
 

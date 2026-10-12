@@ -1,7 +1,7 @@
 import SwiftData
 import SwiftUI
 
-/// Einstellungen (Spezifikation 5.5): Pausen, Kalender, Anzeige, Über, in Debug Builds im Simulator der
+/// Einstellungen (Spezifikation 5.5): Pausen, Kalender, Anzeige, in Debug Builds im Simulator der
 /// Entwicklerbereich und ganz unten der Fuß.
 struct SettingsView: View {
     var body: some View {
@@ -12,7 +12,6 @@ struct SettingsView: View {
                     PausesSection()
                     CalendarSection()
                     DisplaySection()
-                    AboutSection()
                     #if DEBUG && targetEnvironment(simulator)
                     DeveloperSection()
                     #endif
@@ -111,36 +110,6 @@ private struct DisplaySection: View {
         .buttonStyle(.plain)
         .padding(.top, Theme.inlineSpacing)
         .accessibilityIdentifier("settings-language")
-    }
-}
-
-/// Einstellungen > Über: Zeile "Über Hestia", die das Sheet mit Schriften und Bildquellen öffnet (Phase 14).
-private struct AboutSection: View {
-    @State private var isShowingAbout = false
-
-    var body: some View {
-        PaperSection(title: "Über") {
-            Button {
-                isShowingAbout = true
-            } label: {
-                HStack(spacing: Theme.controlSpacing) {
-                    Text("Über Hestia")
-                        .bodyText()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Image(systemName: "chevron.right")
-                        .font(Theme.Typography.symbolSmall)
-                        .accessibilityHidden(true)
-                }
-                .foregroundStyle(Theme.ink)
-                .frame(minHeight: Theme.controlSize)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("settings-about")
-        }
-        .sheet(isPresented: $isShowingAbout) {
-            AboutSheet()
-        }
     }
 }
 
