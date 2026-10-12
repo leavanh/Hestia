@@ -396,7 +396,7 @@ Die App gibt es auf Deutsch (Entwicklungssprache) und Englisch, alle Texte stehe
 | Streak | Streak, Tage in Folge | streak, days in a row |
 | Quote | Quote | Rate |
 | Kalenderwoche | KW 41 | W41 |
-| Weitere (Abschnitt in Heute, ab Phase 18.2) | Heute nicht fällig | Not due today |
+| Weitere (Abschnitt in Heute, ab Phase 18.2) | Nicht fällig | Not due |
 | Beenden | Habit beenden, Historie | End habit, history |
 | Unterstützen (ab Phase 18.1) | Hestia unterstützen · Trinkgeld · Klein · Mittel · Groß | Support Hestia · Tip · Small · Medium · Large |
 | Bewerten (ab Phase 18.1) | Hestia bewerten | Rate Hestia |
@@ -456,7 +456,7 @@ Ab Phase 8: Die Tab Bar bleibt die des Systems, getönt in `ink`. Hintergrund de
   - Ist Weitere leer, fehlt der Abschnitt ganz. Ist die Hauptliste leer, aber Weitere nicht, zeigt das Band "Nichts fällig" und darunter steht nur Weitere.
   - Gilt genauso für vergangene Tage und im Sheet "Tag bearbeiten". Im Sortiermodus ist Weitere ausgeblendet, der Sortiermodus zeigt wie bisher alle aktiven Habits.
   - VoiceOver: Die Kopfzeile ist ein Button "Weitere, 3 Habits" mit Zustand auf- bzw. zugeklappt. Identifier `other-habits-toggle`, die Karten behalten ihre Identifier.
-  - **Ab Phase 18.2** heißt der Abschnitt in der Oberfläche "Heute nicht fällig · 3" (Englisch "Not due today · 3", VoiceOver "Heute nicht fällig, 3 Habits"), auch an vergangenen Tagen und im Sheet "Tag bearbeiten". In der Spezifikation und im Code heißt er weiter "Weitere".
+  - **Ab Phase 18.2** heißt der Abschnitt in der Oberfläche "Nicht fällig · 3" (Englisch "Not due · 3", VoiceOver "Nicht fällig, 3 Habits"), auch an vergangenen Tagen und im Sheet "Tag bearbeiten". In der Spezifikation und im Code heißt er weiter "Weitere".
 - **Reihenfolge:** Oben die offenen Habits, darunter die erledigten. Innerhalb beider Teile gilt die gespeicherte Reihenfolge (`sortOrder`, dann `createdAt`). Erledigt heißt: Am angezeigten Tag ist das Tagesziel erreicht, also Abhakkreis abgehakt bzw. Counter voll. Ein Wochen oder Monats Habit, dessen Fenster erfüllt ist, der am angezeigten Tag aber nicht abgehakt ist, bleibt oben. Wird ein Habit erledigt, rutscht er animiert nach unten, wird es wieder aufgehoben, rutscht er animiert zurück an seinen Platz.
 - **Bearbeiten:** Festes Drücken (ca. 0,6 s) auf die Karte (nicht auf Kreis/Counter) öffnet das Bearbeiten Sheet. Die Karte sinkt dabei ein und gibt ein haptisches Signal, beim Auslösen ein festeres. Einfaches Tippen auf die Karte tut nichts. Für VoiceOver gibt es auf der Karte die Aktion "Bearbeiten".
 - **Sortieren:** Im Sortiermodus Habits per Drag and Drop verschieben. Es gibt eine Reihenfolge für alle Habits, sie wird gespeichert. Auch im Sortiermodus stehen erledigte Habits unten. Verschieben lassen sich nur die offenen Habits, die erledigten sind im Sortiermodus nicht verschiebbar. Nach dem Verschieben bekommen die offenen Habits in ihrer neuen Reihenfolge die vorderen Plätze in `sortOrder`, die erledigten folgen dahinter in ihrer bisherigen Reihenfolge. *(Ab Phase 9.1 ersetzt durch den nächsten Punkt.)*
@@ -1460,14 +1460,14 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 
 ### Phase 18.2: Kleine Korrekturen vor der Veröffentlichung
 
-**Ziel:** Vier kleine Dinge, die mir beim Benutzen aufgefallen sind, sind behoben: Rhythmus im Sheet ist bequem erreichbar, Wochenbeginn heißt "System", Weitere heißt "Heute nicht fällig", im Sortiermodus fehlt der Haken.
+**Ziel:** Vier kleine Dinge, die mir beim Benutzen aufgefallen sind, sind behoben: Rhythmus im Sheet ist bequem erreichbar, Wochenbeginn heißt "System", Weitere heißt "Nicht fällig", im Sortiermodus fehlt der Haken.
 
 **Umfang**
 - **Sheet "Habit anlegen / bearbeiten" (5.3):** Unter dem letzten Feld (Rhythmus bzw. "Habit beenden") steht zusätzlicher Leerraum (`Theme.sheetBottomSpace`, ca. 160 pt), damit sich der Rhythmus weiter nach oben scrollen lässt und nicht am unteren Rand klebt.
 - **Einstellungen, Wochenbeginn (5.5):** Die erste Wahl heißt "System" statt "Automatisch" (Englisch "System" statt "Automatic"), wie bei Darstellung. Verhalten, Schlüssel und gespeicherter Wert (`automatic`) bleiben gleich.
-- **Heute, Weitere (5.2):** Der Abschnitt heißt "Heute nicht fällig · 3" (Englisch "Not due today · 3"), VoiceOver "Heute nicht fällig, 3 Habits". Gilt auch an vergangenen Tagen und im Sheet "Tag bearbeiten". Verhalten, Schlüssel `HestiaOtherExpanded` und Identifier `other-habits-toggle` bleiben. Im Code darf er weiter "Other" heißen.
+- **Heute, Weitere (5.2):** Der Abschnitt heißt "Nicht fällig · 3" (Englisch "Not due · 3"), VoiceOver "Nicht fällig, 3 Habits". Gilt auch an vergangenen Tagen und im Sheet "Tag bearbeiten". Verhalten, Schlüssel `HestiaOtherExpanded` und Identifier `other-habits-toggle` bleiben. Im Code darf er weiter "Other" heißen.
 - **Sortiermodus (5.2):** Der Haken für am Tag erledigte Habits entfällt. Pausierte tragen weiter die ausgegraute Kapsel "Pausiert".
-- **Texte** in `Localizable.xcstrings`, Glossar 4.8 anpassen (Weitere → Heute nicht fällig / Not due today). "Weitere · %lld", "Weitere, %@" und "Automatisch" aus dem Katalog entfernen.
+- **Texte** in `Localizable.xcstrings`, Glossar 4.8 anpassen (Weitere → Nicht fällig / Not due). "Weitere · %lld", "Weitere, %@" und "Automatisch" aus dem Katalog entfernen.
 - **Spezifikation:** 4.8, 5.2, 5.3, 5.5.
 
 **Pflicht Testfälle**
@@ -1476,10 +1476,10 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Definition of Done**
 - [x] Im Sheet "Neuer Habit" kann ich so weit scrollen, dass der Rhythmus mit seiner Einstellung bequem in der Mitte des Bildschirms steht.
 - [x] In den Einstellungen heißt die erste Wahl bei Wochenbeginn "System".
-- [x] In Heute heißt der Abschnitt unter der Liste "Heute nicht fällig", auf Englisch "Not due today".
+- [x] In Heute heißt der Abschnitt unter der Liste "Nicht fällig", auf Englisch "Not due".
 - [x] Im Sortiermodus ist bei erledigten Habits kein Haken mehr zu sehen.
 
-*Geprüft im Simulator (iPhone 18 Pro) mit Testdaten: "Heute nicht fällig · 5" unter der Liste, Sortiermodus ohne Haken, Wochenbeginn "System · Montag · Sonntag", im Sheet "Neuer Habit" lässt sich der Rhythmus auch mit offener Tastatur bis unter die Leiste scrollen. Unit Tests (310) und alle 24 UI Tests grün, Build ohne Warnungen. Bestehende Tests mussten nicht angepasst werden, keiner prüfte die alten Texte oder den Haken.*
+*Geprüft im Simulator (iPhone 18 Pro) mit Testdaten: "Nicht fällig · 5" unter der Liste, Sortiermodus ohne Haken, Wochenbeginn "System · Montag · Sonntag", im Sheet "Neuer Habit" lässt sich der Rhythmus auch mit offener Tastatur bis unter die Leiste scrollen. Unit Tests (310) und alle 24 UI Tests grün, Build ohne Warnungen. Bestehende Tests mussten nicht angepasst werden, keiner prüfte die alten Texte oder den Haken.*
 
 ---
 
@@ -1490,7 +1490,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Entschieden**
 - **Ganze Seite statt Sheet:** Das Detail wird in der `NavigationStack` des Tabs geöffnet (Push), nicht als Sheet. Oben links der Zurück Button des Systems, getönt in `onColor`, Wischen vom linken Rand geht ebenfalls zurück. Die Tab Bar ist im Detail ausgeblendet. Das Band reicht wie bisher bis unter die Statusleiste. Der runde Haken "Fertig" entfällt. Heute bekommt dafür eine `NavigationStack` mit ausgeblendeter Leiste, Kopfband, kleine Leiste und Wischen bleiben wie sie sind.
 - **Welcher Tag:** Aus Heute gilt der angezeigte Tag (auch ein vergangener), aus der Habit Liste im Kalender heute. Im Sheet "Tag bearbeiten" öffnet Antippen das Detail für den gewählten Tag innerhalb des Sheets (Push im Sheet, Zurück führt zur Liste des Tages).
-- **Antippen statt langes Drücken:** Tippen auf die linke Seite einer Karte (Icon, Name, Rhythmus Zeile) öffnet das Detail, Kreis und Counter rechts haken wie bisher ab. Gilt für Hauptliste, "Heute nicht fällig", pausierte Habits und das Sheet "Tag bearbeiten". Langes Drücken, Einsinken und die Haptik dazu entfallen. VoiceOver: die linke Seite ist ein Button mit dem Namen des Habits, die Aktion "Bearbeiten" entfällt.
+- **Antippen statt langes Drücken:** Tippen auf die linke Seite einer Karte (Icon, Name, Rhythmus Zeile) öffnet das Detail, Kreis und Counter rechts haken wie bisher ab. Gilt für Hauptliste, "Nicht fällig", pausierte Habits und das Sheet "Tag bearbeiten". Langes Drücken, Einsinken und die Haptik dazu entfallen. VoiceOver: die linke Seite ist ein Button mit dem Namen des Habits, die Aktion "Bearbeiten" entfällt.
 - **"Habit beenden" zieht ins Detail um.** Im Sheet "Habit bearbeiten" gibt es es nicht mehr, damit es nur einen Ort dafür gibt.
 - **Pausieren** öffnet das bestehende Sheet "Neue Pause" mit diesem Habit vorausgewählt. Andere Habits lassen sich dort wie gewohnt dazunehmen.
 - Ein **beendeter Habit** zeigt im Detail nur Band, Kennzahlen und Kalender: kein Abhaken, kein Bearbeiten, Pausieren oder Beenden.

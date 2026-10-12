@@ -2950,36 +2950,36 @@
         }
       }
     },
-    "Heute nicht fällig · %lld" : {
+    "Nicht fällig · %lld" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Heute nicht fällig · %lld"
+            "value" : "Nicht fällig · %lld"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Not due today · %lld"
+            "value" : "Not due · %lld"
           }
         }
       }
     },
-    "Heute nicht fällig, %@" : {
+    "Nicht fällig, %@" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Heute nicht fällig, %@"
+            "value" : "Nicht fällig, %@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Not due today, %@"
+            "value" : "Not due, %@"
           }
         }
       }
