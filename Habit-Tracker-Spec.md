@@ -314,7 +314,7 @@ Systemleisten in Sheets (Abbrechen, Sichern, Fertig) bleiben Systembuttons, get�
 | `CheckBox` | Quadrat 36 pt mit 1 pt Rand in Habitfarbe. Abgehakt: gefüllt mit Habitfarbe, Häkchen in `onColor`. Ersetzt `CheckCircle`. |
 | `CounterControl` | Taste "−" (Quadrat 26 pt), Wert als "5/8" (Rolle `meta` in Medium, gleich breite Ziffern), Taste "+". Kein Ring mehr. Gesperrte Taste mit `disabledOpacity`. Gesamthöhe wie `CheckBox`. |
 | `WeekDots` | 7 Quadrate (6 pt). Füllung wie 3.6 (Deckkraft nach Anteil), 0 = Habitfarbe mit 22 %. Der angezeigte Tag hat einen äußeren quadratischen Rahmen in Habitfarbe mit verringerter Deckkraft. Ab Phase 9.1 steht vor dem angezeigten Tag mehr Abstand, sodass zwischen Rahmen und Nachbarquadrat mindestens `Theme.dotSpacing` frei bleibt (Wert in `Theme`, z.B. `dotRingClearance`). Der Rahmen berührt nichts. Pausierte Tage: kurzer waagrechter Strich in `ink` mit Pausen Deckkraft. |
-| `HabitIconView` | Quadratische Kachel (36 pt), Fläche `tint`, Symbol in `color`. Bei Status gelb oder rot oben rechts eine quadratische Statusmarke in Statusfarbe, mit schmalem freiem Rand in `background`. Bei grün keine Marke. |
+| `HabitIconView` | Quadratische Kachel (36 pt), Fläche `tint`, Symbol in `color`. Bei Status gelb oder rot oben rechts eine quadratische Statusmarke in Statusfarbe, mit schmalem freiem Rand in `background`. Bei grün keine Marke. Ab Phase 18.1 lässt sich die Marke in den Einstellungen ausblenden (5.5). |
 | `Chip` | Kleine Kapsel mit 2 pt Ecken, Rolle `label` in klein (11 pt), Fläche `ink` mit 14 %. Für "Pausiert". Ersetzt `DayBadge`. |
 | `DayHeader` | Das Kopfband in Heute (5.2): Datumszeile, Titel, Fortschritt, `SegmentBar`, `WeekStrip`. Ersetzt `ProgressHeader` und den bisherigen Kopf. |
 | `SegmentBar` | Fortschritt als Reihe kurzer Balken (3 pt hoch, 3 pt Abstand), ein Balken pro Punkt (3.4), erledigte Punkte voll, offene mit 25 %. Bei mehr als 12 Punkten ein durchgehender Balken mit Füllung nach Prozent. Ersetzt `ProgressRing`. **Ab Phase 9.1 immer ein durchgehender Balken** (3 pt hoch, offener Teil mit 25 %, gefüllter Teil nach Prozent), unabhängig von der Anzahl der Punkte. Ändert sich der Fortschritt, wächst bzw. schrumpft die Füllung kurz animiert. |
@@ -501,7 +501,7 @@ Speichern nur möglich, wenn Name nicht leer.
 - Beendete Habits haben keinen Platz in den Einstellungen (3.9).
 - **Entwickler** (nur in Debug Builds im Simulator sichtbar, ab Phase 16.1 nicht mehr auf dem iPhone): "Testdaten erzeugen" und "Alle Daten zurücksetzen". Startargumente für Vorschauen und UI Tests: `-HestiaSampleData` und dazu `-HestiaSamplePauses` (Lesen war vorgestern und gestern pausiert, Sport hat eine geplante Pause ab übermorgen).
 - **Fuß (ab Phase 12):** Ganz unten steht linksbündig die Wortmarke `HESTIA / HABITS` (zweizeilig, Barlow Condensed Regular, 56 pt, Versalien, Farbe `inkSecondary`) und darunter die Version in Rolle `meta`. Sie ist der einzige Ort der Wortmarke in der App und kein Button. **Ab Phase 14:** Rechts neben der Wortmarke steht klein dieselbe Figur wie in Heute ohne Habits (die Vestalin, 5.2), 80 pt hoch und damit etwas niedriger als die zwei Zeilen der Wortmarke, mit der Grundlinie von "HABITS" ausgerichtet. Sie ist dekorativ und für VoiceOver ausgeblendet.
-- **Aufbau ab Phase 14** (von oben nach unten): Titel "Einstellungen", Abschnitt **Pausen** (wie bisher), Abschnitt **Kalender** (Wochenbeginn, ab Phase 15 Zeiträume), Abschnitt **Anzeige** (Darstellung, ab Phase 16 Sprache), in Debug Builds im Simulator **Entwickler**, ganz unten der Fuß. Alle Abschnitte sind `PaperSection`, es gibt keine neuen Bausteine.
+- **Aufbau ab Phase 14** (von oben nach unten): Titel "Einstellungen", Abschnitt **Pausen** (wie bisher), Abschnitt **Kalender** (Wochenbeginn, ab Phase 15 Zeiträume), Abschnitt **Anzeige** (Darstellung, ab Phase 16 Sprache, ab Phase 18.1 Statusmarke), ab Phase 18.1 Abschnitt **Hestia** (Bewerten, Unterstützen), in Debug Builds im Simulator **Entwickler**, ganz unten der Fuß. Alle Abschnitte sind `PaperSection`, es gibt keine neuen Bausteine.
 - **Darstellung (ab Phase 14):** `SegmentedChoice` mit "System", "Hell", "Dunkel", Voreinstellung "System". Die Wahl gilt sofort für die ganze App samt Sheets (`.preferredColorScheme` an der Wurzel, `nil` bei System). Gespeichert in UserDefaults (`@AppStorage`, Schlüssel `HestiaAppearance`). Der Startbildschirm folgt weiter dem System, das lässt iOS nicht anders zu.
 - **Wochenbeginn (ab Phase 14):** `SegmentedChoice` mit "Automatisch", "Montag", "Sonntag", Voreinstellung "Automatisch". Automatisch übernimmt den ersten Wochentag aus den Systemeinstellungen (`Locale.current`, iOS: Allgemein › Sprache & Region › Erster Wochentag). Gespeichert in UserDefaults (Schlüssel `HestiaFirstWeekday`).
   - Bei rollierenden Zeiträumen ändert der Wochenbeginn **nur die Anzeige**, nie die Rechnung. Status, Streaks und Quoten bleiben gleich. Ab Phase 15 legt er bei Zeiträumen "Kalender" auch fest, wann eine Woche für die Rechnung beginnt (3.5).
@@ -510,6 +510,8 @@ Speichern nur möglich, wenn Name nicht leer.
 - **Über (Phase 14 bis 16, ab Phase 17 entfernt):** Die App hat kein "Über" mehr, weder Abschnitt noch Sheet. Schriften und Bildquellen stehen in der README und in `Branding/QUELLEN.md`, die Lizenzdateien `OFL-*.txt` liegen weiter im App Bundle.
 - **Zeiträume (ab Phase 15):** `SegmentedChoice` mit "Rollierend" und "Kalender", Voreinstellung "Rollierend" (wie bisher). Darunter in Rolle `meta` eine Zeile, die die gewählte Variante erklärt: "Die letzten 7 bzw. 30 Tage" oder "Die laufende Woche bzw. der laufende Monat". Gilt für alle Habits mit Rhythmus pro Woche und pro Monat (3.5). Gespeichert in UserDefaults (Schlüssel `HestiaPeriods`). Ein Wechsel rechnet Status, Streaks und Quoten auch für die Vergangenheit neu (wie 3.10), gespeicherte Erledigungen ändern sich nicht.
 - **Sprache (ab Phase 16):** Zeile "Sprache" im Abschnitt Anzeige, rechts die aktuelle Sprache der App in ihrem eigenen Namen ("Deutsch", "English"), dahinter ein Pfeil nach außen. Tippen öffnet die Seite der App in den iOS Einstellungen (`UIApplication.openSettingsURLString`), dort wählt man die Sprache. Es gibt keinen eigenen Umschalter in der App. iOS zeigt die Sprachwahl erst, wenn die App mehr als eine Sprache mitbringt.
+- **Statusmarke (ab Phase 18.1):** `SegmentedChoice` "Anzeigen" / "Ausblenden" im Abschnitt Anzeige, Voreinstellung "Anzeigen", Schlüssel `HestiaShowStatusMark`. Blendet nur die Marke am Icon aus, nie den Status selbst (Phase 18.1).
+- **Hestia (ab Phase 18.1):** Zeilen "Hestia bewerten" (Bewertungsseite im App Store, erst sichtbar mit App ID) und "Hestia unterstützen" (Sheet mit Trinkgeld Klein, Mittel, Groß per In-App-Kauf). Einzelheiten in Phase 18.1.
 
 ---
 
@@ -1352,10 +1354,10 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 
 **Entschieden:**
 - **Kein "Über":** Abschnitt "Über" in den Einstellungen und das Sheet "Über" entfallen. Pflicht ist die Nennung nicht: Die SIL Open Font License verlangt nur, dass der Lizenztext mit der Schrift mitgeliefert wird (die `OFL-*.txt` bleiben deshalb im App Bundle), die Stiche sind CC0. Die Quellen stehen weiter in `Branding/QUELLEN.md` und in der README.
-- **Veröffentlichung** über das Apple Developer Program meines Freundes. Im App Store steht deshalb sein Name (bzw. der Name seines Accounts) als Anbieter. Die App ist kostenlos, ohne In-App-Käufe und ohne Werbung.
-- **Händlerstatus (EU):** "kein Händler", weil ich kein Geld mit der App verdiene. Die Angabe gilt für den ganzen Account, mein Freund muss sie in App Store Connect machen bzw. bestätigen.
+- **Veröffentlichung** über das Apple Developer Program meines Freundes. Im App Store steht deshalb sein Name (bzw. der Name seines Accounts) als Anbieter. Die App ist kostenlos, ohne In-App-Käufe und ohne Werbung. *(Ab Phase 18.1 mit freiwilligem Trinkgeld per In-App-Kauf.)*
+- **Händlerstatus (EU):** "kein Händler", weil ich kein Geld mit der App verdiene. Die Angabe gilt für den ganzen Account, mein Freund muss sie in App Store Connect machen bzw. bestätigen. *(Mit dem Trinkgeld ab Phase 18.1 neu zu entscheiden, Phase 19 Schritt 1.)*
 - **Datenschutz und Support:** ein Abschnitt in der README auf GitHub. Die App erhebt keine Daten, alles bleibt auf dem iPhone.
-- **Buy Me a Coffee** (`https://buymeacoffee.com/leavanh`) nur in der README, nicht in der App: Apple lässt Trinkgeld an Entwickler in der App nur über In-App-Kauf zu (Richtlinie 3.1.1). Ein Link nach außen riskiert die Ablehnung, ein In-App-Kauf bräuchte Bankdaten und Verträge im Account und würde den Händlerstatus berühren.
+- **Buy Me a Coffee** (`https://buymeacoffee.com/leavanh`) nur in der README, nicht in der App: Apple lässt Trinkgeld an Entwickler in der App nur über In-App-Kauf zu (Richtlinie 3.1.1). Ein Link nach außen riskiert die Ablehnung, ein In-App-Kauf bräuchte Bankdaten und Verträge im Account und würde den Händlerstatus berühren. *(Ab Phase 18.1 gibt es ein Trinkgeld per In-App-Kauf, die Klärung mit dem Account steht in Phase 19.)*
 - **Lizenz:** keine Lizenzdatei. Das Repository ist öffentlich zum Lesen, alle Rechte vorbehalten (steht in der README). Schriften und Bilder behalten ihre eigenen Lizenzen.
 - **Copyright** im Store: "2026 Lea Schulz-Vanheyden". Als Anbieter steht der Account meines Freundes da, das darf abweichen.
 - **Name im Store:** "Hestia Habits". Auf dem Homescreen bleibt "Hestia".
@@ -1367,7 +1369,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - **Verschlüsselung:** `ITSAppUsesNonExemptEncryption = NO` in die Info.plist, damit App Store Connect nicht bei jedem Build fragt.
 - **Datenmodell versionieren:** Das heutige Modell wird `HestiaSchemaV1` (`VersionedSchema` mit `Habit`, `Completion`, `Pause`), dazu ein `SchemaMigrationPlan` ohne Stufen. Der `ModelContainer` startet mit diesem Plan. Spätere Änderungen am Modell kommen als V2 mit Migrationsstufe, damit nach einem Update keine Daten verloren gehen. Abschnitt 6 bekommt den Hinweis.
 - **Release Build prüfen:** Archiv baut ohne Warnungen, kein Entwicklercode und keine Startargumente im Release (alles hinter `#if DEBUG`), Version 1.0, Build 1.
-- **Signing:** *Verschoben nach Phase 18 (Ablauf 3), weil die Team ID noch fehlt.* Team und Bundle ID auf den Account meines Freundes (Team ID von ihm). Die Bundle ID `de.vanheyden.Hestia` bleibt, falls sie in seinem Team frei ist.
+- **Signing:** *Verschoben nach Phase 19 (Schritt 2), weil die Team ID noch fehlt.* Team und Bundle ID auf den Account meines Freundes (Team ID von ihm). Die Bundle ID `de.vanheyden.Hestia` bleibt, falls sie in seinem Team frei ist.
 - **README.md** im Repository (Deutsch und Englisch): kurze Beschreibung mit Screenshot, Abschnitt **Datenschutz** ("Hestia erhebt, speichert und übermittelt keine personenbezogenen Daten. Alle Habits bleiben lokal auf dem Gerät."), Abschnitt **Support** (Issues auf GitHub), Schriften und Bildquellen mit Lizenz, Buy-Me-a-Coffee-Link. Das Repository muss dafür öffentlich sein.
 
 **Pflicht Testfälle**
@@ -1379,36 +1381,134 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - [x] In den Einstellungen gibt es kein "Über" mehr.
 - [x] Meine Habits auf dem iPhone sind nach dem Update auf diese Version noch alle da.
 - [x] Die Datenbank liegt im App-Ordner und ist nicht vom Backup ausgenommen (per Unit Test geprüft, der Simulator kann kein iCloud-Backup wiederherstellen).
-- ~~Ein Archiv (Product › Archive) mit dem Team meines Freundes baut und lässt sich in Xcode ohne Fehler prüfen ("Validate App").~~ *Verschoben nach Phase 18, Ablauf 3 (braucht die Team ID).*
+- ~~Ein Archiv (Product › Archive) mit dem Team meines Freundes baut und lässt sich in Xcode ohne Fehler prüfen ("Validate App").~~ *Verschoben nach Phase 19, Schritt 2 (braucht die Team ID).*
 - [x] Die README ist auf GitHub öffentlich lesbar, mit Datenschutz, Support und Buy-Me-a-Coffee-Link.
 
 *Stand (Simulator iPhone 18 Pro): Über entfernt (`AboutSheet.swift`, Abschnitt in den Einstellungen, fünf Katalogtexte), `Phase14UITests` prüft, dass es keinen Abschnitt "Über" gibt. Neu: `PrivacyInfo.xcprivacy` (kein Tracking, keine Daten, UserDefaults mit `CA92.1`; sonst keine Required Reason APIs im Code), `ITSAppUsesNonExemptEncryption = NO`, `HestiaSchemaV1` mit `HestiaMigrationPlan`. Neue `SchemaMigrationTests`: ein ohne Schema Version angelegter Bestand (Habits, Erledigungen, Pausen) öffnet mit V1 ohne Verlust, die Datenbank liegt in Application Support und ist nicht vom Backup ausgenommen, Manifest und Verschlüsselungsangabe sind im Bundle. Unit Tests (304) grün. Release Build für iOS baut ohne Warnungen, Entwicklercode liegt hinter `#if DEBUG`, Version 1.0 (1). Die README ist auf GitHub ohne Anmeldung abrufbar (Repository und `raw` der README antworten mit 200).*
 
-*Habits auf dem iPhone nach dem Update: von mir geprüft, alle noch da. Signing auf das Team des Freundes und das Archiv mit "Validate App" sind nach Phase 18 verschoben, weil die Team ID noch fehlt (im Projekt steht bis dahin `68SBFGA64J`).*
+*Habits auf dem iPhone nach dem Update: von mir geprüft, alle noch da. Signing auf das Team des Freundes und das Archiv mit "Validate App" sind nach Phase 19 verschoben, weil die Team ID noch fehlt (im Projekt steht bis dahin `68SBFGA64J`).*
 
 ---
 
-### Phase 18: Store-Eintrag und Veröffentlichung
+### Phase 18: Store-Texte und Screenshots
 
-**Ziel:** Hestia Habits steht im App Store, auf Deutsch und Englisch.
+**Ziel:** Texte und Screenshots für den Store-Eintrag liegen fertig in `Store/`, auf Deutsch und Englisch.
 
-**Ablauf (Reihenfolge ist Pflicht)**
-1. **Texte:** Die KI schlägt Untertitel (höchstens 30 Zeichen), Werbetext (170), Beschreibung (4000) und Keywords (100) auf Deutsch und Englisch vor, neutral ohne "du" und "Sie" wie in 4.8. Ich entscheide.
-2. **Screenshots:** Die KI macht im Simulator Screenshots in 6,9 Zoll (iPhone 18 Pro Max, 1320 × 2868) mit den Testdaten, Hell, auf Deutsch und auf Englisch: Heute, Habit Detail, Kalender, Sheet "Neuer Habit", Einstellungen. Ich wähle aus.
-3. **Signing und Archiv** (aus Phase 17 verschoben, braucht die Team ID des Freundes): Team und Bundle ID im Projekt umstellen, Product › Archive baut ohne Fehler, "Validate App" in Xcode ohne Fehler.
-4. **App Store Connect** (mein Freund oder ich mit Zugang zu seinem Team):
-   - App anlegen: Name "Hestia Habits", Hauptsprache Deutsch, Bundle ID, SKU (z.B. `hestia-habits`).
-   - Kategorie: Gesundheit & Fitness, zweite Kategorie Produktivität.
-   - Preis kostenlos, alle Länder.
-   - App-Datenschutz: "Keine Daten erfasst". Datenschutz-URL und Support-URL: README auf GitHub.
-   - Altersfreigabe: Fragebogen, alles "Nein" (4+).
-   - Copyright: "2026 Lea Schulz-Vanheyden".
-   - Angaben für die Prüfung: Kontakt (Name, E-Mail, Telefon), keine Anmeldung nötig.
-5. **TestFlight:** Build hochladen, einige Tage auf meinem iPhone benutzen.
-6. **Einreichen** zur Prüfung, Veröffentlichung von Hand nach der Freigabe.
+*Alles, was ich selbst in Xcode, App Store Connect und mit meinem Freund erledigen muss, steht jetzt in Phase 19.*
+
+**Ablauf**
+1. **Texte:** Die KI schlägt Untertitel (höchstens 30 Zeichen), Werbetext (170), Beschreibung (4000) und Keywords (100) auf Deutsch und Englisch vor, neutral ohne "du" und "Sie" wie in 4.8. Ich entscheide. Ablage: `Store/Texte.md`.
+2. **Screenshots:** Die KI macht im Simulator Screenshots in 6,9 Zoll (iPhone 18 Pro Max, 1320 × 2868) mit den Testdaten, Hell, auf Deutsch und auf Englisch: Heute, Habit Detail, Kalender, Sheet "Neuer Habit", Einstellungen (ohne Entwicklerbereich). Ich wähle aus. Ablage: `Store/Screenshots/`.
 
 **Definition of Done**
-- [ ] Ein Archiv mit dem Team meines Freundes baut und lässt sich in Xcode ohne Fehler prüfen ("Validate App"), aus Phase 17.
-- [ ] Texte und Screenshots sind von mir freigegeben.
-- [ ] Die TestFlight Version lief einige Tage auf meinem iPhone ohne Probleme.
-- [ ] Die App ist von Apple freigegeben und im App Store zu finden.
+- [x] Texte als Entwurf in `Store/Texte.md`.
+- [x] Screenshots in 6,9 Zoll, Deutsch und Englisch, in `Store/Screenshots/`.
+- [ ] Texte und Screenshots sind von mir freigegeben (der Screenshot der Einstellungen wird in Phase 18.1 erneuert).
+
+---
+
+### Phase 18.1: Unterstützen, Bewerten und Statusmarke
+
+**Ziel:** In den Einstellungen kann man Hestia im App Store bewerten und mit einem kleinen, mittleren oder großen Trinkgeld unterstützen. Außerdem lässt sich die gelbe und rote Statusmarke am Icon ausblenden.
+
+**Entschieden:**
+- **Trinkgeld per In-App-Kauf** (überholt die Entscheidung "ohne In-App-Käufe" aus Phase 17): drei Verbrauchsartikel (Consumable), die nichts freischalten. Die App bleibt kostenlos und vollständig nutzbar. Apple lässt Trinkgeld an Entwickler nur so zu (Richtlinie 3.1.1), ein Link nach außen (Buy Me a Coffee) bleibt deshalb weiter nur in der README.
+- **Stufen und Preise:** Klein 2,99 €, Mittel 5,99 €, Groß 9,99 € (Preisstufen in App Store Connect, andere Länder rechnet Apple um). Die App zeigt immer den Preis aus StoreKit (`displayPrice`), nie einen festen Text.
+- **Produkt IDs:** `de.vanheyden.Hestia.tip.small`, `de.vanheyden.Hestia.tip.medium`, `de.vanheyden.Hestia.tip.large`. Ändert sich die Bundle ID in Phase 19, ändern sich die Produkt IDs mit (eine Stelle im Code).
+- **Bewerten** öffnet die Bewertungsseite im App Store (`https://apps.apple.com/app/id<App ID>?action=write-review`), nicht die Systemabfrage `requestReview`: Die Abfrage zeigt iOS nur selten und nach eigenem Ermessen, ein Button muss aber immer etwas tun. Die App ID gibt es erst, wenn die App in App Store Connect angelegt ist (Phase 19). Bis dahin steht sie als leere Konstante im Code und die Zeile "Hestia bewerten" ist ausgeblendet.
+- **Statusmarke ausblenden** ändert nur die Anzeige. Status, Streaks, Quoten und die VoiceOver Angabe zum Status bleiben unverändert.
+- **Datenschutz:** Käufe laufen nur über Apple, die App speichert und sendet nichts dazu. "Keine Daten erfasst" bleibt richtig.
+- Keine Werbung für das Trinkgeld außerhalb der Einstellungen: kein Hinweis beim Start, kein Banner, keine Abfrage nach X Tagen.
+
+**Umfang**
+- **Einstellungen, neuer Abschnitt "Hestia"** zwischen Anzeige und Entwickler (bzw. Fuß), `PaperSection` mit zwei Zeilen wie die Zeile "Sprache" (Text links, rechts ein Pfeil):
+  - **"Hestia bewerten"** mit Pfeil nach außen, öffnet die Bewertungsseite (siehe oben). Ausgeblendet, solange die App ID fehlt.
+  - **"Hestia unterstützen"** öffnet das Sheet "Unterstützen".
+- **Sheet "Unterstützen"** (Aufbau wie die anderen Sheets, `PaperBackground`, Schließen oben):
+  - Kurzer Text in Rolle `body`, neutral wie in 4.8, z.B. "Hestia ist kostenlos, ohne Werbung und ohne Konto. Wer die Entwicklung unterstützen möchte, kann ein Trinkgeld geben. Es schaltet nichts frei."
+  - Drei Zeilen "Klein", "Mittel", "Groß", rechts der Preis aus StoreKit als Button (Variante wie die bestehenden Buttons). Solange die Produkte laden, statt der Preise ein ruhiger Platzhalter. Kommen keine Produkte (offline, nicht angelegt), steht dort in Rolle `meta` "Gerade nicht verfügbar".
+  - Nach einem erfolgreichen Kauf: Text "Danke!" mit einem Satz darunter, leichtes haptisches Signal. Abbrechen durch mich tut nichts, ein Fehler zeigt eine kurze Meldung in Rolle `meta`.
+  - Käufe werden sofort abgeschlossen (`transaction.finish()`), es wird nichts gespeichert. Beim Start lauscht die App auf `Transaction.updates`, damit unterbrochene Käufe (z.B. "Kaufen fragen" bei Familien) abgeschlossen werden.
+- **StoreKit Konfigurationsdatei** `Hestia/Store.storekit` mit den drei Produkten (Namen und Preise wie oben, Deutsch und Englisch), im Debug Schema eingetragen, damit Käufe im Simulator ohne App Store Connect funktionieren. Nicht im Release Build.
+- **Statusmarke:** In den Einstellungen im Abschnitt Anzeige `SegmentedChoice` "Statusmarke" mit "Anzeigen" / "Ausblenden", Voreinstellung "Anzeigen". Darunter in Rolle `meta`: "Gelbe oder rote Marke am Icon, wenn ein Habit Aufmerksamkeit braucht." Gespeichert in UserDefaults (`@AppStorage`, Schlüssel `HestiaShowStatusMark`). Bei "Ausblenden" zeigt `HabitIconView` nirgends eine Statusmarke (4.5), der Identifier `status-<Name>` und die VoiceOver Angabe bleiben.
+- **Texte** in `Localizable.xcstrings` (Deutsch und Englisch), Begriffe in 4.8 ergänzen: Unterstützen / Support, Trinkgeld / Tip, Klein · Mittel · Groß / Small · Medium · Large, Hestia bewerten / Rate Hestia, Statusmarke / Status mark.
+- **Spezifikation:** 4.5 (`HabitIconView` mit Hinweis auf die Einstellung), 5.5 (Aufbau mit Abschnitt Hestia, Statusmarke im Abschnitt Anzeige).
+- **Store:** Screenshot der Einstellungen (Deutsch und Englisch) neu machen. In `Store/Texte.md` prüfen, ob irgendwo "ohne In-App-Käufe" steht, und das anpassen.
+- Identifier: `settings-rate`, `settings-support`, `support-tip-small`, `support-tip-medium`, `support-tip-large`, `support-done`, `settings-status-mark`.
+
+**Pflicht Testfälle**
+- Unit Test: Die Bewertungs-URL wird aus der App ID richtig gebaut. Ohne App ID gibt es keine URL (Zeile ausgeblendet).
+- Unit Test: Die drei Produkt IDs passen zur Bundle ID und sind in der Reihenfolge Klein, Mittel, Groß.
+- UI Test: `Phase14UITests` erweitern statt neu: Statusmarke "Ausblenden" wählen, in Heute zeigt ein roter Habit aus den Testdaten keine Marke mehr, `status-<Name>` liefert weiter "Rot". Danach "Hestia unterstützen" öffnen, die drei Stufen sind zu sehen, Schließen geht.
+- Kein Kauf im UI Test (StoreKit Dialoge sind im UI Test unzuverlässig), den Kauf prüfe ich von Hand im Simulator.
+
+**Definition of Done**
+- [ ] In den Einstellungen gibt es den Abschnitt "Hestia" mit "Hestia unterstützen" (und "Hestia bewerten", sobald die App ID da ist).
+- [ ] Das Sheet zeigt Klein, Mittel und Groß mit Preisen. Im Simulator kann ich ein Trinkgeld kaufen und sehe danach "Danke!".
+- [ ] Mit Statusmarke "Ausblenden" ist am Icon nirgends mehr eine gelbe oder rote Marke zu sehen, mit "Anzeigen" wieder wie bisher. Die Wahl bleibt nach einem Neustart erhalten.
+- [ ] Der Screenshot der Einstellungen ist erneuert.
+
+---
+
+### Phase 19: Veröffentlichung (mache ich selbst)
+
+**Ziel:** Hestia Habits steht im App Store, auf Deutsch und Englisch, mit Trinkgeld.
+
+Diese Phase mache **ich selbst** (bzw. mit meinem Freund), die KI baut hier nichts. Sie hilft nur, wenn ich frage, und trägt auf Zuruf Team ID und App ID im Projekt ein. Die Reihenfolge ist Pflicht.
+
+**Schritt 1: Mit meinem Freund klären (vor allem anderen)**
+- [ ] Er ist einverstanden, dass über seinen Account eine App **mit In-App-Käufen** erscheint.
+- [ ] **Geld landet bei ihm:** Die Trinkgelder zahlt Apple an das Bankkonto seines Accounts aus (abzüglich 15 % Provision im Small Business Program bzw. 30 % ohne). Wir klären, wie das Geld zu mir kommt und ob das für ihn steuerlich etwas ändert.
+- [ ] **Vertrag für kostenpflichtige Apps** (App Store Connect › Business, "Paid Apps Agreement") ist bei ihm aktiv, mit Bankverbindung und Steuerformularen. Ohne ihn lassen sich In-App-Käufe weder testen (außer im Simulator) noch verkaufen.
+- [ ] Wenn er noch nicht drin ist: Antrag auf das **App Store Small Business Program** (15 % statt 30 % Provision).
+- [ ] **Händlerstatus (EU):** Er entscheidet, ob "kein Händler" für seinen Account noch passt. Andere Entwickler mit Trinkgeld geben oft "kein Händler" an, weil sie damit kein Gewerbe betreiben. Mit Einnahmen ist das aber eine Grauzone (Digital Services Act), Apple prüft es nicht und berät nicht dazu. Die Angabe gilt für den ganzen Account, also auch für seine anderen Apps. Mit "kein Händler" bleibt die App in der EU verfügbar.
+- [ ] Er gibt mir seine **Team ID** (developer.apple.com › Account › Mitgliedschaft) und mich als Nutzer in seinem Team frei (Rolle "App-Manager" reicht für alles unten außer Verträgen und Bank).
+
+**Schritt 2: Signing und Archiv in Xcode** (aus Phase 17 verschoben)
+- [ ] In Xcode mit meiner Apple ID anmelden, die im Team meines Freundes ist (Xcode › Einstellungen › Accounts).
+- [ ] Projekt › Target Hestia › Signing & Capabilities: Team auf sein Team stellen, "Automatically manage signing" an. Bundle ID `de.vanheyden.Hestia` behalten, falls Xcode sie annimmt. Sonst neue Bundle ID wählen und der KI sagen (Produkt IDs ändern sich mit, Phase 18.1).
+- [ ] Schema auf "Any iOS Device", Product › Archive. Das Archiv baut ohne Fehler.
+- [ ] Im Organizer "Validate App": ohne Fehler.
+
+**Schritt 3: App in App Store Connect anlegen**
+- [ ] Meine Apps › "+" › Neue App: Plattform iOS, Name "Hestia Habits", Hauptsprache Deutsch, Bundle ID aus Schritt 2, SKU `hestia-habits`.
+- [ ] Die **App ID** (Zahl unter App-Informationen › "Apple-ID") der KI geben bzw. selbst in die Konstante eintragen, damit "Hestia bewerten" erscheint (Phase 18.1).
+- [ ] App-Informationen: Kategorie Gesundheit & Fitness, zweite Kategorie Produktivität. Englisch (USA bzw. UK) als weitere Sprache hinzufügen.
+- [ ] Preis: kostenlos, Verfügbarkeit alle Länder.
+- [ ] App-Datenschutz: "Keine Daten erfasst". Datenschutz-URL und Support-URL: README auf GitHub.
+- [ ] Altersfreigabe: Fragebogen, alles "Nein" (4+).
+- [ ] Copyright: "2026 Lea Schulz-Vanheyden".
+
+**Schritt 4: In-App-Käufe anlegen** (Monetarisierung › In-App-Käufe › "+")
+- [ ] Drei Käufe vom Typ **Verbrauchsartikel**, genau mit diesen Produkt IDs:
+
+  | Referenzname | Produkt ID | Preis |
+  |---|---|---|
+  | Trinkgeld klein | `de.vanheyden.Hestia.tip.small` | 2,99 € |
+  | Trinkgeld mittel | `de.vanheyden.Hestia.tip.medium` | 5,99 € |
+  | Trinkgeld groß | `de.vanheyden.Hestia.tip.large` | 9,99 € |
+- [ ] Für jeden: Anzeigename und Beschreibung auf Deutsch und Englisch (z.B. "Kleines Trinkgeld" / "Small tip", "Unterstützt die Entwicklung von Hestia." / "Supports the development of Hestia."), Verfügbarkeit alle Länder.
+- [ ] Für jeden unter "Prüfungsinformationen" einen Screenshot des Sheets "Unterstützen" hochladen (die KI kann ihn machen) und eine Notiz: "Trinkgeld, schaltet nichts frei."
+- [ ] Status aller drei: "Bereit zur Einreichung".
+
+**Schritt 5: Store-Eintrag ausfüllen** (Version 1.0, Deutsch und Englisch)
+- [ ] Untertitel, Werbetext, Beschreibung, Keywords aus `Store/Texte.md`.
+- [ ] Screenshots 6,9 Zoll aus `Store/Screenshots/` (Apple verkleinert sie für andere Größen selbst).
+- [ ] Angaben für die Prüfung: Kontakt (Name, E-Mail, Telefon), "Anmeldung erforderlich" aus.
+
+**Schritt 6: TestFlight**
+- [ ] Archiv aus Schritt 2 im Organizer mit "Distribute App" › App Store Connect hochladen. Exportkonformität fragt nicht (steht in der Info.plist).
+- [ ] In TestFlight mich als interne Testerin eintragen, Build auf meinem iPhone installieren.
+- [ ] Einige Tage benutzen. Einmal ein Trinkgeld kaufen: In TestFlight ist das kostenlos (Sandbox), der Kauf muss mit "Danke!" durchgehen.
+- [ ] "Hestia bewerten" öffnet die Seite im App Store (vor der Freigabe zeigt sie evtl. noch "nicht verfügbar", das ist normal).
+
+**Schritt 7: Einreichen und veröffentlichen**
+- [ ] Unter Version 1.0 den Build auswählen und im Bereich "In-App-Käufe und Abonnements" **alle drei Trinkgelder hinzufügen**. Der erste In-App-Kauf muss zusammen mit einer App-Version eingereicht werden.
+- [ ] Veröffentlichung: "Diese Version manuell freigeben".
+- [ ] Zur Prüfung einreichen. Bei Rückfragen von Apple antworte ich im Resolution Center (die KI hilft beim Formulieren).
+- [ ] Nach der Freigabe auf "Diese Version veröffentlichen" tippen.
+
+**Definition of Done**
+- [ ] Ein Archiv mit dem Team meines Freundes baut und lässt sich in Xcode ohne Fehler prüfen ("Validate App").
+- [ ] Die TestFlight Version lief einige Tage auf meinem iPhone ohne Probleme, ein Trinkgeld ließ sich kaufen.
+- [ ] Die App ist von Apple freigegeben und im App Store zu finden, die drei Trinkgelder sind verfügbar.
