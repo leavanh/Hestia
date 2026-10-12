@@ -161,7 +161,7 @@ Präzisierung (Phase 5), wann ein Tag als erfüllt oder verpasst zählt:
 
 - Eine Pause hat einen Zeitraum (von, bis, beide Tage eingeschlossen) und gilt für einen oder mehrere ausgewählte Habits. Der Zeitraum darf auch in der Vergangenheit liegen: Die Tage werden dann rückwirkend nicht mehr gewertet.
 - Während der Pause: steht der Habit ausgegraut mit der Kapsel "Pausiert" am Ende der Liste in "Heute" (5.2), lässt sich nicht abhaken, zählt nicht im Tagesfortschritt, Tage zählen nicht in Status und Statistik.
-- Eine laufende Pause kann vorzeitig beendet werden (Enddatum = gestern). Bleibt dadurch kein Tag übrig (die Pause beginnt heute oder später), wird sie entfernt. Eine geplante Pause lässt sich so ebenfalls entfernen.
+- Eine laufende Pause kann vorzeitig beendet werden (Enddatum = gestern). Ab Phase 18.5 geht das auch für einen einzelnen Habit über sein Kontextmenü oder Detail ("Pause beenden"), andere Habits der Pause bleiben pausiert. Bleibt dadurch kein Tag übrig (die Pause beginnt heute oder später), wird sie entfernt. Eine geplante Pause lässt sich so ebenfalls entfernen.
 - Im Kalender im Tab ist ein Tag grau, wenn alle Habits, die es an dem Tag gibt, pausiert sind. Im Habit Detail ist jeder pausierte Tag des Habits grau.
 
 ### 3.9 Beenden
@@ -489,7 +489,7 @@ Speichern nur möglich, wenn Name nicht leer.
 ### 5.4 Kalender
 
 - Monatskalender mit Pfeilen: Der Kalender zeigt einen Monat, mit Pfeil links (voriger Monat) und Pfeil rechts (nächster Monat) rechts neben dem Monatsnamen. Er beginnt beim aktuellen Monat, einen späteren Monat gibt es nicht (Pfeil rechts ist dort deaktiviert). Er reicht mindestens 3 Monate zurück, sonst bis zum Monat des ältesten Habits (dort ist der Pfeil links deaktiviert). Unter dem Monatsnamen steht die Wochentagszeile Mo bis So. *(Ersetzt nach Phase 5.1 den durchgehend scrollbaren Kalender aus Phase 4.)*
-- **Gleicher Kalender überall:** Der Kalender im Tab und der Kalender im Habit Detail sind derselbe Baustein mit demselben Aussehen und denselben Pfeilen. Unterschiede nur: Farbe (Akzentfarbe bzw. Habitfarbe), Tippen (im Tab öffnet ein Tag das Sheet, im Detail sind die Tage nicht antippbar) und die Grenzen (im Tab siehe oben, im Detail Erstellmonat bis aktueller Monat, bei beendeten Habits bis Monat des Beendens). **Ab Phase 18.4** reicht auch der Kalender im Detail mindestens 3 Monate zurück (wie im Tab), die Pfeile haben ein Tippziel von 44 pt.
+- **Gleicher Kalender überall:** Der Kalender im Tab und der Kalender im Habit Detail sind derselbe Baustein mit demselben Aussehen und denselben Pfeilen. Unterschiede nur: Farbe (Akzentfarbe bzw. Habitfarbe), Tippen (im Tab öffnet ein Tag das Sheet, im Detail sind die Tage nicht antippbar) und die Grenzen (im Tab siehe oben, im Detail Erstellmonat bis aktueller Monat, bei beendeten Habits bis Monat des Beendens). **Ab Phase 18.5** wechselt auch waagrechtes Wischen über den Kalender den Monat. **Ab Phase 18.4** reicht auch der Kalender im Detail mindestens 3 Monate zurück (wie im Tab), die Pfeile haben ein Tippziel von 44 pt.
 - Jeder Tag eingefärbt nach Tagesfortschritt (3.4) an diesem Tag: keine Farbe bei 0 %, dann zunehmend kräftigere Akzentfarbe bis 100 %. Zukünftige Tage blass.
 - Tag antippen öffnet Sheet "Tag bearbeiten": dieselbe Liste wie "Heute" für diesen Tag, mit Abhaken und Counter. Zukünftige Tage sind nicht antippbar. Ab Phase 18.3 öffnet Antippen eines Habits in dieser Liste das Habit Detail für den gewählten Tag als Push innerhalb des Sheets (Zurück führt zur Liste des Tages).
 - Darunter Liste aller Habits (aktive zuerst, dann beendete) mit aktuellem Streak.
@@ -1578,6 +1578,35 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - [x] Langes Drücken auf einen Habit öffnet ein Menü mit Bearbeiten, Pausieren und Habit beenden.
 
 *Stand (Simulator iPhone 18 Pro, Testdaten, hell und dunkel angesehen): Fortschritt mit einem Punkt pro Habit (`HabitEngine.points` entfällt, `dayProgress` zählt die Habits der Hauptliste). `WeekStrip` mit Ziehgeste (`scrubIndex(atX:width:)` am Array der Tage), Heute sperrt das Wischen, solange gezogen wird. Karte mit Zusatz neben dem Namen (`extra-<Name>`), `frequencyText` für die Häufigkeit, `rhythmText` mit Zusatz hinten. Detail mit großer Tageszeile (`CheckBox` 56 pt, `CounterControl(isLarge:)`), Kennzahlen in `statSmall` (die Rolle `stat` mit 52 pt entfällt). Kalender im Detail über `firstCalendarMonth` wie im Tab, Pfeile mit 44 pt Tippziel. Ursache des "Kalender geht nicht": Bei einem Habit aus dem laufenden Monat war der Pfeil links gesperrt, dazu waren die Pfeile kleine Tippziele. Tab Bar: Die Tab Bar von iOS 26 ignoriert `unselectedItemTintColor`, `UITabBarAppearance` und Textfarben, deshalb sind nur die Symbole nicht gewählter Tabs eingefärbt, die Beschriftung bleibt in der Farbe des Systems. Neuer Baustein `HabitActions.swift` (`habitContextMenu`, `habitActions`) für Kontextmenü und Detail. Die Zellen des Wochenstreifens haben eine feste Form, sonst meldete eine Zelle ohne Markierung nur den Rahmen ihres Texts (fiel in `Phase9UITests` auf). Unit Tests (316) grün, im Testplan "Komplett" alle UI Tests grün (`Phase9UITests`, `TodayUITests` und `CalendarPhase5UITests` nach den Korrekturen erneut).*
+
+---
+
+### Phase 18.5: Pause beenden im Menü, Monat wischen
+
+**Ziel:** Ein pausierter Habit lässt sich direkt über das Kontextmenü (und im Detail) wieder aktivieren. Im Kalender wechselt Wischen den Monat.
+
+**Entschieden**
+- **Pause beenden statt Pausieren:** Ist ein Habit heute pausiert (laufende Pause), steht im Kontextmenü und im Habit Detail "Pause beenden" statt "Pausieren". Es gilt immer heute, auch wenn Heute einen vergangenen Tag zeigt.
+- **Nur für diesen Habit:** Die laufende Pause endet für diesen Habit gestern (wie "Pause beenden" in den Einstellungen, 3.8). Gilt die Pause noch für andere Habits, bleibt sie für diese unverändert: Der Habit wird aus ihr genommen und bekommt eine eigene Pause vom Beginn bis gestern. Bleibt kein Tag übrig (Pause begann heute), entfällt sie für diesen Habit ganz. Geplante Pausen bleiben unberührt.
+- Kein Dialog, die Aktion ist harmlos und lässt sich mit "Pausieren" wiederholen.
+- **Monat wischen:** Im `MonthCalendar` (Tab und Habit Detail) wechselt waagrechtes Wischen über den Kalender den Monat: nach links der nächste, nach rechts der vorige, mit denselben Grenzen wie die Pfeile. Senkrechtes Scrollen bleibt, Tippen auf Tage im Tab ebenso. Unter iOS 26 geht Wischen nach rechts auf der ganzen Seite zurück: Über dem Kalender hat das Wischen zum Monat Vorrang, überall sonst im Detail führt es wie gewohnt zurück.
+
+**Umfang**
+- `Habit.endRunningPause(today:engine:in:)` (Logik wie oben).
+- `HabitActionMenuItems` und Detail: "Pause beenden" (Symbol `play`) statt "Pausieren", wenn heute pausiert. Identifier im Detail `detail-end-pause`.
+- `MonthCalendar` mit Wischgeste (gleicher Mindestweg wie in Heute, `Theme.swipeDistance`). Eine eigene Geste `HorizontalSwipeGesture` (UIKit, beginnt nur bei waagrechter Bewegung, das Zurück der Navigation wartet auf sie), weil eine SwiftUI `DragGesture` entweder das Detail schließt oder das Scrollen blockiert.
+- **Spezifikation:** 3.8, 5.4.
+
+**Pflicht Testfälle**
+- Unit Test: Pause nur für diesen Habit endet gestern. Geteilte Pause bleibt für die anderen, dieser Habit bekommt eine eigene bis gestern. Heute begonnene Pause entfällt für diesen Habit.
+- Keine neuen UI Tests.
+
+**Definition of Done**
+- [x] Langes Drücken auf einen pausierten Habit zeigt "Pause beenden", danach ist er heute wieder abhakbar.
+- [x] Im Detail eines pausierten Habits steht "Pause beenden".
+- [x] Im Kalender (Tab und Detail) wechselt Wischen den Monat.
+
+*Stand (Simulator iPhone 18 Pro, Testdaten): Lesen über das Kontextmenü pausiert, danach zeigt das Menü "Pause beenden" (Symbol `play`), nach dem Antippen ist Lesen wieder in der Hauptliste und abhakbar, die heute begonnene Pause ist entfallen. Im Detail wechselt Wischen über den Kalender den Monat, ohne die Seite zu schließen; senkrecht scrollt die Seite weiter, außerhalb des Kalenders führt Wischen zurück. Unit Tests (319, neu drei in `HabitLifecycleTests`) und alle 15 UI Tests grün.*
 
 ---
 

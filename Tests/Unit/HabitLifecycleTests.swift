@@ -143,6 +143,47 @@ struct HabitLifecycleTests {
         #expect(habit.pauses.isEmpty)
     }
 
+    // MARK: Pause für einen Habit beenden (Phase 18.5)
+
+    @Test func endingTheOwnRunningPauseSetsItsEndToYesterday() throws {
+        let habit = makeHabit("Sport")
+        let pause = try makePause(8, 14, habits: [habit])
+
+        habit.endRunningPause(today: date(12), engine: engine, in: context)
+
+        #expect(pause.endDay == engine.startOfDay(date(11)))
+        #expect(!engine.isPaused(habit.snapshot, on: date(12)))
+        #expect(engine.isPaused(habit.snapshot, on: date(11)))
+    }
+
+    @Test func endingASharedPauseKeepsItForTheOthers() throws {
+        let sport = makeHabit("Sport")
+        let reading = makeHabit("Lesen")
+        let shared = try makePause(8, 14, habits: [sport, reading])
+
+        sport.endRunningPause(today: date(12), engine: engine, in: context)
+
+        #expect(shared.endDay == engine.startOfDay(date(14)))
+        #expect(shared.habits.map(\.name) == ["Lesen"])
+        #expect(engine.isPaused(reading.snapshot, on: date(13)))
+        #expect(!engine.isPaused(sport.snapshot, on: date(12)))
+        #expect(engine.isPaused(sport.snapshot, on: date(8)), "Die Tage bis gestern bleiben pausiert")
+        #expect(engine.isPaused(sport.snapshot, on: date(11)))
+        #expect(try context.fetchCount(FetchDescriptor<Pause>()) == 2)
+    }
+
+    @Test func endingASharedPauseThatStartedTodayDropsItForThisHabit() throws {
+        let sport = makeHabit("Sport")
+        let reading = makeHabit("Lesen")
+        let shared = try makePause(12, 14, habits: [sport, reading])
+        let upcoming = try makePause(20, 21, habits: [sport])
+
+        sport.endRunningPause(today: date(12), engine: engine, in: context)
+
+        #expect(shared.habits.map(\.name) == ["Lesen"])
+        #expect(sport.pauses.map(\.id) == [upcoming.id], "Geplante Pausen bleiben")
+    }
+
     // MARK: Sortieren
 
     @Test func movingADoneHabitBeforeAnOpenOneStoresItInFront() throws {

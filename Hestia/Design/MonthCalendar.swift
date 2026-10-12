@@ -3,7 +3,7 @@ import SwiftUI
 /// Monatskalender: Monatsname mit Pfeil links und rechts, Wochentagszeile und die Tage des Monats. Jeder Tag ist nach
 /// dem Tagesfortschritt in `tint` eingefärbt: keine Farbe bei 0 %, dann zunehmend kräftiger bis 100 %. Jeder Tag ist ein
 /// Quadrat mit der Tageszahl, heute hat einen äußeren quadratischen Rahmen. Zukünftige Tage sind blass und gesperrt.
-/// Der Monat wechselt mit den Pfeilen zwischen `firstMonth` und `lastMonth` (Spezifikation 5.4).
+/// Der Monat wechselt mit den Pfeilen oder per Wischen zwischen `firstMonth` und `lastMonth` (Spezifikation 5.4).
 /// Im Tab ist es `progress` (Blau) mit antippbaren Tagen, im Habit Detail die Habitfarbe ohne Antippen.
 /// Pausierte Tage sind in blasser `ink` statt eingefärbt. Als Datumsauswahl (`DateRow`) zeigt `selectedDay` den gewählten
 /// Tag gefüllt, `allowsFuture` erlaubt auch Tage nach heute und `isDisabled` sperrt einzelne Tage.
@@ -93,6 +93,15 @@ struct MonthCalendar: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
+        .gesture(HorizontalSwipeGesture { swipe(by: $0) })
+    }
+
+    /// Waagrechtes Wischen wechselt den Monat (ab Phase 18.5): nach links der nächste, nach rechts der vorige,
+    /// mit denselben Grenzen wie die Pfeile. Senkrechte Bewegungen bleiben beim Scrollen (`HorizontalSwipeGesture`).
+    private func swipe(by distance: CGFloat) {
+        guard abs(distance) > Theme.swipeDistance else { return }
+        step(distance < 0 ? 1 : -1)
     }
 
     private func arrow(_ title: LocalizedStringKey, systemImage: String, by months: Int) -> some View {

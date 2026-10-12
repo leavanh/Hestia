@@ -4,10 +4,11 @@ import SwiftUI
 /// Habit Detail (Spezifikation 5.4, ab Phase 18.3 eine ganze Seite): oben ein randloses Band in Habitfarbe mit Rhythmus
 /// Zeile (bei einem beendeten Habit "Beendet am …"), Name und aktuellem Streak. Darunter die Tageszeile mit dem Stand am
 /// Tag groß und dem großen Bedienelement zum Abhaken, ein Raster aus vier kleinen Kennzahlen, der kompakte Monatskalender und unten
-/// "Pausieren" und "Habit beenden". Die Leiste hat keinen Titel und keinen Hintergrund, links den Zurück Button des
+/// "Pausieren" (heute pausiert: "Pause beenden") und "Habit beenden". Die Leiste hat keinen Titel und keinen Hintergrund, links den Zurück Button des
 /// Systems, rechts "Bearbeiten". Die Tab Bar ist ausgeblendet. Ein beendeter Habit zeigt nur Band, Kennzahlen und Kalender.
 struct HabitDetailView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var context
     @Environment(\.colorScheme) private var colorScheme
 
     let habit: Habit
@@ -171,10 +172,18 @@ struct HabitDetailView: View {
 
     private var actionButtons: some View {
         VStack(spacing: Theme.inlineSpacing) {
-            HermesButton("Pausieren", variant: .quiet, fillsWidth: true) {
-                actions.sheet = .pause
+            // Ist der Habit heute pausiert, beendet der Button die Pause für ihn (ab Phase 18.5).
+            if engine.isPaused(habit.snapshot, on: AppClock.now) {
+                HermesButton("Pause beenden", variant: .quiet, fillsWidth: true) {
+                    habit.endRunningPause(today: AppClock.now, engine: engine, in: context)
+                }
+                .accessibilityIdentifier("detail-end-pause")
+            } else {
+                HermesButton("Pausieren", variant: .quiet, fillsWidth: true) {
+                    actions.sheet = .pause
+                }
+                .accessibilityIdentifier("detail-pause")
             }
-            .accessibilityIdentifier("detail-pause")
             HermesButton("Habit beenden", variant: .destructive, role: .destructive, fillsWidth: true) {
                 actions.isConfirmingEnd = true
             }

@@ -42,6 +42,27 @@ extension Habit {
     }
 }
 
+extension Habit {
+    /// Beendet die heute laufende Pause nur für diesen Habit (Phase 18.5): Er ist ab heute nicht mehr pausiert.
+    /// Gilt die Pause nur für ihn, endet sie gestern bzw. entfällt (`Pause.endEarly`). Gilt sie auch für andere,
+    /// bleibt sie für diese, und dieser Habit bekommt eine eigene Pause vom Beginn bis gestern, sofern ein Tag übrig ist.
+    func endRunningPause(today: Date, engine: HabitEngine, in context: ModelContext) {
+        for pause in pauses where engine.phase(of: pause.range, today: today) == .running {
+            if pause.habits.count <= 1 {
+                pause.endEarly(today: today, engine: engine, in: context)
+                continue
+            }
+            pause.habits.removeAll { $0.id == id }
+            if let shortened = engine.endedEarly(pause.range, today: today) {
+                let own = Pause(startDay: shortened.start, endDay: shortened.end)
+                context.insert(own)
+                own.habits = [self]
+            }
+        }
+        try? context.save()
+    }
+}
+
 extension Pause {
     var range: PauseRange {
         PauseRange(start: startDay, end: endDay)

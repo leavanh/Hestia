@@ -17,13 +17,20 @@ struct HabitActionState {
     var isConfirmingEnd = false
 }
 
-/// Die drei Einträge des Kontextmenüs.
+/// Die drei Einträge des Kontextmenüs. Ist der Habit heute pausiert, steht "Pause beenden" statt "Pausieren"
+/// (ab Phase 18.5).
 struct HabitActionMenuItems: View {
     @Binding var state: HabitActionState
+    let isPausedToday: Bool
+    let onEndPause: () -> Void
 
     var body: some View {
         Button("Bearbeiten", systemImage: "pencil") { state.sheet = .edit }
-        Button("Pausieren", systemImage: "pause") { state.sheet = .pause }
+        if isPausedToday {
+            Button("Pause beenden", systemImage: "play", action: onEndPause)
+        } else {
+            Button("Pausieren", systemImage: "pause") { state.sheet = .pause }
+        }
         Button("Habit beenden", systemImage: "stop", role: .destructive) { state.isConfirmingEnd = true }
     }
 }
@@ -70,6 +77,9 @@ private struct HabitActionPresenter: ViewModifier {
 /// reicht seitlich über die Zeile hinaus, ohne das Layout zu verschieben, und die Form der Vorschau ist um 1 pt
 /// eingerückt, sodass die Haarlinie oben an der Karte abgeschnitten wird.
 private struct HabitContextMenu: ViewModifier {
+    @Environment(\.modelContext) private var context
+    @Environment(\.habitEngine) private var engine
+
     let habit: Habit
     @State private var state = HabitActionState()
 
@@ -82,7 +92,11 @@ private struct HabitContextMenu: ViewModifier {
                     .contextMenuPreview,
                     RoundedRectangle(cornerRadius: Theme.contextPreviewCornerRadius).inset(by: Theme.strokeWidth)
                 )
-                .contextMenu { HabitActionMenuItems(state: $state) }
+                .contextMenu {
+                    HabitActionMenuItems(state: $state, isPausedToday: engine.isPaused(habit.snapshot, on: AppClock.now)) {
+                        habit.endRunningPause(today: AppClock.now, engine: engine, in: context)
+                    }
+                }
                 .padding(.horizontal, -Theme.spacing)
                 .habitActions(habit, state: $state)
         } else {
