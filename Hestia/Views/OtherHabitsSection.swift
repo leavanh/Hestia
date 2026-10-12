@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Abschnitt "Weitere" unter der Hauptliste von Heute und im Sheet "Tag bearbeiten" (Spezifikation 5.2): Kopfzeile
+/// Abschnitt "Heute nicht fällig" (im Code "Weitere") unter der Hauptliste von Heute und im Sheet "Tag bearbeiten" (Spezifikation 5.2): Kopfzeile
 /// mit Anzahl und Chevron zum Auf- und Zuklappen, darunter die Karten. Ist die Liste leer, fehlt der Abschnitt.
 /// Der Zustand gilt für jeden Tag und bleibt gespeichert, Voreinstellung zu.
 struct OtherHabitsSection: View {
@@ -36,7 +36,7 @@ struct OtherHabitsSection: View {
             withAnimation(reduceMotion ? nil : .smooth) { isExpanded.toggle() }
         } label: {
             HStack {
-                Text("Weitere · \(habits.count)")
+                Text("Heute nicht fällig · \(habits.count)")
                     .metaText()
                 Spacer()
                 Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
@@ -49,7 +49,7 @@ struct OtherHabitsSection: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(localized("Weitere, \(HabitCountText.text(habits.count))"))
+        .accessibilityLabel(localized("Heute nicht fällig, \(HabitCountText.text(habits.count))"))
         .accessibilityValue(isExpanded ? localized("aufgeklappt") : localized("zugeklappt"))
         .accessibilityIdentifier("other-habits-toggle")
     }

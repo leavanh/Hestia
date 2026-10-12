@@ -614,23 +614,6 @@
         }
       }
     },
-    "Automatisch" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Automatisch"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Automatic"
-          }
-        }
-      }
-    },
     "Bearbeiten" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2967,36 +2950,36 @@
         }
       }
     },
-    "Weitere · %lld" : {
+    "Heute nicht fällig · %lld" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weitere · %lld"
+            "value" : "Heute nicht fällig · %lld"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Others · %lld"
+            "value" : "Not due today · %lld"
           }
         }
       }
     },
-    "Weitere, %@" : {
+    "Heute nicht fällig, %@" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weitere, %@"
+            "value" : "Heute nicht fällig, %@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Others, %@"
+            "value" : "Not due today, %@"
           }
         }
       }

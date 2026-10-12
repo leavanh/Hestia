@@ -70,13 +70,13 @@ enum FirstWeekdaySetting: String, CaseIterable {
 
     var title: String {
         switch self {
-        case .automatic: localized("Automatisch")
+        case .automatic: localized("System")
         case .monday: localized("Montag")
         case .sunday: localized("Sonntag")
         }
     }
 
-    /// Wochenbeginn als Wochentag der App (1 = Montag bis 7 = Sonntag). "Automatisch" folgt dem ersten Wochentag der
+    /// Wochenbeginn als Wochentag der App (1 = Montag bis 7 = Sonntag). "System" folgt dem ersten Wochentag der
     /// Region bzw. der Einstellung in iOS.
     func start(locale: Locale = .current) -> Int {
         switch self {

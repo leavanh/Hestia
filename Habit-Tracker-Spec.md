@@ -396,7 +396,7 @@ Die App gibt es auf Deutsch (Entwicklungssprache) und Englisch, alle Texte stehe
 | Streak | Streak, Tage in Folge | streak, days in a row |
 | Quote | Quote | Rate |
 | Kalenderwoche | KW 41 | W41 |
-| Weitere | Weitere | Others |
+| Weitere (Abschnitt in Heute, ab Phase 18.2) | Heute nicht fällig | Not due today |
 | Beenden | Habit beenden, Historie | End habit, history |
 | Unterstützen (ab Phase 18.1) | Hestia unterstützen · Trinkgeld · Klein · Mittel · Groß | Support Hestia · Tip · Small · Medium · Large |
 | Bewerten (ab Phase 18.1) | Hestia bewerten | Rate Hestia |
@@ -456,10 +456,11 @@ Ab Phase 8: Die Tab Bar bleibt die des Systems, getönt in `ink`. Hintergrund de
   - Ist Weitere leer, fehlt der Abschnitt ganz. Ist die Hauptliste leer, aber Weitere nicht, zeigt das Band "Nichts fällig" und darunter steht nur Weitere.
   - Gilt genauso für vergangene Tage und im Sheet "Tag bearbeiten". Im Sortiermodus ist Weitere ausgeblendet, der Sortiermodus zeigt wie bisher alle aktiven Habits.
   - VoiceOver: Die Kopfzeile ist ein Button "Weitere, 3 Habits" mit Zustand auf- bzw. zugeklappt. Identifier `other-habits-toggle`, die Karten behalten ihre Identifier.
+  - **Ab Phase 18.2** heißt der Abschnitt in der Oberfläche "Heute nicht fällig · 3" (Englisch "Not due today · 3", VoiceOver "Heute nicht fällig, 3 Habits"), auch an vergangenen Tagen und im Sheet "Tag bearbeiten". In der Spezifikation und im Code heißt er weiter "Weitere".
 - **Reihenfolge:** Oben die offenen Habits, darunter die erledigten. Innerhalb beider Teile gilt die gespeicherte Reihenfolge (`sortOrder`, dann `createdAt`). Erledigt heißt: Am angezeigten Tag ist das Tagesziel erreicht, also Abhakkreis abgehakt bzw. Counter voll. Ein Wochen oder Monats Habit, dessen Fenster erfüllt ist, der am angezeigten Tag aber nicht abgehakt ist, bleibt oben. Wird ein Habit erledigt, rutscht er animiert nach unten, wird es wieder aufgehoben, rutscht er animiert zurück an seinen Platz.
 - **Bearbeiten:** Festes Drücken (ca. 0,6 s) auf die Karte (nicht auf Kreis/Counter) öffnet das Bearbeiten Sheet. Die Karte sinkt dabei ein und gibt ein haptisches Signal, beim Auslösen ein festeres. Einfaches Tippen auf die Karte tut nichts. Für VoiceOver gibt es auf der Karte die Aktion "Bearbeiten".
 - **Sortieren:** Im Sortiermodus Habits per Drag and Drop verschieben. Es gibt eine Reihenfolge für alle Habits, sie wird gespeichert. Auch im Sortiermodus stehen erledigte Habits unten. Verschieben lassen sich nur die offenen Habits, die erledigten sind im Sortiermodus nicht verschiebbar. Nach dem Verschieben bekommen die offenen Habits in ihrer neuen Reihenfolge die vorderen Plätze in `sortOrder`, die erledigten folgen dahinter in ihrer bisherigen Reihenfolge. *(Ab Phase 9.1 ersetzt durch den nächsten Punkt.)*
-- **Sortieren (ab Phase 9.1):** Der Sortiermodus zeigt alle aktiven Habits (nicht beendet) in der gespeicherten Reihenfolge (`sortOrder`, dann `createdAt`), unabhängig davon, ob sie am angezeigten Tag fällig, erledigt oder pausiert sind. Alle lassen sich per Drag and Drop verschieben. Die Reihenfolge gilt für alle Tage. Erledigt oder pausiert sind im Sortiermodus nur leise markiert (z.B. Häkchen bzw. Kapsel "Pausiert" ausgegraut), sie verändern die Position nicht. Nach "Fertig" gilt in Heute wieder die Reihenfolge von oben: offene oben, erledigte darunter, pausierte am Ende, jeweils in der neuen gespeicherten Reihenfolge.
+- **Sortieren (ab Phase 9.1):** Der Sortiermodus zeigt alle aktiven Habits (nicht beendet) in der gespeicherten Reihenfolge (`sortOrder`, dann `createdAt`), unabhängig davon, ob sie am angezeigten Tag fällig, erledigt oder pausiert sind. Alle lassen sich per Drag and Drop verschieben. Die Reihenfolge gilt für alle Tage. Erledigt oder pausiert sind im Sortiermodus nur leise markiert (z.B. Häkchen bzw. Kapsel "Pausiert" ausgegraut), sie verändern die Position nicht. *(Ab Phase 18.2 entfällt der Haken, nur pausierte tragen die ausgegraute Kapsel.)* Nach "Fertig" gilt in Heute wieder die Reihenfolge von oben: offene oben, erledigte darunter, pausierte am Ende, jeweils in der neuen gespeicherten Reihenfolge.
 
 ### 5.3 Sheet "Habit anlegen / bearbeiten"
 
@@ -474,6 +475,8 @@ Felder in dieser Reihenfolge:
    - **Monat:** zweites Segmentfeld "Anzahl" / "Monatstag". Bei Anzahl ein Stepper ("1x pro Monat"), bei Monatstag die Auswahl 1 bis 31 (ab Phase 9.1 `MonthDayPicker` statt `StepperControl`).
    - Beim Bearbeiten eines bestehenden Habits sind Rhythmus und Variante passend vorausgewählt (z.B. Wochentage Habit: Woche + Wochentage).
 6. Nur beim Bearbeiten, ganz unten: "Habit beenden" (Dialog: Historie behalten oder löschen, siehe 3.9)
+
+**Ab Phase 18.2:** Unter dem letzten Feld steht Leerraum (`Theme.sheetBottomSpace`), damit sich der Rhythmus bequem nach oben scrollen lässt.
 
 Es gibt keine Auswahl von Tagesgruppen (Morgens, Mittags, Abends). Alle Habits gelten ganztägig.
 
@@ -506,7 +509,7 @@ Speichern nur möglich, wenn Name nicht leer.
 - **Fuß (ab Phase 12):** Ganz unten steht linksbündig die Wortmarke `HESTIA / HABITS` (zweizeilig, Barlow Condensed Regular, 56 pt, Versalien, Farbe `inkSecondary`) und darunter die Version in Rolle `meta`. Sie ist der einzige Ort der Wortmarke in der App und kein Button. **Ab Phase 14:** Rechts neben der Wortmarke steht klein dieselbe Figur wie in Heute ohne Habits (die Vestalin, 5.2), 80 pt hoch und damit etwas niedriger als die zwei Zeilen der Wortmarke, mit der Grundlinie von "HABITS" ausgerichtet. Sie ist dekorativ und für VoiceOver ausgeblendet.
 - **Aufbau ab Phase 14** (von oben nach unten): Titel "Einstellungen", Abschnitt **Pausen** (wie bisher), Abschnitt **Kalender** (Wochenbeginn, ab Phase 15 Zeiträume), Abschnitt **Anzeige** (Darstellung, ab Phase 16 Sprache, ab Phase 18.1 Statusmarke), ab Phase 18.1 Abschnitt **Hestia** (Bewerten, Unterstützen), in Debug Builds im Simulator **Entwickler**, ganz unten der Fuß. Alle Abschnitte sind `PaperSection`, es gibt keine neuen Bausteine.
 - **Darstellung (ab Phase 14):** `SegmentedChoice` mit "System", "Hell", "Dunkel", Voreinstellung "System". Die Wahl gilt sofort für die ganze App samt Sheets (`.preferredColorScheme` an der Wurzel, `nil` bei System). Gespeichert in UserDefaults (`@AppStorage`, Schlüssel `HestiaAppearance`). Der Startbildschirm folgt weiter dem System, das lässt iOS nicht anders zu.
-- **Wochenbeginn (ab Phase 14):** `SegmentedChoice` mit "Automatisch", "Montag", "Sonntag", Voreinstellung "Automatisch". Automatisch übernimmt den ersten Wochentag aus den Systemeinstellungen (`Locale.current`, iOS: Allgemein › Sprache & Region › Erster Wochentag). Gespeichert in UserDefaults (Schlüssel `HestiaFirstWeekday`).
+- **Wochenbeginn (ab Phase 14):** `SegmentedChoice` mit "Automatisch", "Montag", "Sonntag", Voreinstellung "Automatisch" (ab Phase 18.2 heißt "Automatisch" wie bei Darstellung "System", gespeicherter Wert bleibt `automatic`). Automatisch übernimmt den ersten Wochentag aus den Systemeinstellungen (`Locale.current`, iOS: Allgemein › Sprache & Region › Erster Wochentag). Gespeichert in UserDefaults (Schlüssel `HestiaFirstWeekday`).
   - Bei rollierenden Zeiträumen ändert der Wochenbeginn **nur die Anzeige**, nie die Rechnung. Status, Streaks und Quoten bleiben gleich. Ab Phase 15 legt er bei Zeiträumen "Kalender" auch fest, wann eine Woche für die Rechnung beginnt (3.5).
   - Er gilt für: Wochenstreifen in Heute (5.2), Wochentagszeile und Raster im `MonthCalendar` (Tab, Detail, `DateRow`), Reihenfolge der 7 Quadrate im `WeekdayPicker` (5.3), Reihenfolge der Tage in der Rhythmus Zeile (4.5.1, z.B. "SO · MI" statt "MI · SO"). Gespeichert bleibt `weekdays` unverändert (1 = Montag bis 7 = Sonntag).
   - **Kalenderwoche:** Bei Montag ist sie wie bisher die ISO Kalenderwoche. Bei einem anderen Wochenbeginn zählt sie Wochen ab diesem Tag mit der ISO Regel für die erste Woche (mindestens 4 Tage im neuen Jahr). So gehört jeder Tag im Wochenstreifen zur selben KW wie die Datumszeile.
@@ -1471,10 +1474,12 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Keine neuen Tests. Bestehende Tests anpassen, die "Automatisch", "Weitere" oder den Haken im Sortiermodus erwarten.
 
 **Definition of Done**
-- [ ] Im Sheet "Neuer Habit" kann ich so weit scrollen, dass der Rhythmus mit seiner Einstellung bequem in der Mitte des Bildschirms steht.
-- [ ] In den Einstellungen heißt die erste Wahl bei Wochenbeginn "System".
-- [ ] In Heute heißt der Abschnitt unter der Liste "Heute nicht fällig", auf Englisch "Not due today".
-- [ ] Im Sortiermodus ist bei erledigten Habits kein Haken mehr zu sehen.
+- [x] Im Sheet "Neuer Habit" kann ich so weit scrollen, dass der Rhythmus mit seiner Einstellung bequem in der Mitte des Bildschirms steht.
+- [x] In den Einstellungen heißt die erste Wahl bei Wochenbeginn "System".
+- [x] In Heute heißt der Abschnitt unter der Liste "Heute nicht fällig", auf Englisch "Not due today".
+- [x] Im Sortiermodus ist bei erledigten Habits kein Haken mehr zu sehen.
+
+*Geprüft im Simulator (iPhone 18 Pro) mit Testdaten: "Heute nicht fällig · 5" unter der Liste, Sortiermodus ohne Haken, Wochenbeginn "System · Montag · Sonntag", im Sheet "Neuer Habit" lässt sich der Rhythmus auch mit offener Tastatur bis unter die Leiste scrollen. Unit Tests (310) und alle 24 UI Tests grün, Build ohne Warnungen. Bestehende Tests mussten nicht angepasst werden, keiner prüfte die alten Texte oder den Haken.*
 
 ---
 

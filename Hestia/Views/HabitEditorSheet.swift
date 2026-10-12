@@ -71,6 +71,7 @@ struct HabitEditorSheet: View {
                     }
                 }
                 .padding(Theme.spacing)
+                .padding(.bottom, Theme.sheetBottomSpace)
             }
             .background { PaperBackground() }
             .navigationTitle(habit == nil ? LocalizedStringKey("Neuer Habit") : LocalizedStringKey("Habit bearbeiten"))

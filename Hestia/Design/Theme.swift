@@ -74,6 +74,9 @@ enum Theme {
     static let editPressPreviewDelay: Double = 0.25
     /// Größe der Karte, solange sie gedrückt wird.
     static let pressedCardScale: CGFloat = 0.97
+    /// Leerraum unter dem letzten Feld im Sheet "Habit anlegen / bearbeiten", damit sich der Rhythmus bequem nach oben
+    /// scrollen lässt.
+    static let sheetBottomSpace: CGFloat = 160
     /// Innenabstände von `Chip`.
     static let chipPaddingHorizontal: CGFloat = 6
     static let chipPaddingVertical: CGFloat = 2

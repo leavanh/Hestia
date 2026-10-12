@@ -3,7 +3,7 @@ import SwiftUI
 
 /// Sortiermodus von Heute (Spezifikation 5.2): alle aktiven Habits in der gespeicherten Reihenfolge, unabhängig davon,
 /// ob sie am angezeigten Tag fällig, erledigt oder pausiert sind. Alle lassen sich per Drag and Drop verschieben, die
-/// neue Reihenfolge wird sofort gespeichert (`Habit.saveOrder`). Erledigt und pausiert sind nur leise markiert.
+/// neue Reihenfolge wird sofort gespeichert (`Habit.saveOrder`). Pausierte sind nur leise markiert.
 struct HabitSortList: View {
     @Environment(\.modelContext) private var context
 
@@ -65,12 +65,11 @@ struct HabitSortList: View {
         .accessibilityIdentifier("sort-list")
     }
 
-    /// Icon, Name und Rhythmus wie in Heute, rechts leise markiert, ob der Habit am Tag erledigt oder pausiert ist.
+    /// Icon, Name und Rhythmus wie in Heute, rechts leise markiert, ob der Habit am Tag pausiert ist.
     @ViewBuilder
     private func row(_ habit: Habit) -> some View {
         let snapshot = habit.snapshot
         let isPaused = engine.isShownAsPaused(snapshot, on: day)
-        let isDone = !isPaused && engine.isCompleted(snapshot, on: day)
 
         HStack(spacing: Theme.spacing) {
             HabitIconView(habitName: habit.name, iconName: habit.iconName, color: HabitColor(key: habit.colorKey))
@@ -87,11 +86,6 @@ struct HabitSortList: View {
             if isPaused {
                 Chip(text: "Pausiert")
                     .opacity(Theme.pausedOpacity)
-            } else if isDone {
-                Image(systemName: "checkmark")
-                    .font(Theme.Typography.symbol)
-                    .foregroundStyle(Theme.inkSecondary)
-                    .accessibilityLabel("Erledigt")
             }
         }
         .padding(.vertical, Theme.cardPadding)
