@@ -14,7 +14,7 @@ struct OtherHabitsSection: View {
     /// Kante und Platz in der Kaskade beim Tageswechsel (`dayEntrance`), nur in Heute.
     var entranceEdge: Edge?
     var entranceIndex = 0
-    let onEdit: (Habit) -> Void
+    let onOpen: (Habit) -> Void
 
     var body: some View {
         if !habits.isEmpty {
@@ -23,7 +23,7 @@ struct OtherHabitsSection: View {
                     .dayEntrance(from: entranceEdge, index: entranceIndex)
                 if isExpanded {
                     ForEach(Array(habits.enumerated()), id: \.element.id) { index, habit in
-                        DayHabitCard(habit: habit, day: day) { onEdit(habit) }
+                        DayHabitCard(habit: habit, day: day) { onOpen(habit) }
                             .dayEntrance(from: entranceEdge, index: entranceIndex + index + 1)
                     }
                 }

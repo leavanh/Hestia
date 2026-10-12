@@ -89,11 +89,13 @@ final class TodayUITests: XCTestCase {
         XCTAssertTrue(rhythm.waitForExistence(timeout: 5))
         XCTAssertTrue(rhythm.label.localizedCaseInsensitiveContains("20 Min"), "Rhythmus Zeile zeigt den Zusatz: \(rhythm.label)")
 
-        app.staticTexts[name].tap()
-        XCTAssertFalse(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 1.5), "Tippen öffnet kein Sheet")
-
         app.staticTexts[name].press(forDuration: 1.5)
-        XCTAssertTrue(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 5), "Langes Drücken öffnet das Sheet")
+        XCTAssertFalse(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 1.5), "Langes Drücken tut nichts mehr")
+
+        app.openDetail(ofCard: name)
+        app.buttons["detail-edit"].tap()
+        XCTAssertTrue(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 5), "Bearbeiten im Detail öffnet das Sheet")
+        XCTAssertFalse(app.buttons["end-habit"].exists, "Beenden steht nicht mehr im Sheet")
         XCTAssertTrue(app.textFields["detail-field"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.textFields["detail-field"].value as? String, "20 Min", "Bearbeiten zeigt den Zusatz im Feld")
 
@@ -104,7 +106,36 @@ final class TodayUITests: XCTestCase {
         if app.menuItems["Select All"].waitForExistence(timeout: 2) { app.menuItems["Select All"].tap() }
         field.typeText(XCUIKeyboardKey.delete.rawValue)
         app.buttons["Speichern"].tap()
+        app.goBack()
         XCTAssertTrue(rhythm.waitForExistence(timeout: 5))
         XCTAssertFalse(rhythm.label.localizedCaseInsensitiveContains("20 Min"), "Gelöschter Zusatz verschwindet: \(rhythm.label)")
+    }
+
+    /// Antippen öffnet das Detail mit dem Stand des Tages, Abhaken dort gilt auch für die Karte in Heute.
+    @MainActor
+    func testTappingACardOpensTheDetailWhereTheHabitCanBeChecked() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-HestiaResetData", "-HestiaSampleData"]
+        app.launch()
+        XCTAssertTrue(app.staticTexts["Meditieren"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["check-Meditieren"].isSelected)
+
+        app.openDetail(ofCard: "Meditieren")
+        XCTAssertFalse(app.tabBars.firstMatch.isHittable, "Im Detail ist die Tab Bar ausgeblendet")
+        XCTAssertEqual(app.staticTexts["detail-day"].label, "Heute")
+        XCTAssertEqual(app.staticTexts["detail-state"].label, "Offen")
+
+        let check = app.buttons["detail-check"]
+        check.tap()
+        XCTAssertTrue(check.isSelected)
+        XCTAssertEqual(app.staticTexts["detail-state"].label, "Erledigt")
+
+        app.goBack()
+        XCTAssertTrue(app.buttons["check-Meditieren"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["check-Meditieren"].isSelected, "Die Karte in Heute ist abgehakt")
+
+        app.openDetail(ofCard: "Meditieren")
+        app.buttons["detail-edit"].tap()
+        XCTAssertTrue(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 5))
     }
 }

@@ -12,7 +12,8 @@ struct TodayView: View {
     @State private var isCreating = false
     /// Sortiermodus: die offenen Habits lassen sich per Drag and Drop verschieben (Spezifikation 5.2).
     @State private var isSorting = false
-    @State private var editingHabit: Habit?
+    /// Der Habit, dessen Detail offen ist (Push in der `NavigationStack`). Das Detail zeigt den angezeigten Tag.
+    @State private var openedHabit: Habit?
     /// Kante, von der der neue Tag hereingleitet (Wischen nach rechts = von links).
     @State private var slideEdge: Edge = .leading
     /// Kante, von der Kopf und Karten beim Tageswechsel nacheinander hereinfedern. `nil` heißt ohne Kaskade.
@@ -43,19 +44,22 @@ struct TodayView: View {
 
     var body: some View {
         let due = dueHabits
-        Group {
-            if isSorting {
-                HabitSortList(habits: habits, day: shownDay) { isSorting = false }
-            } else {
-                dayScroll(for: due, other: otherHabits)
+        NavigationStack {
+            Group {
+                if isSorting {
+                    HabitSortList(habits: habits, day: shownDay) { isSorting = false }
+                } else {
+                    dayScroll(for: due, other: otherHabits)
+                }
+            }
+            .background { PaperBackground() }
+            .toolbarVisibility(.hidden, for: .navigationBar)
+            .navigationDestination(item: $openedHabit) { habit in
+                HabitDetailView(habit: habit, day: shownDay, today: today)
             }
         }
-        .background { PaperBackground() }
         .sheet(isPresented: $isCreating) {
             HabitEditorSheet()
-        }
-        .sheet(item: $editingHabit) { habit in
-            HabitEditorSheet(habit: habit)
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { showToday() }
@@ -153,12 +157,12 @@ struct TodayView: View {
             }
             VStack(spacing: 0) {
                 ForEach(Array(rows.enumerated()), id: \.element.id) { index, habit in
-                    DayHabitCard(habit: habit, day: shownDay) { editingHabit = habit }
+                    DayHabitCard(habit: habit, day: shownDay) { openedHabit = habit }
                         .dayEntrance(from: entranceEdge, index: index + 3)
                 }
                 OtherHabitsSection(
                     habits: other, day: shownDay, entranceEdge: entranceEdge, entranceIndex: rows.count + 3
-                ) { editingHabit = $0 }
+                ) { openedHabit = $0 }
             }
             .animation(reduceMotion ? nil : .smooth, value: rows.map(\.id))
         }

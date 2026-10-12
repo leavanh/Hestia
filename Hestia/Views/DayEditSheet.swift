@@ -2,14 +2,15 @@ import SwiftData
 import SwiftUI
 
 /// Sheet "Tag bearbeiten": dieselbe Liste wie Heute für einen gewählten Tag, mit Abhaken und Counter
-/// (Spezifikation 5.4). Änderungen werden sofort gespeichert.
+/// (Spezifikation 5.4). Änderungen werden sofort gespeichert. Ein Habit antippen öffnet sein Detail für diesen Tag
+/// (Push im Sheet).
 struct DayEditSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Query(sort: \Habit.createdAt) private var habits: [Habit]
 
     let day: Date
 
-    @State private var editingHabit: Habit?
+    @State private var openedHabit: Habit?
 
     @Environment(\.habitEngine) private var engine
 
@@ -30,9 +31,9 @@ struct DayEditSheet: View {
                     }
                     VStack(spacing: 0) {
                         ForEach(due) { habit in
-                            DayHabitCard(habit: habit, day: day) { editingHabit = habit }
+                            DayHabitCard(habit: habit, day: day) { openedHabit = habit }
                         }
-                        OtherHabitsSection(habits: other, day: day) { editingHabit = $0 }
+                        OtherHabitsSection(habits: other, day: day) { openedHabit = $0 }
                     }
                     .animation(.smooth, value: due.map(\.id))
                 }
@@ -50,8 +51,8 @@ struct DayEditSheet: View {
                     }
                 }
             }
-            .sheet(item: $editingHabit) { habit in
-                HabitEditorSheet(habit: habit)
+            .navigationDestination(item: $openedHabit) { habit in
+                HabitDetailView(habit: habit, day: day, today: AppClock.now)
             }
         }
     }

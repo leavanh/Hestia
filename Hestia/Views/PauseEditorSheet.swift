@@ -8,13 +8,18 @@ struct PauseEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Query(sort: \Habit.createdAt) private var habits: [Habit]
 
-    @State private var selection: Set<UUID> = []
+    @State private var selection: Set<UUID>
     @State private var startDay = AppClock.now
     @State private var endDay = AppClock.now
     /// Die aufgeklappte Datumszeile. Es ist höchstens eine offen.
     @State private var expandedDate: DateField?
 
     private enum DateField { case start, end }
+
+    /// Mit `habit` ist dieser Habit vorausgewählt (Pausieren aus dem Habit Detail).
+    init(preselecting habit: Habit? = nil) {
+        _selection = State(initialValue: habit.map { [$0.id] } ?? [])
+    }
 
     private let engine = HabitEngine()
 

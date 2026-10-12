@@ -3,14 +3,14 @@ import SwiftUI
 
 /// Tab "Kalender": Monatskalender mit Pfeilen, der beim aktuellen Monat beginnt (Spezifikation 5.4). Jeder Tag ist
 /// nach Tagesfortschritt eingefärbt. Ein Tag antippen öffnet das Sheet "Tag bearbeiten", zukünftige Tage sind
-/// gesperrt. Darunter stehen alle Habits mit ihrem aktuellen Streak, ein Habit antippen öffnet sein Detail.
+/// gesperrt. Darunter stehen alle Habits mit ihrem aktuellen Streak, ein Habit antippen öffnet sein Detail als ganze Seite.
 struct CalendarView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Query(sort: \Habit.createdAt) private var habits: [Habit]
 
     @State private var today = AppClock.now
     @State private var selectedDay: SelectedDay?
-    @State private var detailHabit: Habit?
+    @State private var openedHabit: Habit?
 
     @Environment(\.firstWeekday) private var firstWeekday
     @Environment(\.habitEngine) private var engine
@@ -66,8 +66,8 @@ struct CalendarView: View {
             .sheet(item: $selectedDay) { selected in
                 DayEditSheet(day: selected.day)
             }
-            .sheet(item: $detailHabit) { habit in
-                HabitDetailSheet(habit: habit, today: today)
+            .navigationDestination(item: $openedHabit) { habit in
+                HabitDetailView(habit: habit, day: today, today: today)
             }
         }
         .onChange(of: scenePhase) { _, phase in
@@ -102,7 +102,7 @@ extension CalendarView {
                     rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: today), firstWeekday: firstWeekday, periods: engine.periods),
                     streak: engine.currentStreak(snapshot, on: habit.statisticsDay(today: today, engine: engine))
                 ) {
-                    detailHabit = habit
+                    openedHabit = habit
                 }
             }
         }

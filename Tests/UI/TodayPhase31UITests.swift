@@ -124,7 +124,8 @@ final class TodayPhase31UITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["repeat-Miete"].label, "Am \(today). des Monats")
 
         // Bearbeiten zeigt den gespeicherten Tag im Raster als ausgewählt.
-        app.staticTexts["Miete"].press(forDuration: 1.5)
+        app.openDetail(ofCard: "Miete")
+        app.buttons["detail-edit"].tap()
         XCTAssertTrue(app.revealMonthDay(today).isSelected)
         XCTAssertFalse(app.control("monthday-\(otherDay)").isSelected)
     }

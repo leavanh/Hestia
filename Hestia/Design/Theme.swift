@@ -68,12 +68,6 @@ enum Theme {
     /// und Ausblendens.
     static let compactBarPadding: CGFloat = 8
     static let compactBarFadeDuration: Double = 0.15
-    /// So lange muss eine Karte gedrückt werden, bis das Bearbeiten Sheet öffnet.
-    static let editPressDuration: Double = 0.6
-    /// Nach dieser Zeit gibt die Karte beim Drücken ein erstes Zeichen (leichter Impuls, kurz einsinken).
-    static let editPressPreviewDelay: Double = 0.25
-    /// Größe der Karte, solange sie gedrückt wird.
-    static let pressedCardScale: CGFloat = 0.97
     /// Leerraum unter dem letzten Feld im Sheet "Habit anlegen / bearbeiten", damit sich der Rhythmus bequem nach oben
     /// scrollen lässt.
     static let sheetBottomSpace: CGFloat = 160

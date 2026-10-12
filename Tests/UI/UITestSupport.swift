@@ -32,6 +32,21 @@ extension XCUIApplication {
         button.tap()
     }
 
+    /// Geht im Habit Detail mit dem Zurück Button des Systems (links in der Leiste) zurück.
+    @MainActor
+    func goBack() {
+        let back = navigationBars.buttons.element(boundBy: 0)
+        XCTAssertTrue(back.waitForExistence(timeout: 5), "Zurück Button fehlt")
+        back.tap()
+    }
+
+    /// Öffnet das Habit Detail per Antippen des Namens in der Karte und wartet, bis die Seite da ist.
+    @MainActor
+    func openDetail(ofCard name: String) {
+        staticTexts[name].tap()
+        XCTAssertTrue(scrollViews["habit-detail"].waitForExistence(timeout: 5), "Detail von \(name) öffnet nicht")
+    }
+
     /// Ein Baustein mit Bezeichner, egal welchen Typ ihn XCTest meldet (z.B. `StepperControl`).
     @MainActor
     func control(_ identifier: String) -> XCUIElement {

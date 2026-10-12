@@ -164,7 +164,7 @@ Präzisierung (Phase 5), wann ein Tag als erfüllt oder verpasst zählt:
 
 ### 3.9 Beenden
 
-- Ein Habit wird im Bearbeiten Sheet beendet ("Habit beenden"). Ein Dialog fragt dann genau eins: **Historie behalten** oder **Historie löschen** (oder Abbrechen). Es gibt keine weitere Entscheidung und nichts dazu in den Einstellungen.
+- Ein Habit wird im Habit Detail beendet ("Habit beenden", ab Phase 18.3; vorher im Bearbeiten Sheet). Ein Dialog fragt dann genau eins: **Historie behalten** oder **Historie löschen** (oder Abbrechen). Es gibt keine weitere Entscheidung und nichts dazu in den Einstellungen.
 - **Historie behalten:** Der Habit erscheint ab diesem Tag nicht mehr in "Heute" (`endedAt` ist der Tag des Beendens). Im Kalender und in der Statistik bleibt er mit seiner Historie sichtbar. Ein Wiederaktivieren gibt es nicht.
 - **Historie löschen:** Der Habit, alle seine Erledigungen und seine Zuordnung zu Pausen werden entfernt. Eine Pause, die dadurch keinen Habit mehr hat, wird ebenfalls entfernt. Das ist unwiderruflich, der Dialog sagt das.
 
@@ -311,7 +311,7 @@ Systemleisten in Sheets (Abbrechen, Sichern, Fertig) bleiben Systembuttons, get�
 | `PaperBackground` | Fläche `background` für alle Bildschirme und Sheets. Ersetzt `GlassBackground`. |
 | Tab Bar | Die Tab Bar des Systems (`TabView`), ohne eigene Gestaltung. Einzige Anpassung: Tönung in `ink` (`.tint(Theme.ink)`), der gewählte Tab ist also blau. |
 | `PaperSection` | Abschnitt mit Überschrift in Rolle `meta` und darunter dem Inhalt, oben eine Haarlinie. Keine Karte. Ersetzt `GlassSection` und `glassCard()`. |
-| `HabitCard` | Flache Zeile ohne Karte, oben eine Haarlinie. Links `HabitIconView`, daneben Name (Rolle `title`), darunter die Rhythmus Zeile (4.5.1) und in derselben Zeile rechts daneben die 7 Tage Punkte (ab Phase 9, wie im Mockup; reicht der Platz bei großer Schrift nicht, stehen die Punkte darunter), rechts `CheckBox` oder `CounterControl`. Kein weiterer Text. Langes Drücken, Einsinken und VoiceOver Aktion wie bisher. |
+| `HabitCard` | Flache Zeile ohne Karte, oben eine Haarlinie. Links `HabitIconView`, daneben Name (Rolle `title`), darunter die Rhythmus Zeile (4.5.1) und in derselben Zeile rechts daneben die 7 Tage Punkte (ab Phase 9, wie im Mockup; reicht der Platz bei großer Schrift nicht, stehen die Punkte darunter), rechts `CheckBox` oder `CounterControl`. Kein weiterer Text. Ab Phase 18.3: Tippen auf die linke Seite (Icon, Name, Rhythmus Zeile) öffnet das Habit Detail (`onOpen`, Identifier `open-<Name>`, für VoiceOver ein Button mit dem Namen des Habits), Kreis und Counter rechts haken wie bisher ab. Langes Drücken, Einsinken und die VoiceOver Aktion "Bearbeiten" entfallen. Das Bedienelement (`CheckBox` bzw. `CounterControl`) liegt im gemeinsamen Baustein `HabitDayControl`, den auch das Habit Detail nutzt. |
 | `CheckBox` | Quadrat 36 pt mit 1 pt Rand in Habitfarbe. Abgehakt: gefüllt mit Habitfarbe, Häkchen in `onColor`. Ersetzt `CheckCircle`. |
 | `CounterControl` | Taste "−" (Quadrat 26 pt), Wert als "5/8" (Rolle `meta` in Medium, gleich breite Ziffern), Taste "+". Kein Ring mehr. Gesperrte Taste mit `disabledOpacity`. Gesamthöhe wie `CheckBox`. |
 | `WeekDots` | 7 Quadrate (6 pt). Füllung wie 3.6 (Deckkraft nach Anteil), 0 = Habitfarbe mit 22 %. Der angezeigte Tag hat einen äußeren quadratischen Rahmen in Habitfarbe mit verringerter Deckkraft. Ab Phase 9.1 steht vor dem angezeigten Tag mehr Abstand, sodass zwischen Rahmen und Nachbarquadrat mindestens `Theme.dotSpacing` frei bleibt (Wert in `Theme`, z.B. `dotRingClearance`). Der Rahmen berührt nichts. Pausierte Tage: kurzer waagrechter Strich in `ink` mit Pausen Deckkraft. |
@@ -378,7 +378,7 @@ Entfallen: `figure.pool.swim`, `tree.fill`, `graduationcap.fill`, `creditcard.fi
 
 ### 4.7 Bewegung
 
-Unverändert: Tageswechsel, Einsinken beim langen Drücken, Rutschen erledigter Habits, Reduce Motion nur Überblenden. Neue Übergänge (z.B. Einblenden der kleinen Leiste in Heute) sind kurz (ca. 0,1 bis 0,2 s) und bei Reduce Motion ohne Bewegung.
+Unverändert: Tageswechsel, Rutschen erledigter Habits, Reduce Motion nur Überblenden. *(Das Einsinken beim langen Drücken entfällt ab Phase 18.3.)* Neue Übergänge (z.B. Einblenden der kleinen Leiste in Heute) sind kurz (ca. 0,1 bis 0,2 s) und bei Reduce Motion ohne Bewegung.
 
 ### 4.8 Glossar und Texte (ab Phase 16)
 
@@ -449,17 +449,17 @@ Ab Phase 8: Die Tab Bar bleibt die des Systems, getönt in `ink`. Hintergrund de
 - Für den angezeigten Tag gelten Fälligkeit, Fortschritt, Abhaken, Status und 7 Tage Punkte so, als wäre dieser Tag heute. Tage vor der Erstellung eines Habits und pausierte Tage verhalten sich wie in Abschnitt 3 beschrieben.
 - *Bis Phase 8:* Oben rechts: Plus Button für neuen Habit. Zeigt die Ansicht einen vergangenen Tag, steht in der Datumszeile rechts (auf einer Ebene mit Datum und Kapsel, nicht in der Leiste) ein Button "Heute >" mit kleinem Chevron, der (animiert, wie ein Wischen nach vorn) zu heute zurückspringt. Auf heute ist er nicht zu sehen. Oben links: Button "Sortieren".
 - Darunter eine einzige Liste mit `HabitCard`s, ohne Abschnitte und ohne Überschriften.
-- **Pausierte Habits** (3.8) stehen am Ende der Liste (ab Phase 13 am Ende von Weitere), nach den erledigten, in der gespeicherten Reihenfolge: Icon und Name ausgegraut, daneben die Kapsel "Pausiert" (wie im Sheet "Neue Pause"), Abhakkreis bzw. Counter ausgegraut und nicht bedienbar. Langes Drücken öffnet weiter das Bearbeiten Sheet. Sie zählen nicht im Fortschritt. Dasselbe gilt im Sheet "Tag bearbeiten" für den gewählten Tag.
+- **Pausierte Habits** (3.8) stehen am Ende der Liste (ab Phase 13 am Ende von Weitere), nach den erledigten, in der gespeicherten Reihenfolge: Icon und Name ausgegraut, daneben die Kapsel "Pausiert" (wie im Sheet "Neue Pause"), Abhakkreis bzw. Counter ausgegraut und nicht bedienbar. Tippen auf die linke Seite öffnet das Habit Detail (5.4, ab Phase 18.3, vorher langes Drücken auf das Bearbeiten Sheet). Sie zählen nicht im Fortschritt. Dasselbe gilt im Sheet "Tag bearbeiten" für den gewählten Tag.
 - **Weitere (ab Phase 13):** Unter der Hauptliste steht der Abschnitt **Weitere** mit den Habits, die am angezeigten Tag nicht dran oder schon erfüllt sind (Zuordnung 3.2).
   - Kopfzeile mit Haarlinie oben, Rolle `meta`: links "Weitere · 3" (Anzahl der Habits darin), rechts ein Chevron (zu: nach rechts, offen: nach unten). Tippen auf die ganze Zeile klappt auf und zu, kurz animiert, bei Reduce Motion ohne Bewegung. **Voreinstellung zugeklappt.** Der Zustand bleibt gespeichert (UserDefaults, Schlüssel `HestiaOtherExpanded`) und gilt für jeden Tag.
   - Aufgeklappt stehen darunter `HabitCard`s wie in der Hauptliste, in der gespeicherten Reihenfolge (`sortOrder`, dann `createdAt`), pausierte am Ende. Erledigte rutschen hier nicht nach unten, die Reihenfolge bleibt fest.
-  - Abhaken, Counter, 7 Tage Punkte, Status und langes Drücken zum Bearbeiten funktionieren wie in der Hauptliste. Pausierte sind ausgegraut und nicht abhakbar (wie bisher).
+  - Abhaken, Counter, 7 Tage Punkte, Status und Tippen zum Öffnen des Details funktionieren wie in der Hauptliste. Pausierte sind ausgegraut und nicht abhakbar (wie bisher).
   - Ist Weitere leer, fehlt der Abschnitt ganz. Ist die Hauptliste leer, aber Weitere nicht, zeigt das Band "Nichts fällig" und darunter steht nur Weitere.
   - Gilt genauso für vergangene Tage und im Sheet "Tag bearbeiten". Im Sortiermodus ist Weitere ausgeblendet, der Sortiermodus zeigt wie bisher alle aktiven Habits.
   - VoiceOver: Die Kopfzeile ist ein Button "Weitere, 3 Habits" mit Zustand auf- bzw. zugeklappt. Identifier `other-habits-toggle`, die Karten behalten ihre Identifier.
   - **Ab Phase 18.2** heißt der Abschnitt in der Oberfläche "Nicht fällig · 3" (Englisch "Not due · 3", VoiceOver "Nicht fällig, 3 Habits"), auch an vergangenen Tagen und im Sheet "Tag bearbeiten". In der Spezifikation und im Code heißt er weiter "Weitere".
 - **Reihenfolge:** Oben die offenen Habits, darunter die erledigten. Innerhalb beider Teile gilt die gespeicherte Reihenfolge (`sortOrder`, dann `createdAt`). Erledigt heißt: Am angezeigten Tag ist das Tagesziel erreicht, also Abhakkreis abgehakt bzw. Counter voll. Ein Wochen oder Monats Habit, dessen Fenster erfüllt ist, der am angezeigten Tag aber nicht abgehakt ist, bleibt oben. Wird ein Habit erledigt, rutscht er animiert nach unten, wird es wieder aufgehoben, rutscht er animiert zurück an seinen Platz.
-- **Bearbeiten:** Festes Drücken (ca. 0,6 s) auf die Karte (nicht auf Kreis/Counter) öffnet das Bearbeiten Sheet. Die Karte sinkt dabei ein und gibt ein haptisches Signal, beim Auslösen ein festeres. Einfaches Tippen auf die Karte tut nichts. Für VoiceOver gibt es auf der Karte die Aktion "Bearbeiten".
+- **Bearbeiten:** Festes Drücken (ca. 0,6 s) auf die Karte (nicht auf Kreis/Counter) öffnet das Bearbeiten Sheet. Die Karte sinkt dabei ein und gibt ein haptisches Signal, beim Auslösen ein festeres. Einfaches Tippen auf die Karte tut nichts. Für VoiceOver gibt es auf der Karte die Aktion "Bearbeiten". *(Ab Phase 18.3 ersetzt: Tippen auf die linke Seite der Karte öffnet das Habit Detail, dort steht oben rechts "Bearbeiten". Langes Drücken tut nichts. Das Detail ist eine ganze Seite in der `NavigationStack` von Heute (Push, Zurück oben links, Tab Bar ausgeblendet) und gilt für den angezeigten Tag, auch einen vergangenen. Heute hat dafür eine `NavigationStack` mit ausgeblendeter Leiste.)*
 - **Sortieren:** Im Sortiermodus Habits per Drag and Drop verschieben. Es gibt eine Reihenfolge für alle Habits, sie wird gespeichert. Auch im Sortiermodus stehen erledigte Habits unten. Verschieben lassen sich nur die offenen Habits, die erledigten sind im Sortiermodus nicht verschiebbar. Nach dem Verschieben bekommen die offenen Habits in ihrer neuen Reihenfolge die vorderen Plätze in `sortOrder`, die erledigten folgen dahinter in ihrer bisherigen Reihenfolge. *(Ab Phase 9.1 ersetzt durch den nächsten Punkt.)*
 - **Sortieren (ab Phase 9.1):** Der Sortiermodus zeigt alle aktiven Habits (nicht beendet) in der gespeicherten Reihenfolge (`sortOrder`, dann `createdAt`), unabhängig davon, ob sie am angezeigten Tag fällig, erledigt oder pausiert sind. Alle lassen sich per Drag and Drop verschieben. Die Reihenfolge gilt für alle Tage. Erledigt oder pausiert sind im Sortiermodus nur leise markiert (z.B. Häkchen bzw. Kapsel "Pausiert" ausgegraut), sie verändern die Position nicht. *(Ab Phase 18.2 entfällt der Haken, nur pausierte tragen die ausgegraute Kapsel.)* Nach "Fertig" gilt in Heute wieder die Reihenfolge von oben: offene oben, erledigte darunter, pausierte am Ende, jeweils in der neuen gespeicherten Reihenfolge.
 
@@ -475,7 +475,7 @@ Felder in dieser Reihenfolge:
    - **Woche:** zweites Segmentfeld "Anzahl" / "Wochentage". Bei Anzahl ein Stepper ("2x pro Woche"), bei Wochentage 7 Kreise M D M D F S S.
    - **Monat:** zweites Segmentfeld "Anzahl" / "Monatstag". Bei Anzahl ein Stepper ("1x pro Monat"), bei Monatstag die Auswahl 1 bis 31 (ab Phase 9.1 `MonthDayPicker` statt `StepperControl`).
    - Beim Bearbeiten eines bestehenden Habits sind Rhythmus und Variante passend vorausgewählt (z.B. Wochentage Habit: Woche + Wochentage).
-6. Nur beim Bearbeiten, ganz unten: "Habit beenden" (Dialog: Historie behalten oder löschen, siehe 3.9)
+6. *(Bis Phase 18.2:)* Nur beim Bearbeiten, ganz unten: "Habit beenden" (Dialog: Historie behalten oder löschen, siehe 3.9). **Ab Phase 18.3 entfällt das Feld**, beendet wird im Habit Detail (5.4), damit es nur einen Ort dafür gibt.
 
 **Ab Phase 18.2:** Unter dem letzten Feld steht Leerraum (`Theme.sheetBottomSpace`), damit sich der Rhythmus bequem nach oben scrollen lässt.
 
@@ -488,7 +488,7 @@ Speichern nur möglich, wenn Name nicht leer.
 - Monatskalender mit Pfeilen: Der Kalender zeigt einen Monat, mit Pfeil links (voriger Monat) und Pfeil rechts (nächster Monat) rechts neben dem Monatsnamen. Er beginnt beim aktuellen Monat, einen späteren Monat gibt es nicht (Pfeil rechts ist dort deaktiviert). Er reicht mindestens 3 Monate zurück, sonst bis zum Monat des ältesten Habits (dort ist der Pfeil links deaktiviert). Unter dem Monatsnamen steht die Wochentagszeile Mo bis So. *(Ersetzt nach Phase 5.1 den durchgehend scrollbaren Kalender aus Phase 4.)*
 - **Gleicher Kalender überall:** Der Kalender im Tab und der Kalender im Habit Detail sind derselbe Baustein mit demselben Aussehen und denselben Pfeilen. Unterschiede nur: Farbe (Akzentfarbe bzw. Habitfarbe), Tippen (im Tab öffnet ein Tag das Sheet, im Detail sind die Tage nicht antippbar) und die Grenzen (im Tab siehe oben, im Detail Erstellmonat bis aktueller Monat, bei beendeten Habits bis Monat des Beendens).
 - Jeder Tag eingefärbt nach Tagesfortschritt (3.4) an diesem Tag: keine Farbe bei 0 %, dann zunehmend kräftigere Akzentfarbe bis 100 %. Zukünftige Tage blass.
-- Tag antippen öffnet Sheet "Tag bearbeiten": dieselbe Liste wie "Heute" für diesen Tag, mit Abhaken und Counter. Zukünftige Tage sind nicht antippbar.
+- Tag antippen öffnet Sheet "Tag bearbeiten": dieselbe Liste wie "Heute" für diesen Tag, mit Abhaken und Counter. Zukünftige Tage sind nicht antippbar. Ab Phase 18.3 öffnet Antippen eines Habits in dieser Liste das Habit Detail für den gewählten Tag als Push innerhalb des Sheets (Zurück führt zur Liste des Tages).
 - Darunter Liste aller Habits (aktive zuerst, dann beendete) mit aktuellem Streak.
 - **Habit Detail ab Phase 11** (ersetzt den nächsten Punkt): Habit antippen öffnet das Detail als Sheet. Oben ein randloses **Band in Habitfarbe** (Fläche `color`, Schrift `onColor`), wie das Kopfband in Heute, nur in der Farbe des Habits:
   1. Oben rechts in der Leiste der **runde Haken** "Fertig" (Systembutton, `role: .confirm`, getönt in `onColor`), der das Sheet schließt. Die Leiste hat keinen Titel und keinen Hintergrund, das Band reicht darunter bis zum oberen Rand des Sheets. *(Phase 11 hatte "Fertig" und "Bearbeiten" als eckige Buttons im Band, ab Phase 11.2 ersetzt: sie passten nicht zu den runden Ecken des Sheets. Bearbeitet wird im Detail nicht, sondern wie bisher über langes Drücken in Heute.)* Nach "Historie behalten" im Bearbeiten Sheet (aus Heute) zeigt das Detail den beendeten Habit.
@@ -497,6 +497,11 @@ Speichern nur möglich, wenn Name nicht leer.
   4. Aktueller Streak groß (Rolle `numeral`), daneben "Tage in Folge" (Einzahl "Tag in Folge") in Rolle `meta`.
   
   Darunter auf `background` ein Raster aus 2 × 2 Kennzahlen (`StatValue`), getrennt durch Haarlinien: **Quote 30 Tage** ("86 %" bzw. "–"), **Längster Streak**, **Erledigungen** (Summe aller Erledigungen, 3.7) und **Pausen** (Anzahl der Pausen, 3.7). Darunter der `MonthCalendar` in Habitfarbe in der kompakten Darstellung (4.5). **Ab Phase 11.1 stehen unter dem Band alle Texte, Haarlinien, Pfeile und Tageszahlen in der Habitfarbe** (`color`, Beschriftungen mit 70 %, Haarlinien mit 25 % bzw. 20 %) statt in `ink`; die Fläche bleibt `background`. Technisch überschreibt `inkOverride` (Environment) die Tinte von `StatValue`, `Hairline` und `MonthCalendar`. Pausierte Tage zeigen im kompakten Kalender wie `WeekDots` einen kurzen waagrechten Strich in der Tinte mit Pausen Deckkraft statt einer Fläche (ab Phase 11.2). Kein Icon im Detail, keine Leiste mit Titel, nur der runde Haken.
+- **Habit Detail ab Phase 18.3** (ergänzt und ersetzt den vorigen Punkt, wo es abweicht): Das Detail ist eine **ganze Seite** (`HabitDetailView`), kein Sheet. Aus Heute, aus der Habit Liste im Kalender und aus dem Sheet "Tag bearbeiten" wird es per Push in der `NavigationStack` geöffnet. Oben links der Zurück Button des Systems (Wischen vom linken Rand geht ebenfalls), die Tab Bar ist ausgeblendet, der runde Haken "Fertig" entfällt. Oben rechts steht der Systembutton "Bearbeiten" (Symbol `pencil`, `detail-edit`), er öffnet das Sheet "Habit bearbeiten". Beide Symbole stehen in `onColor`. Die Leiste hat weiter keinen Titel und keinen Hintergrund.
+  - **Tag:** Aus Heute gilt der angezeigte Tag, aus der Habit Liste im Kalender heute, aus "Tag bearbeiten" der gewählte Tag.
+  - **Tageszeile** direkt unter dem Band, oben eine Haarlinie, in Habitfarbe: links der Tag relativ ("Heute", "Gestern", "Vor 3 Tagen", Rolle `title`, `detail-day`) und darunter in Rolle `meta` der Stand ("Erledigt" bzw. "Offen", bei Counter "2 von 3", `detail-state`), rechts `HabitDayControl` (`detail-check` bzw. `detail-counter`), mit derselben Logik wie in der Karte. Ist der Habit an dem Tag pausiert: Kapsel "Pausiert" statt des Stands, Kreis bzw. Counter ausgegraut und nicht bedienbar.
+  - **Unten** unter dem Kalender, volle Breite untereinander: "Pausieren" (`quiet`, `detail-pause`, öffnet das Sheet "Neue Pause" mit diesem Habit vorausgewählt) und "Habit beenden" (`destructive`, `detail-end`, Dialog "Historie behalten / löschen" wie in 3.9). Nach "Historie behalten" zeigt das Detail den beendeten Habit, nach "Historie löschen" geht die Seite zurück.
+  - **Beendeter Habit:** nur Band, Kennzahlen und Kalender. Kein Abhaken, kein Bearbeiten, Pausieren oder Beenden.
 - *Bis Phase 10:* Habit antippen öffnet als Sheet das **Habit Detail**: Icon, Name, Rhythmus, eigener Monatskalender (nur dieser Habit, Tage mit Erledigung in Habitfarbe, bei Tagesziel größer 1 mit Teilfüllung), aktueller Streak, längster Streak, Quote 30 Tage (3.7). Der Monatskalender ist derselbe wie im Tab (siehe oben).
 - Unter dem Monatskalender im Tab steht die Habit Liste. Der ganze Tab scrollt senkrecht, der Kalender selbst wird nur mit den Pfeilen gewechselt.
 
@@ -1096,7 +1101,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 
 **Aufräumen (Pflicht, keine Überbleibsel)**
 - Löschen: Kopf mit Icon im Detail, Navigationstitel "Habit Detail", der Abschnitt "Statistik" als Überschrift.
-- Identifier: `detail-name`, `detail-rhythm`, `stat-current-streak`, `stat-longest-streak`, `stat-rate-30` bleiben gleich. Neu: `stat-total`, `stat-pauses`, `detail-done`.
+- Identifier: `detail-name`, `detail-rhythm`, `stat-current-streak`, `stat-longest-streak`, `stat-rate-30` bleiben gleich. Neu: `stat-total`, `stat-pauses`, `detail-done` *(entfällt ab Phase 18.3)*.
 - UI Tests anpassen, die den Kopf mit Icon oder den Titel "Habit Detail" erwarten (u.a. `CalendarPhase5UITests`, `CalendarPhase51UITests`).
 
 **Pflicht Testfälle**
@@ -1515,11 +1520,13 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Keine neuen Unit Tests, die Rechenlogik ändert sich nicht.
 
 **Definition of Done**
-- [ ] Antippen eines Habits in Heute öffnet das Detail als ganze Seite mit Zurück oben links, ohne Tab Bar. Langes Drücken tut nichts mehr.
-- [ ] Antippen eines Habits in der Liste im Kalender öffnet dieselbe Seite.
-- [ ] Im Detail sehe ich, ob der Habit am Tag erledigt ist bzw. wie oft, und kann ihn dort abhaken. Zurück in Heute ist die Karte ebenfalls abgehakt.
-- [ ] Aus dem Detail kann ich den Habit bearbeiten, pausieren und beenden. Im Sheet "Habit bearbeiten" gibt es kein "Habit beenden" mehr.
-- [ ] Ein beendeter Habit zeigt im Detail kein Abhaken und keine Buttons.
+- [x] Antippen eines Habits in Heute öffnet das Detail als ganze Seite mit Zurück oben links, ohne Tab Bar. Langes Drücken tut nichts mehr.
+- [x] Antippen eines Habits in der Liste im Kalender öffnet dieselbe Seite.
+- [x] Im Detail sehe ich, ob der Habit am Tag erledigt ist bzw. wie oft, und kann ihn dort abhaken. Zurück in Heute ist die Karte ebenfalls abgehakt.
+- [x] Aus dem Detail kann ich den Habit bearbeiten, pausieren und beenden. Im Sheet "Habit bearbeiten" gibt es kein "Habit beenden" mehr.
+- [x] Ein beendeter Habit zeigt im Detail kein Abhaken und keine Buttons.
+
+*Stand (Simulator iPhone 18 Pro): `HabitDetailView` ersetzt `HabitDetailSheet`, Heute hat eine `NavigationStack` mit ausgeblendeter Leiste, im Kalender und im Sheet "Tag bearbeiten" öffnet Antippen das Detail per Push. `HabitDayControl` ist der gemeinsame Baustein für Kreis und Counter. `HabitCard` hat statt `onEdit` nun `onOpen` (Tippen auf die linke Seite, Identifier `open-<Name>`), das lange Drücken samt `Theme.editPressDuration`, `editPressPreviewDelay`, `pressedCardScale` und Haptik ist gelöscht, ebenso `editingHabit`, `detail-done` und das Beenden im `HabitEditorSheet`. "Pausieren" öffnet `PauseEditorSheet(preselecting:)`. Neu: `HermesButton(fillsWidth:)` für die vollen Breiten. Die Symbole der Leiste folgen über `toolbarColorScheme` dem Band (hell im hellen Modus). Das Detail im Simulator mit Testdaten angesehen. Ein UI Test neu (`testTappingACardOpensTheDetailWhereTheHabitCanBeChecked`), `TodayUITests`, `TodayPhase31UITests` und `SettingsPhase6UITests` auf Antippen umgestellt (dort jetzt auch "Historie behalten" mit beendetem Detail). Die in der Planung genannten Dateien `TodayPhase32UITests` und `CalendarPhase51UITests` gibt es seit dem Bündeln der UI Tests nicht mehr. Unit Tests (310) und alle 15 UI Tests grün.*
 
 ---
 

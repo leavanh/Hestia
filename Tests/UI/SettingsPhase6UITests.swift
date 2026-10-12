@@ -15,17 +15,23 @@ final class SettingsPhase6UITests: XCTestCase {
         return app
     }
 
-    /// Beendet einen Habit über das Bearbeiten Sheet (langes Drücken, "Habit beenden", Antwort im Dialog).
+    /// Beendet einen Habit im Detail (Antippen, "Habit beenden", Antwort im Dialog). Nach "Historie löschen" geht die
+    /// Seite zurück, nach "Historie behalten" zeigt sie den beendeten Habit und der Test geht selbst zurück.
     @MainActor
     private func endHabit(named name: String, answer: String, in app: XCUIApplication) {
-        app.staticTexts[name].press(forDuration: 1.5)
-        XCTAssertTrue(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 5))
-        let end = app.buttons["end-habit"]
+        app.openDetail(ofCard: name)
+        let end = app.buttons["detail-end"]
         for _ in 0..<4 where !end.isHittable { app.swipeUp() }
         end.tap()
         let alert = app.alerts["Habit beenden?"]
         XCTAssertTrue(alert.waitForExistence(timeout: 5))
         alert.buttons[answer].tap()
+        if answer == "Historie behalten" {
+            XCTAssertTrue(app.staticTexts["detail-rhythm"].waitForExistence(timeout: 5))
+            XCTAssertFalse(app.buttons["detail-end"].exists, "Beendet: keine Buttons mehr")
+            XCTAssertFalse(app.buttons["detail-check"].exists, "Beendet: kein Abhaken mehr")
+            app.goBack()
+        }
         XCTAssertTrue(app.staticTexts["today-title"].waitForExistence(timeout: 5))
     }
 
@@ -42,6 +48,8 @@ final class SettingsPhase6UITests: XCTestCase {
         let app = launchFresh(extraArguments: ["-HestiaSampleData"])
         XCTAssertTrue(app.staticTexts["Lesen"].waitForExistence(timeout: 5))
 
+        endHabit(named: "Meditieren", answer: "Historie behalten", in: app)
+        XCTAssertFalse(app.staticTexts["Meditieren"].exists, "Beendet: weg aus Heute")
         endHabit(named: "Lesen", answer: "Historie löschen", in: app)
         XCTAssertFalse(app.staticTexts["Lesen"].exists, "Gelöscht: weg aus Heute")
 
@@ -49,6 +57,7 @@ final class SettingsPhase6UITests: XCTestCase {
         XCTAssertTrue(app.buttons["calendar-previous"].waitForExistence(timeout: 5))
         XCTAssertTrue(scrollToExist(app.buttons["habit-row-Sport"], in: app))
         XCTAssertFalse(app.buttons["habit-row-Lesen"].exists, "Auch im Kalender ist er weg")
+        XCTAssertTrue(scrollToExist(app.buttons["habit-row-Meditieren"], in: app), "Mit Historie behalten bleibt der beendete Habit im Kalender")
     }
 }
 

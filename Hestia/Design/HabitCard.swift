@@ -2,9 +2,9 @@ import SwiftUI
 
 /// Flache Zeile eines Habits mit Haarlinie oben: links Icon mit Statusmarke, Name und darunter Rhythmus Zeile mit den
 /// 7 Tage Punkten rechts daneben, rechts `CheckBox` oder `CounterControl`.
-/// Festes Drücken (`Theme.editPressDuration`) auf die linke Seite ruft `onEdit` auf (auch als VoiceOver Aktion "Bearbeiten"),
+/// Antippen der linken Seite ruft `onOpen` auf (Habit Detail, für VoiceOver ein Button mit dem Namen des Habits),
 /// die rechte Seite bedient sich selbst. Ein pausierter Habit ist ausgegraut, trägt den Chip "Pausiert" neben dem Namen
-/// und lässt sich nicht abhaken. Dabei sinkt die Zeile kurz ein und gibt einen leichten, beim Auslösen einen festen Impuls.
+/// und lässt sich nicht abhaken.
 struct HabitCard<Control: View>: View {
     let name: String
     let iconName: String
@@ -13,13 +13,8 @@ struct HabitCard<Control: View>: View {
     let rhythmText: String
     let dots: [WeekDot]
     var isPaused = false
-    let onEdit: () -> Void
+    let onOpen: () -> Void
     @ViewBuilder var control: Control
-
-    @State private var editCount = 0
-    @State private var isPressing = false
-    /// Wird nach `Theme.editPressPreviewDelay` Drücken wahr, nicht schon beim bloßen Berühren (z.B. zum Scrollen).
-    @State private var isPreviewing = false
 
     var body: some View {
         // Bei großer Schrift stehen Icon, Texte und Bedienelement untereinander, damit nichts abgeschnitten wird.
@@ -52,24 +47,12 @@ struct HabitCard<Control: View>: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .contentShape(Rectangle())
-            .onLongPressGesture(minimumDuration: Theme.editPressDuration) {
-                editCount += 1
-                onEdit()
-            } onPressingChanged: { pressing in
-                isPressing = pressing
-            }
-            .task(id: isPressing) {
-                guard isPressing else {
-                    isPreviewing = false
-                    return
-                }
-                try? await Task.sleep(for: .seconds(Theme.editPressPreviewDelay))
-                if !Task.isCancelled { isPreviewing = true }
-            }
-            .sensoryFeedback(.impact(weight: .light), trigger: isPreviewing) { _, preview in preview }
-            .sensoryFeedback(.impact(flexibility: .rigid, intensity: 1), trigger: editCount)
+            .onTapGesture(perform: onOpen)
             .accessibilityElement(children: .contain)
-            .accessibilityAction(named: "Bearbeiten", onEdit)
+            .accessibilityLabel(name)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction(.default, onOpen)
+            .accessibilityIdentifier("open-\(name)")
 
             control
                 .disabled(isPaused)
@@ -78,8 +61,6 @@ struct HabitCard<Control: View>: View {
         .padding(.vertical, Theme.cardPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .overlay(alignment: .top) { Hairline() }
-        .scaleEffect(isPreviewing ? Theme.pressedCardScale : 1)
-        .animation(.spring(duration: 0.25, bounce: 0.3), value: isPreviewing)
     }
 
     private var rhythmLine: some View {
@@ -101,28 +82,28 @@ struct HabitCard<Control: View>: View {
             HabitCard(
                 name: "Sport", iconName: "figure.run", habitColor: .orange, status: .yellow,
                 rhythmText: "1 von 3 diese Woche",
-                dots: [.fill(0), .fill(0), .fill(1), .fill(1), .fill(0), .fill(1), .fill(0)], onEdit: {}
+                dots: [.fill(0), .fill(0), .fill(1), .fill(1), .fill(0), .fill(1), .fill(0)], onOpen: {}
             ) {
                 CheckBox(isChecked: false, habitColor: .orange) {}
             }
             HabitCard(
                 name: "Wasser trinken", iconName: "drop.fill", habitColor: .teal, status: .green,
                 rhythmText: "3 pro Tag",
-                dots: [.fill(1), .fill(0.66), .fill(0.33), .fill(1), .fill(0), .fill(1), .fill(0.66)], onEdit: {}
+                dots: [.fill(1), .fill(0.66), .fill(0.33), .fill(1), .fill(0), .fill(1), .fill(0.66)], onOpen: {}
             ) {
                 CounterControl(count: 2, target: 3, habitColor: .teal, id: "p", onDecrement: {}, onIncrement: {})
             }
             HabitCard(
                 name: "Yoga", iconName: "figure.walk", habitColor: .violet, status: .red,
                 rhythmText: "Mo · Do",
-                dots: [.fill(0), .fill(1), .fill(0), .fill(0), .fill(1), .fill(0), .fill(0)], onEdit: {}
+                dots: [.fill(0), .fill(1), .fill(0), .fill(0), .fill(1), .fill(0), .fill(0)], onOpen: {}
             ) {
                 CheckBox(isChecked: true, habitColor: .violet) {}
             }
             HabitCard(
                 name: "Lesen", iconName: "book.fill", habitColor: .pink, status: .green,
                 rhythmText: "Täglich",
-                dots: [.fill(1), .fill(1), .paused, .paused, .paused, .paused, .paused], isPaused: true, onEdit: {}
+                dots: [.fill(1), .fill(1), .paused, .paused, .paused, .paused, .paused], isPaused: true, onOpen: {}
             ) {
                 CheckBox(isChecked: false, habitColor: .pink) {}
             }

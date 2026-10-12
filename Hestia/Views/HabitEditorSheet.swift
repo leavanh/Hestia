@@ -16,7 +16,6 @@ struct HabitEditorSheet: View {
     @State private var targetCount: Int
     @State private var weekdays: Set<Int>
     @State private var monthDay: Int
-    @State private var isConfirmingEnd = false
     @FocusState private var isNameFocused: Bool
 
     init(habit: Habit? = nil) {
@@ -66,9 +65,6 @@ struct HabitEditorSheet: View {
                     PaperSection(title: "Rhythmus") {
                         rhythmSection
                     }
-                    if let habit, habit.isAlive, habit.endedAt == nil {
-                        endButton
-                    }
                 }
                 .padding(Theme.spacing)
                 .padding(.bottom, Theme.sheetBottomSpace)
@@ -89,13 +85,6 @@ struct HabitEditorSheet: View {
                     .disabled(trimmedName.isEmpty)
                 }
             }
-            .alert("Habit beenden?", isPresented: $isConfirmingEnd) {
-                Button("Historie behalten") { endHabit(keepingHistory: true) }
-                Button("Historie löschen", role: .destructive) { endHabit(keepingHistory: false) }
-                Button("Abbrechen", role: .cancel) {}
-            } message: {
-                Text("Der Habit erscheint nicht mehr in Heute. Historie in Kalender und Statistik behalten oder löschen? Gelöschte Historie lässt sich nicht wiederherstellen.")
-            }
             .onAppear { isNameFocused = habit == nil }
             .onChange(of: rhythm) { _, new in
                 // Die Anzahl bleibt, soweit der neue Rhythmus sie erlaubt.
@@ -103,27 +92,6 @@ struct HabitEditorSheet: View {
                     targetCount = min(max(targetCount, range.lowerBound), range.upperBound)
                 }
             }
-        }
-    }
-
-    /// "Habit beenden", ganz unten und nur beim Bearbeiten (Spezifikation 5.3). Beendet wird erst nach Bestätigung.
-    private var endButton: some View {
-        HermesButton("Habit beenden", variant: .destructive, role: .destructive) {
-            isConfirmingEnd = true
-        }
-        .frame(maxWidth: .infinity)
-        .accessibilityIdentifier("end-habit")
-    }
-
-    /// Behalten: der Habit ist ab heute beendet, seine Historie bleibt. Löschen: Habit, Erledigungen und Pausen
-    /// Zuordnung sind weg (Spezifikation 3.9).
-    private func endHabit(keepingHistory: Bool) {
-        guard let habit else { return }
-        dismiss()
-        if keepingHistory {
-            habit.end(on: AppClock.now, engine: HabitEngine(), in: context)
-        } else {
-            habit.deleteWithHistory(in: context)
         }
     }
 
