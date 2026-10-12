@@ -1455,6 +1455,68 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 
 ---
 
+### Phase 18.2: Kleine Korrekturen vor der Veröffentlichung
+
+**Ziel:** Vier kleine Dinge, die mir beim Benutzen aufgefallen sind, sind behoben: Rhythmus im Sheet ist bequem erreichbar, Wochenbeginn heißt "System", Weitere heißt "Heute nicht fällig", im Sortiermodus fehlt der Haken.
+
+**Umfang**
+- **Sheet "Habit anlegen / bearbeiten" (5.3):** Unter dem letzten Feld (Rhythmus bzw. "Habit beenden") steht zusätzlicher Leerraum (`Theme.sheetBottomSpace`, ca. 160 pt), damit sich der Rhythmus weiter nach oben scrollen lässt und nicht am unteren Rand klebt.
+- **Einstellungen, Wochenbeginn (5.5):** Die erste Wahl heißt "System" statt "Automatisch" (Englisch "System" statt "Automatic"), wie bei Darstellung. Verhalten, Schlüssel und gespeicherter Wert (`automatic`) bleiben gleich.
+- **Heute, Weitere (5.2):** Der Abschnitt heißt "Heute nicht fällig · 3" (Englisch "Not due today · 3"), VoiceOver "Heute nicht fällig, 3 Habits". Gilt auch an vergangenen Tagen und im Sheet "Tag bearbeiten". Verhalten, Schlüssel `HestiaOtherExpanded` und Identifier `other-habits-toggle` bleiben. Im Code darf er weiter "Other" heißen.
+- **Sortiermodus (5.2):** Der Haken für am Tag erledigte Habits entfällt. Pausierte tragen weiter die ausgegraute Kapsel "Pausiert".
+- **Texte** in `Localizable.xcstrings`, Glossar 4.8 anpassen (Weitere → Heute nicht fällig / Not due today). "Weitere · %lld", "Weitere, %@" und "Automatisch" aus dem Katalog entfernen.
+- **Spezifikation:** 4.8, 5.2, 5.3, 5.5.
+
+**Pflicht Testfälle**
+- Keine neuen Tests. Bestehende Tests anpassen, die "Automatisch", "Weitere" oder den Haken im Sortiermodus erwarten.
+
+**Definition of Done**
+- [ ] Im Sheet "Neuer Habit" kann ich so weit scrollen, dass der Rhythmus mit seiner Einstellung bequem in der Mitte des Bildschirms steht.
+- [ ] In den Einstellungen heißt die erste Wahl bei Wochenbeginn "System".
+- [ ] In Heute heißt der Abschnitt unter der Liste "Heute nicht fällig", auf Englisch "Not due today".
+- [ ] Im Sortiermodus ist bei erledigten Habits kein Haken mehr zu sehen.
+
+---
+
+### Phase 18.3: Habit Detail als zentrale Seite
+
+**Ziel:** Ein Habit antippen, in Heute wie im Kalender, öffnet das Habit Detail als ganze Seite mit Zurück oben links. Dort sehe ich, ob und wie oft der Habit am Tag erledigt ist, hake ihn ab und kann ihn bearbeiten, pausieren und beenden. Langes Drücken gibt es nicht mehr.
+
+**Entschieden**
+- **Ganze Seite statt Sheet:** Das Detail wird in der `NavigationStack` des Tabs geöffnet (Push), nicht als Sheet. Oben links der Zurück Button des Systems, getönt in `onColor`, Wischen vom linken Rand geht ebenfalls zurück. Die Tab Bar ist im Detail ausgeblendet. Das Band reicht wie bisher bis unter die Statusleiste. Der runde Haken "Fertig" entfällt. Heute bekommt dafür eine `NavigationStack` mit ausgeblendeter Leiste, Kopfband, kleine Leiste und Wischen bleiben wie sie sind.
+- **Welcher Tag:** Aus Heute gilt der angezeigte Tag (auch ein vergangener), aus der Habit Liste im Kalender heute. Im Sheet "Tag bearbeiten" öffnet Antippen das Detail für den gewählten Tag innerhalb des Sheets (Push im Sheet, Zurück führt zur Liste des Tages).
+- **Antippen statt langes Drücken:** Tippen auf die linke Seite einer Karte (Icon, Name, Rhythmus Zeile) öffnet das Detail, Kreis und Counter rechts haken wie bisher ab. Gilt für Hauptliste, "Heute nicht fällig", pausierte Habits und das Sheet "Tag bearbeiten". Langes Drücken, Einsinken und die Haptik dazu entfallen. VoiceOver: die linke Seite ist ein Button mit dem Namen des Habits, die Aktion "Bearbeiten" entfällt.
+- **"Habit beenden" zieht ins Detail um.** Im Sheet "Habit bearbeiten" gibt es es nicht mehr, damit es nur einen Ort dafür gibt.
+- **Pausieren** öffnet das bestehende Sheet "Neue Pause" mit diesem Habit vorausgewählt. Andere Habits lassen sich dort wie gewohnt dazunehmen.
+- Ein **beendeter Habit** zeigt im Detail nur Band, Kennzahlen und Kalender: kein Abhaken, kein Bearbeiten, Pausieren oder Beenden.
+
+**Umfang**
+- **Detail, Leiste:** links Zurück (System), rechts der Button "Bearbeiten" (Systembutton mit Symbol `pencil`, getönt in `onColor`), öffnet das Sheet "Habit bearbeiten". Kein Titel, kein Hintergrund (wie bisher).
+- **Detail, Tageszeile** direkt unter dem Band, oben eine Haarlinie wie bei den Karten, in Habitfarbe (`inkOverride`): links der Tag relativ ("Heute", "Gestern", "Vor 3 Tagen", Rolle `title`) und darunter in Rolle `meta` der Stand am Tag: "Erledigt" bzw. "Offen", bei Counter "2 von 3". Rechts `CheckBox` bzw. `CounterControl`, genau wie in der Karte und mit derselben Logik (Abhaken für diesen Tag, `setCount`). Ist der Habit an dem Tag pausiert: Kapsel "Pausiert", Kreis bzw. Counter ausgegraut und nicht bedienbar.
+- **Detail, unten** unter dem Kalender: "Pausieren" (`HermesButton`, Variante `quiet`) und "Habit beenden" (Variante `destructive`), volle Breite untereinander. "Habit beenden" fragt wie bisher (Historie behalten oder löschen, 3.9). Nach "Historie behalten" zeigt das Detail den beendeten Habit, nach "Historie löschen" geht es zurück.
+- **Kalender Tab:** Habit antippen öffnet das Detail per Push statt als Sheet.
+- **Sheet "Habit bearbeiten" (5.3):** "Habit beenden" entfällt.
+- **Spezifikation:** 4.5 (`HabitCard` ohne langes Drücken), 5.2 (Bearbeiten), 5.3 (Feld 6), 5.4 (Detail). In 4.7 den Punkt zum Einsinken als entfallen markieren.
+
+**Aufräumen (Pflicht, keine Überbleibsel)**
+- Löschen: `onLongPressGesture` in `HabitCard` samt `Theme.editPressDuration`, `Theme.editPressPreviewDelay`, `Theme.pressedCardScale`, die Haptik dazu, `editingHabit` in Heute und im Sheet "Tag bearbeiten", der Haken `detail-done`, `endButton` und Bestätigung im `HabitEditorSheet`.
+- `HabitDetailSheet` heißt `HabitDetailView`. Das Bedienelement (Kreis oder Counter) liegt in einem eigenen Baustein, den Karte und Detail gemeinsam nutzen, statt doppelt.
+- Identifier: neu `detail-day`, `detail-check` bzw. `detail-counter`, `detail-edit`, `detail-pause`, `detail-end`. `end-habit` entfällt (jetzt `detail-end`). Die Karte bekommt `open-<Name>`.
+
+**Pflicht Testfälle**
+- Bestehende UI Tests, die mit langem Drücken bearbeiten oder beenden (`TodayUITests`, `SettingsPhase6UITests`, `TodayPhase31UITests`, `TodayPhase32UITests`) und die `detail-done` nutzen (`CalendarPhase5UITests`, `CalendarPhase51UITests`), auf Antippen und Zurück umstellen.
+- UI Test (einer, neu): In Heute einen offenen Habit aus den Testdaten antippen, das Detail zeigt "Offen", im Detail abhaken zeigt "Erledigt", Zurück, die Karte in Heute ist abgehakt. Danach erneut öffnen, "Bearbeiten" öffnet das Sheet.
+- Keine neuen Unit Tests, die Rechenlogik ändert sich nicht.
+
+**Definition of Done**
+- [ ] Antippen eines Habits in Heute öffnet das Detail als ganze Seite mit Zurück oben links, ohne Tab Bar. Langes Drücken tut nichts mehr.
+- [ ] Antippen eines Habits in der Liste im Kalender öffnet dieselbe Seite.
+- [ ] Im Detail sehe ich, ob der Habit am Tag erledigt ist bzw. wie oft, und kann ihn dort abhaken. Zurück in Heute ist die Karte ebenfalls abgehakt.
+- [ ] Aus dem Detail kann ich den Habit bearbeiten, pausieren und beenden. Im Sheet "Habit bearbeiten" gibt es kein "Habit beenden" mehr.
+- [ ] Ein beendeter Habit zeigt im Detail kein Abhaken und keine Buttons.
+
+---
+
 ### Phase 19: Veröffentlichung (mache ich selbst)
 
 **Ziel:** Hestia Habits steht im App Store, auf Deutsch und Englisch, mit Trinkgeld.
