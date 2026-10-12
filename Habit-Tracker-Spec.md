@@ -1358,6 +1358,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - **Datenschutz und Support:** ein Abschnitt in der README auf GitHub. Die App erhebt keine Daten, alles bleibt auf dem iPhone.
 - **Buy Me a Coffee** (`https://buymeacoffee.com/leavanh`) nur in der README, nicht in der App: Apple lässt Trinkgeld an Entwickler in der App nur über In-App-Kauf zu (Richtlinie 3.1.1). Ein Link nach außen riskiert die Ablehnung, ein In-App-Kauf bräuchte Bankdaten und Verträge im Account und würde den Händlerstatus berühren.
 - **Name im Store:** "Hestia Habits". Auf dem Homescreen bleibt "Hestia".
+- **Daten beim Handywechsel:** Die Datenbank liegt im App-Ordner (Application Support) und ist nicht vom Backup ausgenommen. Sie kommt deshalb mit dem iCloud-Backup, einem Backup über den Mac und der direkten Übertragung beim Einrichten eines neuen iPhones mit, ebenso die Einstellungen (UserDefaults). Ein Abgleich über iCloud (CloudKit) zwischen mehreren Geräten gibt es in 1.0 nicht. Er wäre eine eigene spätere Phase, weil das Modell dafür angepasst werden muss (alle Felder optional oder mit Standardwert, Beziehungen optional) und der Account meines Freundes die iCloud-Berechtigung braucht.
 
 **Umfang**
 - **Über entfernen:** `AboutSheet.swift`, `AboutSection` in `SettingsView`, die Texte dazu im Katalog, der Teil "Über Hestia" in `Phase14UITests`, Abschnitt 5.5 (Aufbau ohne Über). Die Lizenzdateien `OFL-*.txt` bleiben in "Copy Bundle Resources".
@@ -1376,6 +1377,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Definition of Done**
 - [ ] In den Einstellungen gibt es kein "Über" mehr.
 - [ ] Meine Habits auf dem iPhone sind nach dem Update auf diese Version noch alle da.
+- [ ] Nach "Backup wiederherstellen" im Simulator (oder auf einem zweiten Gerät) sind Habits, Erledigungen, Pausen und Einstellungen wieder da.
 - [ ] Ein Archiv (Product › Archive) mit dem Team meines Freundes baut und lässt sich in Xcode ohne Fehler prüfen ("Validate App").
 - [ ] Die README ist auf GitHub öffentlich lesbar, mit Datenschutz, Support und Buy-Me-a-Coffee-Link.
 
