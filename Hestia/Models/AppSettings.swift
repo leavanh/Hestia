@@ -10,16 +10,16 @@ enum SettingsKey {
 extension Periods {
     var title: String {
         switch self {
-        case .rolling: "Rollierend"
-        case .calendar: "Kalender"
+        case .rolling: localized("Rollierend")
+        case .calendar: localized("Kalender")
         }
     }
 
     /// Erklärzeile unter der Auswahl (Spezifikation 5.5).
     var explanation: String {
         switch self {
-        case .rolling: "Die letzten 7 bzw. 30 Tage"
-        case .calendar: "Die laufende Woche bzw. der laufende Monat"
+        case .rolling: localized("Die letzten 7 bzw. 30 Tage")
+        case .calendar: localized("Die laufende Woche bzw. der laufende Monat")
         }
     }
 }
@@ -32,9 +32,9 @@ enum AppearanceSetting: String, CaseIterable {
 
     var title: String {
         switch self {
-        case .system: "System"
-        case .light: "Hell"
-        case .dark: "Dunkel"
+        case .system: localized("System")
+        case .light: localized("Hell")
+        case .dark: localized("Dunkel")
         }
     }
 
@@ -56,9 +56,9 @@ enum FirstWeekdaySetting: String, CaseIterable {
 
     var title: String {
         switch self {
-        case .automatic: "Automatisch"
-        case .monday: "Montag"
-        case .sunday: "Sonntag"
+        case .automatic: localized("Automatisch")
+        case .monday: localized("Montag")
+        case .sunday: localized("Sonntag")
         }
     }
 

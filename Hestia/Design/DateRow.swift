@@ -4,7 +4,7 @@ import SwiftUI
 /// einen `MonthCalendar` zur Auswahl auf. Ein zweites Tippen oder die Wahl eines Tags klappt ihn wieder zu. Ob die Zeile
 /// aufgeklappt ist, bestimmt der Aufrufer, damit höchstens eine Zeile offen ist.
 struct DateRow: View {
-    let title: String
+    let title: LocalizedStringKey
     @Binding var date: Date
     @Binding var isExpanded: Bool
     /// Frühester wählbarer Tag. `nil` heißt ohne Grenze.

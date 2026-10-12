@@ -58,7 +58,7 @@ final class CalendarPhase5UITests: XCTestCase {
         // Streak im Band, vier Kennzahlen im Raster. Im Wert steht nur die Zahl, die Einheit in der Beschriftung.
         XCTAssertEqual(app.staticTexts["stat-current-streak"].label, "Aktueller Streak: 1 Tag")
         XCTAssertEqual(app.staticTexts["stat-longest-streak"].label, "4")
-        XCTAssertEqual(app.staticTexts["stat-rate-30"].label, "79 %")
+        XCTAssertEqual(app.staticTexts["stat-rate-30"].label, "79\u{00A0}%")
         XCTAssertEqual(app.staticTexts["stat-total"].label, "48")
         XCTAssertEqual(app.staticTexts["stat-pauses"].label, "0")
     }

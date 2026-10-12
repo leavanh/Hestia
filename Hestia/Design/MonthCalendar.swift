@@ -61,7 +61,7 @@ struct MonthCalendar: View {
 
         VStack(alignment: .leading, spacing: Theme.spacing) {
             HStack {
-                Text(grid.firstDay.formatted(.dateTime.month(.wide).year().locale(Locale(identifier: "de_DE"))))
+                Text(grid.firstDay.formatted(.dateTime.month(.wide).year().locale(.current)))
                     .metaText()
                     .foregroundStyle(ink)
                     .accessibilityAddTraits(.isHeader)
@@ -168,12 +168,12 @@ struct MonthCalendar: View {
     }
 
     private func accessibilityValue(isFuture: Bool, isPausedDay: Bool, isSelected: Bool, progress: DayProgress) -> String {
-        if selectedDay != nil { return isSelected ? "Ausgewählt" : "" }
-        return isFuture ? "" : (isPausedDay ? "Pausiert" : value(for: progress))
+        if selectedDay != nil { return isSelected ? localized("Ausgewählt") : "" }
+        return isFuture ? "" : (isPausedDay ? localized("Pausiert") : value(for: progress))
     }
 
     private func value(for progress: DayProgress) -> String {
-        progress.total == 0 ? "Nichts fällig" : "\(progress.percent) %"
+        progress.total == 0 ? localized("Nichts fällig") : PercentText.text(progress.percent)
     }
 
     /// Bezeichner im Format `2026-10-08` für Accessibility und Tests.

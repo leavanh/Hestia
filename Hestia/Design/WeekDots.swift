@@ -24,11 +24,7 @@ struct WeekDots: View {
     /// Für VoiceOver und Tests: wie viele der 7 Tage pausiert sind.
     private var pausedText: String {
         let count = dots.filter { $0 == .paused }.count
-        switch count {
-        case 0: return ""
-        case 1: return "1 Tag pausiert"
-        default: return "\(count) Tage pausiert"
-        }
+        return count == 0 ? "" : localized("\(count) Tage pausiert")
     }
 
     /// Der Rahmen liegt nur als Überlagerung um das Quadrat und verändert Abstände und Ausrichtung nicht.

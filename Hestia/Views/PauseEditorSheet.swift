@@ -66,7 +66,7 @@ struct PauseEditorSheet: View {
     @ViewBuilder
     private var habitChoices: some View {
         if choices.isEmpty {
-            Text("Es gibt keine aktiven Habits. Lege zuerst in Heute einen Habit an.")
+            Text("Keine aktiven Habits. Zuerst in Heute einen Habit anlegen.")
                 .bodyText()
                 .foregroundStyle(Theme.inkSecondary)
         } else {
@@ -98,7 +98,7 @@ struct PauseEditorSheet: View {
                         .accessibilityIdentifier("pause-state-\(habit.name)")
                         CheckBox(
                             isChecked: selection.contains(habit.id), habitColor: habitColor, label: habit.name,
-                            checkedText: "Ausgewählt", uncheckedText: "Nicht ausgewählt"
+                            checkedText: localized("Ausgewählt"), uncheckedText: localized("Nicht ausgewählt")
                         ) {
                             toggle(habit)
                         }

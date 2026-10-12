@@ -7,7 +7,7 @@ struct CounterControl: View {
     let target: Int
     let habitColor: HabitColor
     /// Was VoiceOver für den Wert liest, z.B. der Habit Name.
-    var label = "Erledigt"
+    var label = localized("Erledigt")
     /// Grundlage für die Bezeichner der drei Teile ("<id>-minus", "<id>-value", "<id>-plus").
     let id: String
     let onDecrement: () -> Void
@@ -30,7 +30,7 @@ struct CounterControl: View {
                 .frame(minWidth: Theme.counterKeySize, minHeight: Theme.controlSize)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(label)
-                .accessibilityValue("\(count) von \(target)")
+                .accessibilityValue(localized("\(count) von \(target)"))
                 .accessibilityAdjustableAction { direction in
                     switch direction {
                     case .increment: if count < target { onIncrement() }

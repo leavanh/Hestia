@@ -3,7 +3,7 @@ import SwiftUI
 /// Eine Kennzahl: großer Wert in Rolle `stat`, darunter die Beschriftung in Rolle `meta`. Im Wert steht nur die Zahl
 /// bzw. Prozentzahl, die Einheit gehört in die Beschriftung (Spezifikation 4.5).
 struct StatValue: View {
-    let title: String
+    let title: LocalizedStringKey
     let value: String
     let identifier: String
 
@@ -28,13 +28,23 @@ struct StatValue: View {
     }
 
     /// "1 Tag", "5 Tage".
-    static func daysText(_ days: Int) -> String {
-        days == 1 ? "1 Tag" : "\(days) Tage"
+    static func daysText(_ days: Int, locale: Locale = .current) -> String {
+        localized("\(days) Tage", locale: locale)
     }
 
-    /// "67 %", ohne Quote ein Strich.
-    static func rateText(_ percent: Int?) -> String {
-        percent.map { "\($0) %" } ?? "–"
+    /// Einheit unter dem Streak in der Liste: "Tag" bzw. "Tage".
+    static func dayUnitText(_ days: Int, locale: Locale = .current) -> String {
+        days == 1 ? localized("Tag", locale: locale) : localized("Tage", locale: locale)
+    }
+
+    /// Zeile unter dem aktuellen Streak im Detail: "Tag in Folge" bzw. "Tage in Folge".
+    static func inARowText(_ days: Int, locale: Locale = .current) -> String {
+        days == 1 ? localized("Tag in Folge", locale: locale) : localized("Tage in Folge", locale: locale)
+    }
+
+    /// "67 %" bzw. "67%", ohne Quote ein Strich.
+    static func rateText(_ percent: Int?, locale: Locale = .current) -> String {
+        percent.map { PercentText.text($0, locale: locale) } ?? "–"
     }
 }
 

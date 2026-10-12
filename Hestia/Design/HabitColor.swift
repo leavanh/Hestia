@@ -22,17 +22,17 @@ enum HabitColor: String, CaseIterable, Identifiable {
     /// Vordergrund auf voller Habitfarbe (Häkchen, Text im Band des Details).
     var onColor: Color { Theme.background }
 
-    /// Deutscher Name für VoiceOver in der Farbauswahl.
+    /// Name für VoiceOver in der Farbauswahl.
     var title: String {
         switch self {
-        case .blue: "Blau"
-        case .violet: "Indigo"
-        case .pink: "Pink"
-        case .red: "Rot"
-        case .orange: "Orange"
-        case .yellow: "Ocker"
-        case .green: "Grün"
-        case .teal: "Cyan"
+        case .blue: localized("Blau")
+        case .violet: localized("Indigo")
+        case .pink: localized("Pink")
+        case .red: localized("Rot")
+        case .orange: localized("Orange")
+        case .yellow: localized("Ocker")
+        case .green: localized("Grün")
+        case .teal: localized("Cyan")
         }
     }
 

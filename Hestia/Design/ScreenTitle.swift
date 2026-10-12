@@ -2,9 +2,9 @@ import SwiftUI
 
 /// Großer Titel eines Tabs (Kalender, Einstellungen) in Rolle `display`, links bündig im Inhalt.
 struct ScreenTitle: View {
-    let title: String
+    let title: LocalizedStringKey
 
-    init(_ title: String) {
+    init(_ title: LocalizedStringKey) {
         self.title = title
     }
 

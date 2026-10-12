@@ -22,7 +22,7 @@ final class TodayPhase31UITests: XCTestCase {
         let titles = ["Heute", "Gestern", "Vorgestern"]
         return (
             -offset < titles.count ? titles[-offset] : "Vor \(-offset) Tagen",
-            date.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "de_DE")))
+            date.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "de")))
         )
     }
 

@@ -9,9 +9,9 @@ enum RhythmGroup: CaseIterable {
 
     var title: String {
         switch self {
-        case .daily: "Täglich"
-        case .week: "Woche"
-        case .month: "Monat"
+        case .daily: localized("Täglich")
+        case .week: localized("Woche")
+        case .month: localized("Monat")
         }
     }
 
@@ -46,9 +46,9 @@ enum Rhythm: String, Codable, CaseIterable {
     var variantTitle: String? {
         switch self {
         case .daily: nil
-        case .weekly, .monthly: "Anzahl"
-        case .weekdays: "Wochentage"
-        case .monthDay: "Monatstag"
+        case .weekly, .monthly: localized("Anzahl")
+        case .weekdays: localized("Wochentage")
+        case .monthDay: localized("Monatstag")
         }
     }
 
@@ -63,11 +63,11 @@ enum Rhythm: String, Codable, CaseIterable {
     }
 
     /// Text zur Anzahl, z.B. "3x pro Woche".
-    func targetText(_ count: Int) -> String {
+    func targetText(_ count: Int, locale: Locale = .current) -> String {
         switch self {
-        case .daily: "\(count)x täglich"
-        case .weekly: "\(count)x pro Woche"
-        case .monthly: "\(count)x pro Monat"
+        case .daily: localized("\(count)x täglich", locale: locale)
+        case .weekly: localized("\(count)x pro Woche", locale: locale)
+        case .monthly: localized("\(count)x pro Monat", locale: locale)
         case .weekdays, .monthDay: ""
         }
     }

@@ -64,12 +64,12 @@ struct HermesButtonStyle: ButtonStyle {
 
 /// Button mit Titel in Rolle `label` im Stil `HermesButtonStyle`.
 struct HermesButton: View {
-    let title: String
+    let title: LocalizedStringResource
     var variant: HermesButtonStyle.Variant
     var role: ButtonRole?
     let action: () -> Void
 
-    init(_ title: String, variant: HermesButtonStyle.Variant = .primary, role: ButtonRole? = nil, action: @escaping () -> Void) {
+    init(_ title: LocalizedStringResource, variant: HermesButtonStyle.Variant = .primary, role: ButtonRole? = nil, action: @escaping () -> Void) {
         self.title = title
         self.variant = variant
         self.role = role
@@ -81,6 +81,8 @@ struct HermesButton: View {
             Text(title).labelText()
         }
         .buttonStyle(.hermes(variant))
+        // Versalien entstehen nur in der Ansicht, VoiceOver liest den Text normal geschrieben.
+        .accessibilityLabel(String(localized: title))
     }
 }
 

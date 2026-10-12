@@ -72,7 +72,7 @@ struct DayHeader: View {
             Text(" · ")
                 .accessibilityHidden(true)
             Text(DayText.weekNumber(day, engine: engine, firstWeekday: firstWeekday))
-                .accessibilityLabel("Kalenderwoche \(engine.weekOfYear(day, firstWeekday: firstWeekday))")
+                .accessibilityLabel(DayText.weekNumberSpoken(day, engine: engine, firstWeekday: firstWeekday))
                 .accessibilityIdentifier("week-number")
         }
         .metaText()
@@ -109,11 +109,11 @@ struct DayHeader: View {
         .accessibilityIdentifier("back-to-today")
     }
 
-    /// Groß "4/6", daneben "Erledigt" und die Prozent, darunter die `SegmentBar`. Ohne Punkte nur "Heute nichts fällig".
+    /// Groß "4/6", daneben "Erledigt" und die Prozent, darunter die `SegmentBar`. Ohne Punkte nur "Nichts fällig".
     @ViewBuilder
     private var progressBlock: some View {
         if progress.total == 0 {
-            Text("Heute nichts fällig")
+            Text("Nichts fällig")
                 .titleText()
                 .accessibilityIdentifier("progress-text")
         } else {
@@ -125,14 +125,13 @@ struct DayHeader: View {
                         .minimumScaleFactor(0.5)
                     VStack(alignment: .leading, spacing: 0) {
                         Text("Erledigt")
-                        // Geschütztes Leerzeichen, damit "%" nicht allein umbricht.
-                        Text("\(progress.percent)\u{00A0}%")
+                                        Text(PercentText.text(progress.percent))
                     }
                     .metaText()
                     .foregroundStyle(Theme.onBandSecondary)
                 }
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("\(progress.done) von \(progress.total) erledigt, \(progress.percent)\u{00A0}%")
+                .accessibilityLabel(localized("\(progress.done) von \(progress.total) erledigt, \(PercentText.text(progress.percent))"))
                 .accessibilityAddTraits(.isStaticText)
                 .accessibilityIdentifier("progress-text")
                 SegmentBar(done: progress.done, total: progress.total)

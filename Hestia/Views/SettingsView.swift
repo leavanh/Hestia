@@ -67,6 +67,7 @@ private struct CalendarSection: View {
 /// Einstellungen > Anzeige: Darstellung System, Hell oder Dunkel (Phase 14).
 private struct DisplaySection: View {
     @AppStorage(SettingsKey.appearance) private var appearance = AppearanceSetting.system
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         PaperSection(title: "Anzeige") {
@@ -80,8 +81,36 @@ private struct DisplaySection: View {
                     id: { "settings-appearance-\($0.rawValue)" }
                 )
                 .accessibilityIdentifier("settings-appearance")
+                languageRow
             }
         }
+    }
+
+    /// Zeile "Sprache" (Phase 16): rechts die Sprache der App, Tippen öffnet die Seite der App in den iOS Einstellungen.
+    /// Die Sprache wählt man dort, es gibt keinen eigenen Umschalter.
+    private var languageRow: some View {
+        Button {
+            if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+        } label: {
+            HStack(spacing: Theme.controlSpacing) {
+                Text("Sprache")
+                    .bodyText()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text(verbatim: AppLanguage.currentName())
+                    .bodyText()
+                    .foregroundStyle(Theme.inkSecondary)
+                    .accessibilityIdentifier("settings-language-name")
+                Image(systemName: "arrow.up.right")
+                    .font(Theme.Typography.symbolSmall)
+                    .accessibilityHidden(true)
+            }
+            .foregroundStyle(Theme.ink)
+            .frame(minHeight: Theme.controlSize)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .padding(.top, Theme.inlineSpacing)
+        .accessibilityIdentifier("settings-language")
     }
 }
 
@@ -121,7 +150,7 @@ private struct Footer: View {
         let info = Bundle.main.infoDictionary
         let short = info?["CFBundleShortVersionString"] as? String ?? "–"
         let build = info?["CFBundleVersion"] as? String ?? "–"
-        return "Version \(short) (\(build))"
+        return localized("Version \(short) (\(build))")
     }
 
     var body: some View {
@@ -179,7 +208,7 @@ private struct PausesSection: View {
             if listed.isEmpty {
                 EmptyState(
                     title: "Keine Pausen",
-                    message: "Es gibt keine laufenden oder geplanten Pausen. Mit einer Pause zählen Tage, an denen du einen Habit nicht machen kannst, nicht mit.",
+                    message: "Keine laufenden oder geplanten Pausen. Tage, an denen ein Habit nicht möglich ist, zählen mit einer Pause nicht mit.",
                     identifier: "no-pauses",
                     showsHairline: false
                 )

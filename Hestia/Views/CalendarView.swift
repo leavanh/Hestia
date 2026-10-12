@@ -89,7 +89,7 @@ extension CalendarView {
                 EmptyState(
                     engraving: .torch,
                     title: "Noch keine Daten",
-                    message: "Sobald du in Heute Habits anlegst und abhakst, färben sich hier die Tage und deine Streaks erscheinen.",
+                    message: "Sobald in Heute Habits angelegt und abgehakt sind, färben sich hier die Tage und Streaks erscheinen.",
                     identifier: "calendar-empty"
                 )
             }

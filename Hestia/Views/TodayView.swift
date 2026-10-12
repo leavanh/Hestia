@@ -144,9 +144,9 @@ struct TodayView: View {
                 EmptyState(
                     engraving: .vestal,
                     title: "Noch keine Habits",
-                    message: "Hier erscheinen deine Habits an jedem Tag, an dem sie fällig sind.",
+                    message: "Habits erscheinen hier an jedem Tag, an dem sie fällig sind.",
                     identifier: "today-empty",
-                    actionTitle: "Lege deinen ersten Habit an",
+                    actionTitle: "Ersten Habit anlegen",
                     action: { isCreating = true }
                 )
                 .dayEntrance(from: entranceEdge, index: 3)

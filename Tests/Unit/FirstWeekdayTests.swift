@@ -55,10 +55,10 @@ struct FirstWeekdayTests {
     }
 
     @Test func automaticFollowsTheRegion() {
-        #expect(FirstWeekdaySetting.automatic.start(locale: Locale(identifier: "de_DE")) == monday)
+        #expect(FirstWeekdaySetting.automatic.start(locale: Locale(identifier: "de_AT")) == monday)
         #expect(FirstWeekdaySetting.automatic.start(locale: Locale(identifier: "en_US")) == sunday)
         #expect(FirstWeekdaySetting.monday.start(locale: Locale(identifier: "en_US")) == monday)
-        #expect(FirstWeekdaySetting.sunday.start(locale: Locale(identifier: "de_DE")) == sunday)
+        #expect(FirstWeekdaySetting.sunday.start(locale: Locale(identifier: "de_AT")) == sunday)
     }
 
     @Test func weekdayNamesComeFromTheCalendar() {

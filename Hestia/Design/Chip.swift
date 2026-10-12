@@ -3,12 +3,13 @@ import SwiftUI
 /// Kleine Kapsel mit 2 pt Ecken für "Pausiert", "Läuft", "Geplant" und (bis Phase 9) den Tag in Heute.
 /// Ein invertierter Chip (Fläche `ink`, Schrift `background`) hebt den Tag "Heute" hervor.
 struct Chip: View {
-    let text: String
+    let text: LocalizedStringResource
     var isInverted = false
 
     var body: some View {
         Text(text)
             .labelText(small: true)
+            .accessibilityLabel(String(localized: text))
             .foregroundStyle(isInverted ? Theme.background : Theme.ink)
             .padding(.horizontal, Theme.chipPaddingHorizontal)
             .padding(.vertical, Theme.chipPaddingVertical)

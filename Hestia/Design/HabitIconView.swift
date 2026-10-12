@@ -74,18 +74,18 @@ struct HabitIconView: View {
 
     private var statusTitle: String {
         switch status {
-        case .green, nil: "Grün"
-        case .yellow: "Gelb"
-        case .red: "Rot"
+        case .green, nil: localized("Grün")
+        case .yellow: localized("Gelb")
+        case .red: localized("Rot")
         }
     }
 
     /// Was die Farbe bedeutet (Spezifikation 3.5), damit VoiceOver mehr sagt als nur die Farbe.
     private var statusHint: String {
         switch status {
-        case .green, nil: "Im Plan."
-        case .yellow: "Ziel ist erfüllt, aber bald nicht mehr, wenn nichts dazukommt."
-        case .red: "Ziel ist nicht erfüllt."
+        case .green, nil: localized("Im Plan.")
+        case .yellow: localized("Ziel erfüllt, aber nicht mehr lange ohne weitere Erledigung.")
+        case .red: localized("Ziel nicht erfüllt.")
         }
     }
 }

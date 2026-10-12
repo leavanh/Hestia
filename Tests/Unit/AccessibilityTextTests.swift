@@ -21,7 +21,7 @@ struct AccessibilityTextTests {
     }
 
     @Test func iconNamesAreDistinct() {
-        let titles = HabitIcons.all.map(HabitIcons.title(for:))
+        let titles = HabitIcons.all.map { HabitIcons.title(for: $0) }
         #expect(Set(titles).count == titles.count)
     }
 

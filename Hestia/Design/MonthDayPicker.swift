@@ -16,7 +16,7 @@ struct MonthDayPicker: View {
                 }
             }
             if selection >= 29 {
-                Text("Fehlt der Tag im Monat, gilt der letzte Tag")
+                Text("Hat der Monat den Tag nicht, gilt der letzte Tag.")
                     .metaText()
                     .foregroundStyle(Theme.inkSecondary)
                     .accessibilityIdentifier("monthday-hint")
@@ -44,7 +44,7 @@ struct MonthDayPicker: View {
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity)
-        .accessibilityLabel("\(day). des Monats")
+        .accessibilityLabel(localized("\(day). des Monats"))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
         .accessibilityIdentifier("monthday-\(day)")
     }

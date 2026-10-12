@@ -49,8 +49,8 @@ struct OtherHabitsSection: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Weitere, \(HabitCountText.text(habits.count))")
-        .accessibilityValue(isExpanded ? "aufgeklappt" : "zugeklappt")
+        .accessibilityLabel(localized("Weitere, \(HabitCountText.text(habits.count))"))
+        .accessibilityValue(isExpanded ? localized("aufgeklappt") : localized("zugeklappt"))
         .accessibilityIdentifier("other-habits-toggle")
     }
 }

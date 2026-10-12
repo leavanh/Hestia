@@ -77,9 +77,9 @@ struct HabitDetailSheet: View {
                 Text("\(stats.currentStreak)")
                     .font(Theme.Typography.numeral)
                     .lineLimit(1)
-                    .accessibilityLabel("Aktueller Streak: \(StatValue.daysText(stats.currentStreak))")
+                    .accessibilityLabel(localized("Aktueller Streak: \(StatValue.daysText(stats.currentStreak))"))
                     .accessibilityIdentifier("stat-current-streak")
-                Text(stats.currentStreak == 1 ? "Tag in Folge" : "Tage in Folge")
+                Text(StatValue.inARowText(stats.currentStreak))
                     .metaText()
                     .foregroundStyle(habitColor.onColor.opacity(0.8))
                     .accessibilityHidden(true)
@@ -97,7 +97,7 @@ struct HabitDetailSheet: View {
     /// "20 Min · Täglich", bei einem beendeten Habit "Beendet am 3. Okt".
     private func metaLine(snapshot: HabitSnapshot) -> String {
         if let endedAt = habit.endedAt {
-            return "Beendet am \(DayText.shortDate(endedAt, engine: engine))"
+            return localized("Beendet am \(DayText.shortDate(endedAt, engine: engine))")
         }
         return snapshot.rhythmText(window: engine.windowProgress(snapshot, on: today), firstWeekday: firstWeekday, periods: engine.periods)
     }

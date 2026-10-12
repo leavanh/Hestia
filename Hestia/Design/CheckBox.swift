@@ -5,9 +5,9 @@ import SwiftUI
 struct CheckBox: View {
     let isChecked: Bool
     let habitColor: HabitColor
-    var label = "Abhaken"
-    var checkedText = "Erledigt"
-    var uncheckedText = "Offen"
+    var label = localized("Abhaken")
+    var checkedText = localized("Erledigt")
+    var uncheckedText = localized("Offen")
     let action: () -> Void
 
     var body: some View {

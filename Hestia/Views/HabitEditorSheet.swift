@@ -73,7 +73,7 @@ struct HabitEditorSheet: View {
                 .padding(Theme.spacing)
             }
             .background { PaperBackground() }
-            .navigationTitle(habit == nil ? "Neuer Habit" : "Habit bearbeiten")
+            .navigationTitle(habit == nil ? LocalizedStringKey("Neuer Habit") : LocalizedStringKey("Habit bearbeiten"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -93,7 +93,7 @@ struct HabitEditorSheet: View {
                 Button("Historie löschen", role: .destructive) { endHabit(keepingHistory: false) }
                 Button("Abbrechen", role: .cancel) {}
             } message: {
-                Text("Der Habit erscheint nicht mehr in Heute. Soll seine Historie in Kalender und Statistik bleiben oder gelöscht werden? Gelöscht ist sie unwiderruflich weg.")
+                Text("Der Habit erscheint nicht mehr in Heute. Historie in Kalender und Statistik behalten oder löschen? Gelöschte Historie lässt sich nicht wiederherstellen.")
             }
             .onAppear { isNameFocused = habit == nil }
             .onChange(of: rhythm) { _, new in

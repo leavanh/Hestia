@@ -1,3 +1,5 @@
+import Foundation
+
 /// Kuratierte Auswahl an SF Symbols für Habits (Spezifikation 4.6): 6 Zeilen zu je 6, jede Zeile ein Thema.
 nonisolated enum HabitIcons {
     static let all: [String] = [
@@ -17,8 +19,8 @@ nonisolated enum HabitIcons {
 
     static let `default` = all[0]
 
-    /// Deutsche Namen für VoiceOver in der Icon Auswahl.
-    private static let titles: [String: String] = [
+    /// Namen für VoiceOver in der Icon Auswahl, im String Catalog übersetzt.
+    private static let titles: [String: String.LocalizationValue] = [
         "figure.run": "Laufen", "figure.walk": "Gehen", "figure.hiking": "Wandern", "dumbbell.fill": "Hantel",
         "figure.yoga": "Yoga", "bicycle": "Fahrrad",
         "sparkles": "Hautpflege", "bubbles.and.sparkles.fill": "Reinigung", "face.smiling.fill": "Gesicht",
@@ -33,7 +35,7 @@ nonisolated enum HabitIcons {
         "iphone.slash": "Weniger Handy", "pawprint.fill": "Haustier",
     ]
 
-    static func title(for icon: String) -> String {
-        titles[icon] ?? icon
+    static func title(for icon: String, locale: Locale = .current) -> String {
+        titles[icon].map { localized($0, locale: locale) } ?? icon
     }
 }

@@ -38,7 +38,7 @@ struct HabitSortList: View {
                         .displayText()
                         .foregroundStyle(Theme.ink)
                         .accessibilityAddTraits(.isHeader)
-                    Text("Verschiebe Habits am Griff.")
+                    Text("Habits am Griff verschieben.")
                         .bodyText()
                         .foregroundStyle(Theme.inkSecondary)
                 }

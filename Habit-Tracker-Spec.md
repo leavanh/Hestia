@@ -89,7 +89,7 @@ Gezählt werden alle am angezeigten Tag fälligen Habits (siehe 3.2). **Ab Phase
 | Feste Wochentage, fester Monatstag | 1 | 1, wenn heute abgehakt |
 | Pro Woche, pro Monat | 1 | 1, wenn heute abgehakt **oder** Ziel im Fenster schon erfüllt |
 
-Prozent = erledigte Punkte geteilt durch Punkte, gerundet auf ganze Zahl. Bei 0 Punkten wird "Heute nichts fällig" angezeigt.
+Prozent = erledigte Punkte geteilt durch Punkte, gerundet auf ganze Zahl. Bei 0 Punkten wird "Nichts fällig" angezeigt (bis Phase 15 "Heute nichts fällig", auch an vergangenen Tagen).
 
 ### 3.5 Status (grün, gelb, rot)
 
@@ -379,6 +379,36 @@ Entfallen: `figure.pool.swim`, `tree.fill`, `graduationcap.fill`, `creditcard.fi
 
 Unverändert: Tageswechsel, Einsinken beim langen Drücken, Rutschen erledigter Habits, Reduce Motion nur Überblenden. Neue Übergänge (z.B. Einblenden der kleinen Leiste in Heute) sind kurz (ca. 0,1 bis 0,2 s) und bei Reduce Motion ohne Bewegung.
 
+### 4.8 Glossar und Texte (ab Phase 16)
+
+Die App gibt es auf Deutsch (Entwicklungssprache) und Englisch, alle Texte stehen in `Localizable.xcstrings`. Die Sprache wählt man in iOS (Einstellungen › Hestia › Sprache), die Zeile "Sprache" in den Einstellungen springt dorthin (5.5).
+
+| Begriff | Deutsch | Englisch |
+|---|---|---|
+| Habit | Habit, Habits | habit, habits |
+| Erledigung | Erledigung, Erledigungen; Zustand "Erledigt" / "Offen" | completion, completions; "Done" / "Not done" |
+| Rhythmus | Rhythmus | Repeat ("3x per week") |
+| Zeiträume (Einstellung) | Zeiträume · Rollierend · Kalender | Periods · Rolling · Calendar |
+| Fenster | kommt in keinem Text vor, nur "in 7 Tagen" / "in 30 Tagen" | "in 7 days" / "in 30 days" |
+| Pause | Pause, Pausiert | pause, Paused |
+| Datum der Pause | Zeitraum (im Sheet "Neue Pause") | Dates |
+| Zusatz | Zusatz | Detail |
+| Streak | Streak, Tage in Folge | streak, days in a row |
+| Quote | Quote | Rate |
+| Kalenderwoche | KW 41 | W41 |
+| Weitere | Weitere | Others |
+| Beenden | Habit beenden, Historie | End habit, history |
+
+**Regeln**
+- **Versalien:** Im Code und im Katalog steht jeder Text normal geschrieben, die Versalien entstehen in der Ansicht (Rollen `label` und `meta`, 4.3).
+- **Englisch:** Satzschreibweise ("New habit", "Keep history"), nicht Title Case. Überschriften und Buttons ohne Schlusspunkt, ganze Sätze mit.
+- **Ansprache:** neutral, ohne "du" und "Sie", im Englischen ohne "you", wo es natürlich geht. Anweisungen im Infinitiv ("Ersten Habit anlegen") bzw. Imperativ ("Add first habit").
+- **Nicht übersetzt:** Wortmarke `HESTIA / HABITS`, App Name, Namen und Zusätze der Habits, Schriftnamen, Autoren und Lizenznamen im Sheet "Über", der Abschnitt "Entwickler" und Fehlermeldungen für Entwickler.
+- **Datum und Zahlen:** folgen der Sprache der App und der Region (`Locale.current`), kein festes Gebietsschema. Prozent als "67 %" (mit geschütztem Leerzeichen) auf Deutsch, "67%" auf Englisch. Beispiele Datumszeile: "So · 11. Okt · KW 41" / "Sun · Oct 11 · W41".
+- **Technik:** Texte in Hilfsfunktionen kommen über `localized(_:locale:)` (`Localization.swift`), das wegen der Tests auch eine andere Sprache als die der App liefern kann. Text in Ansichten steht als Literal in `Text(...)`, Buttons usw. und wird so automatisch aus dem Katalog gelesen. Der Katalog ist von Hand gepflegt (`extractionState: manual`), die Erzeugung von Symbolen ist aus (`STRING_CATALOG_GENERATE_SYMBOLS = NO`).
+
+Die vollständige Zuordnung Deutsch zu Englisch steht im Katalog selbst.
+
 ---
 
 ## 5. Bildschirme
@@ -405,7 +435,7 @@ Ab Phase 8: Die Tab Bar bleibt die des Systems, getönt in `ink`. Hintergrund de
 - **Kopfband (ab Phase 9, ersetzt den nächsten Punkt):** Oben ein Band in Markenblau (`band`, hell und dunkel gleich), randlos bis unter die Statusleiste. Es gibt in Heute keine Navigationsleiste mehr. Das Band (`DayHeader`) enthält von oben nach unten:
   1. **Datumszeile** (Rolle `meta`, `onBandSecondary`): links Wochentag kurz, Datum und Kalenderwoche ("So · 11. Okt · KW 41"), rechts der Plus Button (Variante `onBand`, Quadrat mit Plus Symbol, VoiceOver "Neuer Habit"). Die Kalenderwoche ist die ISO Kalenderwoche des angezeigten Tags.
   2. **Titel** (Rolle `display`): der angezeigte Tag relativ zu heute: "Heute", "Gestern", "Vorgestern", sonst "Vor n Tagen" (wie bisher `RelativeDay`). Die bisherige Kapsel neben dem Datum entfällt, weil der Titel das schon sagt. An vergangenen Tagen steht rechts auf Höhe des Titels der Button "Heute ›" (Variante `onBand`), der wie bisher animiert zu heute springt.
-  3. **Fortschritt:** links groß "erledigte Punkte/Punkte" (Rolle `numeral`, z.B. "4/6"), daneben klein untereinander "Erledigt" und die Prozent ("67 %") in Rolle `meta`. Zählung wie 3.4, nur die Darstellung ist neu. Bei 0 Punkten steht statt Zahl und Balken "Heute nichts fällig" (Rolle `title`). Darunter die `SegmentBar`.
+  3. **Fortschritt:** links groß "erledigte Punkte/Punkte" (Rolle `numeral`, z.B. "4/6"), daneben klein untereinander "Erledigt" und die Prozent ("67 %") in Rolle `meta`. Zählung wie 3.4, nur die Darstellung ist neu. Bei 0 Punkten steht statt Zahl und Balken "Nichts fällig" (Rolle `title`; bis Phase 15 "Heute nichts fällig"). Darunter die `SegmentBar`.
   4. **Wochenstreifen** (`WeekStrip`): Mo bis So der ISO Woche des angezeigten Tags, der angezeigte Tag invertiert. Antippen eines vergangenen Tags oder von heute wechselt dorthin, mit derselben Animation wie Wischen (Richtung nach Datum). Tage nach heute sind blass und nicht antippbar. Wischen über eine Wochengrenze zeigt im Streifen die neue Woche. Ab Phase 9.1 gleitet der Streifen ohne Verzögerung und genauso schnell wie Datumszeile und Titel (nicht als letztes Glied der Kaskade, kein Nachfedern). Wandert nur die Markierung innerhalb der Woche, geschieht das sofort mit dem Wischen, ebenso kurz. VoiceOver liest jeden Tag als vollständiges Datum, der angezeigte Tag ist als ausgewählt markiert.
 - **Listenkopf (ab Phase 9):** Direkt unter dem Band eine Zeile in Rolle `meta`: links die Anzahl der Zeilen in der Liste ("6 Habits", Einzahl "1 Habit", pausierte zählen mit; ab Phase 13 nur die Zeilen der Hauptliste), rechts der Button "Sortieren" bzw. im Sortiermodus "Fertig" (Variante `text`). Er ersetzt den Button oben links.
 - **Scrollen (ab Phase 9):** Das Band scrollt mit dem Inhalt weg. Ist es aus dem Bild gescrollt (Schwelle `Theme.compactBarScrollOffset`: vom Band ist weniger als diese Höhe zu sehen), erscheint oben eine schmale Leiste in `band` mit "Heute · 4/6" (Titel und Fortschritt, Rolle `label`) links und dem Plus Button rechts. Sie ersetzt den kleinen Navigationstitel. Wischen und Tageswechsel funktionieren in beiden Zuständen. Ab Phase 9.1 hat die Leiste oben und unten so viel Innenabstand, dass der Plus Button mit Luft darin steht (mindestens `Theme.spacing` bzw. 8 pt über und unter dem Button, Wert in `Theme`, z.B. `compactBarPadding`). Er reicht nicht bis an die Unterkante.
@@ -420,7 +450,7 @@ Ab Phase 8: Die Tab Bar bleibt die des Systems, getönt in `ink`. Hintergrund de
   - Kopfzeile mit Haarlinie oben, Rolle `meta`: links "Weitere · 3" (Anzahl der Habits darin), rechts ein Chevron (zu: nach rechts, offen: nach unten). Tippen auf die ganze Zeile klappt auf und zu, kurz animiert, bei Reduce Motion ohne Bewegung. **Voreinstellung zugeklappt.** Der Zustand bleibt gespeichert (UserDefaults, Schlüssel `HestiaOtherExpanded`) und gilt für jeden Tag.
   - Aufgeklappt stehen darunter `HabitCard`s wie in der Hauptliste, in der gespeicherten Reihenfolge (`sortOrder`, dann `createdAt`), pausierte am Ende. Erledigte rutschen hier nicht nach unten, die Reihenfolge bleibt fest.
   - Abhaken, Counter, 7 Tage Punkte, Status und langes Drücken zum Bearbeiten funktionieren wie in der Hauptliste. Pausierte sind ausgegraut und nicht abhakbar (wie bisher).
-  - Ist Weitere leer, fehlt der Abschnitt ganz. Ist die Hauptliste leer, aber Weitere nicht, zeigt das Band "Heute nichts fällig" und darunter steht nur Weitere.
+  - Ist Weitere leer, fehlt der Abschnitt ganz. Ist die Hauptliste leer, aber Weitere nicht, zeigt das Band "Nichts fällig" und darunter steht nur Weitere.
   - Gilt genauso für vergangene Tage und im Sheet "Tag bearbeiten". Im Sortiermodus ist Weitere ausgeblendet, der Sortiermodus zeigt wie bisher alle aktiven Habits.
   - VoiceOver: Die Kopfzeile ist ein Button "Weitere, 3 Habits" mit Zustand auf- bzw. zugeklappt. Identifier `other-habits-toggle`, die Karten behalten ihre Identifier.
 - **Reihenfolge:** Oben die offenen Habits, darunter die erledigten. Innerhalb beider Teile gilt die gespeicherte Reihenfolge (`sortOrder`, dann `createdAt`). Erledigt heißt: Am angezeigten Tag ist das Tagesziel erreicht, also Abhakkreis abgehakt bzw. Counter voll. Ein Wochen oder Monats Habit, dessen Fenster erfüllt ist, der am angezeigten Tag aber nicht abgehakt ist, bleibt oben. Wird ein Habit erledigt, rutscht er animiert nach unten, wird es wieder aufgehoben, rutscht er animiert zurück an seinen Platz.
@@ -825,7 +855,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Ziel:** Die App fühlt sich fertig und stimmig an.
 
 **Umfang**
-- Leerzustände: Heute ohne Habits ("Lege deinen ersten Habit an" mit Button), Kalender ohne Daten, keine Pausen.
+- Leerzustände: Heute ohne Habits ("Ersten Habit anlegen" mit Button, bis Phase 15 "Lege deinen ersten Habit an"), Kalender ohne Daten, keine Pausen.
 - App Icon (minimalistisch, passend zum Farbverlauf).
 - VoiceOver Beschriftungen für Abhakkreis, Counter und Statusmarke.
 - Prüfung mit großer Schrift (Dynamic Type) und Korrektur von Umbrüchen.
@@ -1288,7 +1318,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 
 **Umfang**
 - `Localizable.xcstrings` mit allen Texten auf Deutsch und Englisch. Texte in `Text(...)`, Buttons usw. landen automatisch im Katalog. Texte aus Hilfsfunktionen, die einen `String` liefern (z.B. `Rhythm`, `HabitCountText`, `HabitSnapshot+Text`, `PauseRange+Text`, `RelativeDay`), werden zu `String(localized:)` bzw. `LocalizedStringResource`.
-- **Einzahl und Mehrzahl** über den Katalog ("Vary by Plural"), keine eigenen `if` mehr (z.B. "1 Habit" / "n Habits", "Tag in Folge" / "Tage in Folge").
+- **Einzahl und Mehrzahl** über den Katalog ("Vary by Plural"), wo die Zahl im Text steht: "1 Habit" / "n Habits", "1 Tag" / "n Tage", "n Tage pausiert". Texte ohne Zahl ("Tag in Folge" / "Tage in Folge", "Tag" / "Tage" unter dem Streak) sind zwei eigene Schlüssel, weil Xcode Mehrzahlvarianten ohne Zahl im Text ablehnt; die Auswahl `== 1` steht in `StatValue`.
 - **Datum und Zahlen:** kein festes `de_DE` mehr. Monatsnamen, Wochentage, Datumsangaben und Prozent folgen der Sprache der App. Wochentagskürzel aus dem `Calendar` (seit Phase 14).
 - Die Datumszeile in Heute ("So · 11. Okt · KW 41") bekommt im Englischen eine passende Form, festgelegt in der Texttabelle.
 - **Sprache:** Zeile im Abschnitt Anzeige (5.5), Identifier `settings-language`.
@@ -1302,9 +1332,15 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Kein neuer UI Test.
 
 **Definition of Done**
-- [ ] Glossar und Texttabelle sind von mir freigegeben, bevor Code geändert wurde.
-- [ ] Mit iPhone auf Englisch (oder Hestia in iOS auf Englisch gestellt) ist die ganze App englisch, auch Datum, Monatsnamen und VoiceOver. Kein deutsches Wort bleibt übrig außer Habit Namen.
-- [ ] Mit Deutsch sieht die App aus wie freigegeben.
+- [x] Glossar und Texttabelle sind von mir freigegeben, bevor Code geändert wurde.
+- [x] Mit iPhone auf Englisch (oder Hestia in iOS auf Englisch gestellt) ist die ganze App englisch, auch Datum, Monatsnamen und VoiceOver. Kein deutsches Wort bleibt übrig außer Habit Namen.
+- [x] Mit Deutsch sieht die App aus wie freigegeben.
 - [ ] Die Zeile "Sprache" in den Einstellungen öffnet die iOS Einstellungen der App, dort lässt sich die Sprache wechseln.
-- [ ] Keine Texte sprechen mich mit "du" oder "Sie" an.
-- [ ] Eine Suche nach `de_DE` im Code findet nichts mehr.
+- [x] Keine Texte sprechen mich mit "du" oder "Sie" an.
+- [x] Eine Suche nach `de_DE` im Code findet nichts mehr.
+
+*Geprüft per Unit und UI Tests (iPhone 18 Pro Simulator, Testpläne fest auf Deutsch/Deutschland): Unit Tests (300) grün, darunter neu `LocalizationTests` (1 und 3 Habits, 1 und 3 Tage Streak, jede Rhythmus Zeile, Zielzahl, relativer Tag, Pausenzeitraum, Datum, KW, Icon Namen jeweils Deutsch und Englisch sowie der Katalog: jeder Schlüssel hat eine fertig übersetzte englische Zeile). Komplett-Lauf vollständig grün (23 UI Tests, keiner neu), Build ohne Warnungen. Die Texttabelle wurde im Chat freigegeben, vor dem ersten Code. Zusätzlich im Simulator mit englischer App Sprache (`-AppleLanguages (en)`) angesehen: Heute (Datumszeile "Mon · Oct 12 · W41", "Today", "Done 29%", "Reorder", "12 habits", "3 per day", "20 min · Daily"), Kalender ("October 2026", "1 day"), Einstellungen (alle Abschnitte, Zeile "Language / English"), Sheet "New pause" und Sheet "New habit". Kein deutsches Wort bleibt außer den Habit Namen der Testdaten. Die Anrede ist neutral (Katalog enthält weder "du" noch "Sie" noch "you"). In Tests und App steht kein `de_DE` mehr (Tests nutzen `de` bzw. `de_AT`). VoiceOver Texte stehen im Katalog und sind über die Unit Tests belegt, mit VoiceOver selbst wurde nicht gelesen.*
+
+*Abweichungen von der Planung: Mehrzahl über den Katalog nur dort, wo die Zahl im Text steht (Xcode lehnt Mehrzahlvarianten ohne Zahl ab), "Tag in Folge" und "Tag" sind deshalb eigene Schlüssel (4.8). `STRING_CATALOG_GENERATE_SYMBOLS` ist aus, weil Schlüssel wie "Habit beenden" und "Habit beenden?" dasselbe Symbol ergeben. "Heute nichts fällig" heißt jetzt "Nichts fällig", weil es auch an vergangenen Tagen stand. HermesButton und Chip setzen den VoiceOver Text selbst, damit er nicht in Versalien gelesen wird.*
+
+*Offen: Die Zeile "Sprache" öffnet im Simulator die Startseite der iOS Einstellungen mit dem Zurück Link "Hestia", nicht die Seite der App. Ob sie auf dem iPhone direkt bei Hestia landet und dort die Sprache wählbar ist, ist noch nicht geprüft, deshalb steht dieser Punkt offen.*

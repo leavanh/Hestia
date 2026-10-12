@@ -21,7 +21,7 @@ struct AboutFont: Identifiable, Hashable {
     var licenseText: String {
         guard let url = Bundle.main.url(forResource: licenseFile, withExtension: "txt"),
               let text = try? String(contentsOf: url, encoding: .utf8) else {
-            return "Der Lizenztext liegt nicht in der App."
+            return localized("Lizenztext nicht in der App enthalten.")
         }
         return text
     }

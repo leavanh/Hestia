@@ -8,9 +8,9 @@ enum AppTab: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .today: "Heute"
-        case .calendar: "Kalender"
-        case .settings: "Einstellungen"
+        case .today: localized("Heute")
+        case .calendar: localized("Kalender")
+        case .settings: localized("Einstellungen")
         }
     }
 

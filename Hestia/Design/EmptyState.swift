@@ -5,13 +5,13 @@ import SwiftUI
 /// Ab Phase 12 optional ein Stich über dem Titel, nur in Heute und Kalender.
 struct EmptyState: View {
     var engraving: EngravingImage.Motif?
-    let title: String
-    let message: String
+    let title: LocalizedStringKey
+    let message: LocalizedStringKey
     /// Bezeichner des Erklärungstexts für Tests.
     var identifier = "empty-state"
     /// Haarlinie oben. Entfällt, wenn der Leerzustand schon in einem `PaperSection` steht.
     var showsHairline = true
-    var actionTitle: String?
+    var actionTitle: LocalizedStringResource?
     var action: (() -> Void)?
 
     var body: some View {
@@ -48,7 +48,7 @@ struct EmptyState: View {
             EmptyState(
                 engraving: .vestal,
                 title: "Noch keine Habits",
-                message: "Lege deinen ersten Habit an.", actionTitle: "Habit anlegen", action: {}
+                message: "Hier erscheinen Habits.", actionTitle: "Habit anlegen", action: {}
             )
             EmptyState(title: "Keine Pausen", message: "Es gibt keine laufenden oder geplanten Pausen.")
         }

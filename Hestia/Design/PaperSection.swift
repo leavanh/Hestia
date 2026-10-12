@@ -3,7 +3,7 @@ import SwiftUI
 /// Abschnitt ohne Karte: oben eine Haarlinie, darunter die Überschrift in Rolle `meta` und der Inhalt.
 /// Für Felder in Sheets und die Abschnitte der Einstellungen.
 struct PaperSection<Content: View>: View {
-    let title: String
+    let title: LocalizedStringKey
     @ViewBuilder var content: Content
 
     var body: some View {

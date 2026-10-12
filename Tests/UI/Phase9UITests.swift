@@ -15,7 +15,7 @@ final class Phase9UITests: XCTestCase {
     }
 
     private func fullDate(_ day: Date) -> String {
-        day.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "de_DE")))
+        day.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "de")))
     }
 
     /// Wartet, bis die Datumszeile `day` zeigt und nur noch ein Kopf im Bild ist (nach der Animation).
