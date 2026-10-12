@@ -1403,7 +1403,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Definition of Done**
 - [x] Texte als Entwurf in `Store/Texte.md`.
 - [x] Screenshots in 6,9 Zoll, Deutsch und Englisch, in `Store/Screenshots/`.
-- [ ] Texte und Screenshots sind von mir freigegeben (der Screenshot der Einstellungen wird in Phase 18.1 erneuert).
+- [x] Texte und Screenshots sind von mir freigegeben (der Screenshot der Einstellungen wird in Phase 18.1 erneuert).
 
 ---
 
