@@ -1344,3 +1344,62 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 *Abweichungen von der Planung: Mehrzahl über den Katalog nur dort, wo die Zahl im Text steht (Xcode lehnt Mehrzahlvarianten ohne Zahl ab), "Tag in Folge" und "Tag" sind deshalb eigene Schlüssel (4.8). `STRING_CATALOG_GENERATE_SYMBOLS` ist aus, weil Schlüssel wie "Habit beenden" und "Habit beenden?" dasselbe Symbol ergeben. "Heute nichts fällig" heißt jetzt "Nichts fällig", weil es auch an vergangenen Tagen stand. HermesButton und Chip setzen den VoiceOver Text selbst, damit er nicht in Versalien gelesen wird.*
 
 *Sprachzeile im Simulator (iPhone 18 Pro, iOS Sprache Englisch) bis zum Ende durchgespielt: Tippen auf "Language / English" öffnet die iOS Einstellungen. Beim ersten Mal (frisch gestartete Einstellungs App) landete der Sprung in deren Suche, unter Apps › Hestia steht der Abschnitt "Preferred Language" mit "Language"; beim zweiten Mal landete er direkt auf der Sprachseite von Hestia (English, Deutsch). Dort "Deutsch" gewählt, über den Zurück Link "Hestia" in die App gewechselt: Die App läuft auf Deutsch (Heute, "Erledigt 29 %", "Sortieren", "3 pro Tag", "20 Min · Täglich", "MO · 12. OKT · KW 42"). iOS zeigt die Sprachwahl nur, weil die App seit dieser Phase zwei Sprachen mitbringt. Ein echtes iPhone wurde nicht geprüft, das Verhalten der Einstellungs App beim ersten Öffnen kann dort anders sein. Entscheidung: Der Simulator genügt für diesen Punkt (allgemeine Definition of Done: "iPhone 16 Pro oder Simulator").*
+
+---
+
+### Phase 17: Vorbereitung für den App Store
+
+**Ziel:** Das Projekt erfüllt alles, was Apple beim Hochladen prüft, die App hat kein "Über" mehr, und für das GitHub Repository gibt es eine README mit Datenschutz, Support und Buy-Me-a-Coffee-Link.
+
+**Entschieden:**
+- **Kein "Über":** Abschnitt "Über" in den Einstellungen und das Sheet "Über" entfallen. Pflicht ist die Nennung nicht: Die SIL Open Font License verlangt nur, dass der Lizenztext mit der Schrift mitgeliefert wird (die `OFL-*.txt` bleiben deshalb im App Bundle), die Stiche sind CC0. Die Quellen stehen weiter in `Branding/QUELLEN.md` und in der README.
+- **Veröffentlichung** über das Apple Developer Program meines Freundes. Im App Store steht deshalb sein Name (bzw. der Name seines Accounts) als Anbieter. Die App ist kostenlos, ohne In-App-Käufe und ohne Werbung.
+- **Händlerstatus (EU):** "kein Händler", weil ich kein Geld mit der App verdiene. Die Angabe gilt für den ganzen Account, mein Freund muss sie in App Store Connect machen bzw. bestätigen.
+- **Datenschutz und Support:** ein Abschnitt in der README auf GitHub. Die App erhebt keine Daten, alles bleibt auf dem iPhone.
+- **Buy Me a Coffee** (`https://buymeacoffee.com/leavanh`) nur in der README, nicht in der App: Apple lässt Trinkgeld an Entwickler in der App nur über In-App-Kauf zu (Richtlinie 3.1.1). Ein Link nach außen riskiert die Ablehnung, ein In-App-Kauf bräuchte Bankdaten und Verträge im Account und würde den Händlerstatus berühren.
+- **Name im Store:** "Hestia Habits". Auf dem Homescreen bleibt "Hestia".
+
+**Umfang**
+- **Über entfernen:** `AboutSheet.swift`, `AboutSection` in `SettingsView`, die Texte dazu im Katalog, der Teil "Über Hestia" in `Phase14UITests`, Abschnitt 5.5 (Aufbau ohne Über). Die Lizenzdateien `OFL-*.txt` bleiben in "Copy Bundle Resources".
+- **Privacy Manifest** `Hestia/PrivacyInfo.xcprivacy`: keine Datenerhebung, kein Tracking, Grund für UserDefaults (`NSPrivacyAccessedAPICategoryUserDefaults`, `CA92.1`, `@AppStorage`). Weitere Required Reason APIs im Code suchen (z.B. Dateidatum, Systemstartzeit) und, falls vorhanden, eintragen.
+- **Verschlüsselung:** `ITSAppUsesNonExemptEncryption = NO` in die Info.plist, damit App Store Connect nicht bei jedem Build fragt.
+- **Datenmodell versionieren:** Das heutige Modell wird `HestiaSchemaV1` (`VersionedSchema` mit `Habit`, `Completion`, `Pause`), dazu ein `SchemaMigrationPlan` ohne Stufen. Der `ModelContainer` startet mit diesem Plan. Spätere Änderungen am Modell kommen als V2 mit Migrationsstufe, damit nach einem Update keine Daten verloren gehen. Abschnitt 6 bekommt den Hinweis.
+- **Release Build prüfen:** Archiv baut ohne Warnungen, kein Entwicklercode und keine Startargumente im Release (alles hinter `#if DEBUG`), Version 1.0, Build 1.
+- **Signing:** Team und Bundle ID auf den Account meines Freundes (Team ID von ihm). Die Bundle ID `de.vanheyden.Hestia` bleibt, falls sie in seinem Team frei ist.
+- **README.md** im Repository (Deutsch und Englisch): kurze Beschreibung mit Screenshot, Abschnitt **Datenschutz** ("Hestia erhebt, speichert und übermittelt keine personenbezogenen Daten. Alle Habits bleiben lokal auf dem Gerät."), Abschnitt **Support** (Issues auf GitHub), Schriften und Bildquellen mit Lizenz, Buy-Me-a-Coffee-Link. Das Repository muss dafür öffentlich sein.
+
+**Pflicht Testfälle**
+- Unit Test: Der Container öffnet einen bestehenden Datenbestand (angelegt ohne Schema-Version) mit `HestiaSchemaV1` ohne Datenverlust: Habits, Erledigungen und Pausen sind danach vollständig da.
+- UI Test: `Phase14UITests` ohne den Teil "Über", die Einstellungen zeigen keinen Abschnitt "Über" mehr.
+- Kein neuer UI Test.
+
+**Definition of Done**
+- [ ] In den Einstellungen gibt es kein "Über" mehr.
+- [ ] Meine Habits auf dem iPhone sind nach dem Update auf diese Version noch alle da.
+- [ ] Ein Archiv (Product › Archive) mit dem Team meines Freundes baut und lässt sich in Xcode ohne Fehler prüfen ("Validate App").
+- [ ] Die README ist auf GitHub öffentlich lesbar, mit Datenschutz, Support und Buy-Me-a-Coffee-Link.
+
+---
+
+### Phase 18: Store-Eintrag und Veröffentlichung
+
+**Ziel:** Hestia Habits steht im App Store, auf Deutsch und Englisch.
+
+**Ablauf (Reihenfolge ist Pflicht)**
+1. **Texte:** Die KI schlägt Untertitel (höchstens 30 Zeichen), Werbetext (170), Beschreibung (4000) und Keywords (100) auf Deutsch und Englisch vor, neutral ohne "du" und "Sie" wie in 4.8. Ich entscheide.
+2. **Screenshots:** Die KI macht im Simulator Screenshots in 6,9 Zoll (iPhone 18 Pro Max, 1320 × 2868) mit den Testdaten, Hell, auf Deutsch und auf Englisch: Heute, Habit Detail, Kalender, Sheet "Neuer Habit", Einstellungen. Ich wähle aus.
+3. **App Store Connect** (mein Freund oder ich mit Zugang zu seinem Team):
+   - App anlegen: Name "Hestia Habits", Hauptsprache Deutsch, Bundle ID, SKU (z.B. `hestia-habits`).
+   - Kategorie: Gesundheit & Fitness, zweite Kategorie Produktivität.
+   - Preis kostenlos, alle Länder.
+   - App-Datenschutz: "Keine Daten erfasst". Datenschutz-URL und Support-URL: README auf GitHub.
+   - Altersfreigabe: Fragebogen, alles "Nein" (4+).
+   - Copyright: "2026 Lea Schulz-Vanheyden".
+   - Angaben für die Prüfung: Kontakt (Name, E-Mail, Telefon), keine Anmeldung nötig.
+4. **TestFlight:** Build hochladen, einige Tage auf meinem iPhone benutzen.
+5. **Einreichen** zur Prüfung, Veröffentlichung von Hand nach der Freigabe.
+
+**Definition of Done**
+- [ ] Texte und Screenshots sind von mir freigegeben.
+- [ ] Die TestFlight Version lief einige Tage auf meinem iPhone ohne Probleme.
+- [ ] Die App ist von Apple freigegeben und im App Store zu finden.
