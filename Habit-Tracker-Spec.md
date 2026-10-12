@@ -1261,11 +1261,13 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - UI Test (einer, bestehenden erweitern, wenn möglich): Mit Testdaten Zeiträume "Kalender" wählen, die Rhythmus Zeile eines Wochen Habits enthält "diese Woche". Zurück auf "Rollierend": "in 7 Tagen".
 
 **Definition of Done**
-- [ ] Ich kann zwischen rollierend und Kalender wählen, die Erklärzeile sagt, was gilt.
-- [ ] Bei "Kalender" ist ein Wochen Habit am Montag grün, auch wenn die letzte Woche verpasst war. Gelb und rot stimmen mit einem von Hand nachgerechneten Beispiel überein.
-- [ ] Wochen mit Pausen und die erste angebrochene Woche werden nie rot.
-- [ ] Streaks und Quote im Detail stimmen für beide Einstellungen mit einem von Hand nachgerechneten Beispiel aus den Testdaten überein.
-- [ ] Mit "Rollierend" ist alles wie vor dieser Phase.
+- [x] Ich kann zwischen rollierend und Kalender wählen, die Erklärzeile sagt, was gilt.
+- [x] Bei "Kalender" ist ein Wochen Habit am Montag grün, auch wenn die letzte Woche verpasst war. Gelb und rot stimmen mit einem von Hand nachgerechneten Beispiel überein.
+- [x] Wochen mit Pausen und die erste angebrochene Woche werden nie rot.
+- [x] Streaks und Quote im Detail stimmen für beide Einstellungen mit einem von Hand nachgerechneten Beispiel aus den Testdaten überein.
+- [x] Mit "Rollierend" ist alles wie vor dieser Phase.
+
+*Geprüft per Unit und UI Tests (iPhone 18 Pro Simulator): Die Einstellung "Zeiträume" (Rollierend / Kalender) steht im Abschnitt Kalender, die Erklärzeile wechselt mit. Die Engine rechnet Status, Fortschritt, Streaks, Quote und Weitere über `period(for:on:)`, die Ansichten bekommen sie als `habitEngine` aus der Umgebung und rechnen bei einer Änderung neu. Die Pflicht Testfälle liegen in `CalendarPeriodTests` (Ampel Mo bis So, neue Woche grün, Wochenbeginn Sonntag, Monat inkl. Februar, Pause, Erstellung, Streak und Quote, Weitere), die Rhythmus Zeile in `RhythmTextTests`, der UI Test in `Phase15UITests` ("in 7 Tagen" und "diese Woche"). Mit "Rollierend" bleiben alle bestehenden Tests zu Status, Streaks und Quote unverändert grün, nur die Erwartung der Rhythmus Zeile ist an die neue Tabelle 4.5.1 angepasst ("in 7 Tagen" statt "diese Woche"). Unit Tests (288) grün, Komplett-Lauf vollständig grün (23 UI Tests, davon neu `Phase15UITests`), Build ohne Warnungen. Hell und Dunkel wurden nicht gesondert angesehen, die Phase fügt in den Einstellungen nur Bausteine hinzu, die es schon gibt.*
 
 ---
 
