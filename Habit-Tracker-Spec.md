@@ -1367,7 +1367,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - **Verschlüsselung:** `ITSAppUsesNonExemptEncryption = NO` in die Info.plist, damit App Store Connect nicht bei jedem Build fragt.
 - **Datenmodell versionieren:** Das heutige Modell wird `HestiaSchemaV1` (`VersionedSchema` mit `Habit`, `Completion`, `Pause`), dazu ein `SchemaMigrationPlan` ohne Stufen. Der `ModelContainer` startet mit diesem Plan. Spätere Änderungen am Modell kommen als V2 mit Migrationsstufe, damit nach einem Update keine Daten verloren gehen. Abschnitt 6 bekommt den Hinweis.
 - **Release Build prüfen:** Archiv baut ohne Warnungen, kein Entwicklercode und keine Startargumente im Release (alles hinter `#if DEBUG`), Version 1.0, Build 1.
-- **Signing:** Team und Bundle ID auf den Account meines Freundes (Team ID von ihm). Die Bundle ID `de.vanheyden.Hestia` bleibt, falls sie in seinem Team frei ist.
+- **Signing:** *Verschoben nach Phase 18 (Ablauf 3), weil die Team ID noch fehlt.* Team und Bundle ID auf den Account meines Freundes (Team ID von ihm). Die Bundle ID `de.vanheyden.Hestia` bleibt, falls sie in seinem Team frei ist.
 - **README.md** im Repository (Deutsch und Englisch): kurze Beschreibung mit Screenshot, Abschnitt **Datenschutz** ("Hestia erhebt, speichert und übermittelt keine personenbezogenen Daten. Alle Habits bleiben lokal auf dem Gerät."), Abschnitt **Support** (Issues auf GitHub), Schriften und Bildquellen mit Lizenz, Buy-Me-a-Coffee-Link. Das Repository muss dafür öffentlich sein.
 
 **Pflicht Testfälle**
@@ -1377,14 +1377,14 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 
 **Definition of Done**
 - [x] In den Einstellungen gibt es kein "Über" mehr.
-- [ ] Meine Habits auf dem iPhone sind nach dem Update auf diese Version noch alle da.
+- [x] Meine Habits auf dem iPhone sind nach dem Update auf diese Version noch alle da.
 - [x] Die Datenbank liegt im App-Ordner und ist nicht vom Backup ausgenommen (per Unit Test geprüft, der Simulator kann kein iCloud-Backup wiederherstellen).
-- [ ] Ein Archiv (Product › Archive) mit dem Team meines Freundes baut und lässt sich in Xcode ohne Fehler prüfen ("Validate App").
+- ~~Ein Archiv (Product › Archive) mit dem Team meines Freundes baut und lässt sich in Xcode ohne Fehler prüfen ("Validate App").~~ *Verschoben nach Phase 18, Ablauf 3 (braucht die Team ID).*
 - [x] Die README ist auf GitHub öffentlich lesbar, mit Datenschutz, Support und Buy-Me-a-Coffee-Link.
 
 *Stand (Simulator iPhone 18 Pro): Über entfernt (`AboutSheet.swift`, Abschnitt in den Einstellungen, fünf Katalogtexte), `Phase14UITests` prüft, dass es keinen Abschnitt "Über" gibt. Neu: `PrivacyInfo.xcprivacy` (kein Tracking, keine Daten, UserDefaults mit `CA92.1`; sonst keine Required Reason APIs im Code), `ITSAppUsesNonExemptEncryption = NO`, `HestiaSchemaV1` mit `HestiaMigrationPlan`. Neue `SchemaMigrationTests`: ein ohne Schema Version angelegter Bestand (Habits, Erledigungen, Pausen) öffnet mit V1 ohne Verlust, die Datenbank liegt in Application Support und ist nicht vom Backup ausgenommen, Manifest und Verschlüsselungsangabe sind im Bundle. Unit Tests (304) grün. Release Build für iOS baut ohne Warnungen, Entwicklercode liegt hinter `#if DEBUG`, Version 1.0 (1). Die README ist auf GitHub ohne Anmeldung abrufbar (Repository und `raw` der README antworten mit 200).*
 
-*Offen, braucht Dinge von außen: (1) Signing auf das Team des Freundes (Team ID von ihm, derzeit steht `68SBFGA64J` im Projekt) und danach Product › Archive mit "Validate App". (2) Ob die Habits auf meinem iPhone nach dem Update noch da sind, kann nur ich dort sehen; der Test deckt den Bestandsfall ab.*
+*Habits auf dem iPhone nach dem Update: von mir geprüft, alle noch da. Signing auf das Team des Freundes und das Archiv mit "Validate App" sind nach Phase 18 verschoben, weil die Team ID noch fehlt (im Projekt steht bis dahin `68SBFGA64J`).*
 
 ---
 
@@ -1395,7 +1395,8 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Ablauf (Reihenfolge ist Pflicht)**
 1. **Texte:** Die KI schlägt Untertitel (höchstens 30 Zeichen), Werbetext (170), Beschreibung (4000) und Keywords (100) auf Deutsch und Englisch vor, neutral ohne "du" und "Sie" wie in 4.8. Ich entscheide.
 2. **Screenshots:** Die KI macht im Simulator Screenshots in 6,9 Zoll (iPhone 18 Pro Max, 1320 × 2868) mit den Testdaten, Hell, auf Deutsch und auf Englisch: Heute, Habit Detail, Kalender, Sheet "Neuer Habit", Einstellungen. Ich wähle aus.
-3. **App Store Connect** (mein Freund oder ich mit Zugang zu seinem Team):
+3. **Signing und Archiv** (aus Phase 17 verschoben, braucht die Team ID des Freundes): Team und Bundle ID im Projekt umstellen, Product › Archive baut ohne Fehler, "Validate App" in Xcode ohne Fehler.
+4. **App Store Connect** (mein Freund oder ich mit Zugang zu seinem Team):
    - App anlegen: Name "Hestia Habits", Hauptsprache Deutsch, Bundle ID, SKU (z.B. `hestia-habits`).
    - Kategorie: Gesundheit & Fitness, zweite Kategorie Produktivität.
    - Preis kostenlos, alle Länder.
@@ -1403,10 +1404,11 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
    - Altersfreigabe: Fragebogen, alles "Nein" (4+).
    - Copyright: "2026 Lea Schulz-Vanheyden".
    - Angaben für die Prüfung: Kontakt (Name, E-Mail, Telefon), keine Anmeldung nötig.
-4. **TestFlight:** Build hochladen, einige Tage auf meinem iPhone benutzen.
-5. **Einreichen** zur Prüfung, Veröffentlichung von Hand nach der Freigabe.
+5. **TestFlight:** Build hochladen, einige Tage auf meinem iPhone benutzen.
+6. **Einreichen** zur Prüfung, Veröffentlichung von Hand nach der Freigabe.
 
 **Definition of Done**
+- [ ] Ein Archiv mit dem Team meines Freundes baut und lässt sich in Xcode ohne Fehler prüfen ("Validate App"), aus Phase 17.
 - [ ] Texte und Screenshots sind von mir freigegeben.
 - [ ] Die TestFlight Version lief einige Tage auf meinem iPhone ohne Probleme.
 - [ ] Die App ist von Apple freigegeben und im App Store zu finden.
