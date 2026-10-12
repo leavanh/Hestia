@@ -54,12 +54,21 @@ final class CalendarPhase5UITests: XCTestCase {
         openDetail(of: "Lesen", in: app)
 
         XCTAssertEqual(app.staticTexts["detail-name"].label, "Lesen")
-        XCTAssertEqual(app.staticTexts["detail-rhythm"].label, "20 Min · Täglich")
+        XCTAssertEqual(app.staticTexts["detail-rhythm"].label, "Täglich · 20 Min")
         // Streak im Band, vier Kennzahlen im Raster. Im Wert steht nur die Zahl, die Einheit in der Beschriftung.
         XCTAssertEqual(app.staticTexts["stat-current-streak"].label, "Aktueller Streak: 1 Tag")
         XCTAssertEqual(app.staticTexts["stat-longest-streak"].label, "4")
         XCTAssertEqual(app.staticTexts["stat-rate-30"].label, "79\u{00A0}%")
         XCTAssertEqual(app.staticTexts["stat-total"].label, "48")
         XCTAssertEqual(app.staticTexts["stat-pauses"].label, "0")
+
+        // Im Kalender des Details lässt sich ein Monat zurückblättern (Phase 18.4).
+        let previous = app.buttons["habit-calendar-previous"]
+        let detail = app.scrollViews["habit-detail"]
+        for _ in 0..<4 where !previous.isHittable { detail.swipeUp() }
+        let month = app.staticTexts.matching(NSPredicate(format: "identifier BEGINSWITH 'habit-calendar-month-'")).firstMatch
+        let shownMonth = month.identifier
+        previous.tap()
+        XCTAssertNotEqual(month.identifier, shownMonth, "Pfeil links zeigt den Monat davor")
     }
 }

@@ -66,9 +66,9 @@ struct PauseEngineTests {
         ]
         for day in 12...14 {
             let progress = engine.dayProgress(habits, on: october(day))
-            #expect(progress.total == 3, "Nur der unpausierte Habit zählt")
+            #expect(progress.total == 1, "Nur der unpausierte Habit zählt")
         }
-        #expect(engine.dayProgress(habits, on: october(15)).total == 5)
+        #expect(engine.dayProgress(habits, on: october(15)).total == 3)
     }
 
     @Test func pausedDaysDoNotCountEvenIfSomethingWasChecked() {

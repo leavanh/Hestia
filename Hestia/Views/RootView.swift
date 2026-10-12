@@ -33,20 +33,48 @@ struct RootView: View {
 
     var body: some View {
         TabView(selection: selectionBinding) {
-            Tab(AppTab.today.title, systemImage: AppTab.today.systemImage, value: AppTab.today) {
+            Tab(value: AppTab.today) {
                 slideIn(TodayView().environment(\.tabReselectCount, reselectCounts[.today, default: 0]))
+            } label: {
+                tabLabel(.today)
             }
             .accessibilityIdentifier(AppTab.today.identifier)
-            Tab(AppTab.calendar.title, systemImage: AppTab.calendar.systemImage, value: AppTab.calendar) {
+            Tab(value: AppTab.calendar) {
                 slideIn(CalendarView().environment(\.tabReselectCount, reselectCounts[.calendar, default: 0]))
+            } label: {
+                tabLabel(.calendar)
             }
             .accessibilityIdentifier(AppTab.calendar.identifier)
-            Tab(AppTab.settings.title, systemImage: AppTab.settings.systemImage, value: AppTab.settings) {
+            Tab(value: AppTab.settings) {
                 slideIn(SettingsView().environment(\.tabReselectCount, reselectCounts[.settings, default: 0]))
+            } label: {
+                tabLabel(.settings)
             }
             .accessibilityIdentifier(AppTab.settings.identifier)
         }
         .tint(Theme.ink)
+    }
+
+    /// Name und Symbol eines Tabs. Die Tab Bar von iOS 26 färbt nicht gewählte Tabs immer schwarz bzw. weiß und
+    /// übernimmt dafür weder `unselectedItemTintColor` noch eine Textfarbe. Deshalb ist das Symbol eines nicht gewählten
+    /// Tabs schon eingefärbt (`ink` mit 45 %, ab Phase 18.4), das des gewählten bleibt eine Vorlage und folgt der
+    /// Tönung in `ink`. Die Beschriftung bleibt in der Farbe des Systems.
+    private func tabLabel(_ tab: AppTab) -> some View {
+        Label {
+            Text(tab.title)
+        } icon: {
+            if tab == selection {
+                Image(systemName: tab.systemImage)
+            } else {
+                Image(uiImage: Self.tintedSymbol(tab.systemImage))
+            }
+        }
+    }
+
+    /// Wie das System die gefüllte Variante des Symbols, falls es eine gibt.
+    private static func tintedSymbol(_ name: String) -> UIImage {
+        let image = UIImage(systemName: "\(name).fill") ?? UIImage(systemName: name) ?? UIImage()
+        return image.withTintColor(Theme.tabUnselectedUIColor, renderingMode: .alwaysOriginal)
     }
 
     /// Lässt den Inhalt eines Tabs beim Wechsel einblenden und ein Stück aus Richtung des Tabs hereingleiten.

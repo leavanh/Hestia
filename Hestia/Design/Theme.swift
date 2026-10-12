@@ -19,6 +19,13 @@ enum Theme {
     static let maxControlTypeSize: DynamicTypeSize = .xxxLarge
     /// Größe von `CheckBox`, `HabitIconView` und der Höhe von `CounterControl`.
     static let controlSize: CGFloat = 36
+    /// Große Variante von `CheckBox` und `CounterControl` in der Tageszeile des Habit Details (ab Phase 18.4).
+    static let controlSizeLarge: CGFloat = 56
+    static let counterKeySizeLarge: CGFloat = 44
+    /// Angehobene Karte beim Kontextmenü (ab Phase 18.4): runde Ecken passend zum Menü des Systems.
+    static let contextPreviewCornerRadius: CGFloat = 16
+    /// Mindestgröße der Tippziele der Monatspfeile im `MonthCalendar` (ab Phase 18.4).
+    static let minTapSize: CGFloat = 44
     /// Abstand zwischen den Teilen von `CounterControl`.
     static let controlSpacing: CGFloat = 8
     /// Kantenlänge der Counter Tasten.
@@ -141,6 +148,8 @@ enum Theme {
     /// damit sie dem Modus folgen und nicht dem beim Start.
     static let backgroundUIColor = dynamicUIColor(light: paperHex, dark: nightHex)
     static let inkUIColor = dynamicUIColor(light: brandHex, dark: paperHex)
+    /// Nicht gewählte Tabs in der Tab Bar: `ink` mit 45 % (ab Phase 18.4), der gewählte Tab ist voll `ink`.
+    static let tabUnselectedUIColor = dynamicUIColor(light: brandHex, dark: paperHex, lightAlpha: 0.45, darkAlpha: 0.45)
 
     /// Statusfarben, nur für die Statusmarke am Icon. Für grün gibt es keine Farbe.
     static let statusYellow = dynamic(light: 0xA88000, dark: 0xF2C200)

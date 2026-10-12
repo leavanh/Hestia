@@ -99,17 +99,11 @@ struct HabitEngineTests {
         #expect(engine.isCompleted(weekly, on: yesterday))
     }
 
-    // MARK: Punkte (Spezifikation 3.4)
+    // MARK: Punkte (Spezifikation 3.4, ab Phase 18.4 ein Punkt pro Habit)
 
-    @Test func pointsEqualDailyTarget() {
-        #expect(engine.points(daily(target: 1), on: day) == 1)
-        #expect(engine.points(daily(target: 3), on: day) == 3)
-        #expect(engine.points(daily(target: 10), on: day) == 10)
-    }
-
-    @Test func donePointsAreTodaysValue() {
-        let habit = daily(target: 3, [(day, 2)])
-        #expect(engine.donePoints(habit, on: day) == 2)
+    @Test func donePointsCountOnlyAFullCounter() {
+        #expect(engine.donePoints(daily(target: 3, [(day, 2)]), on: day) == 0)
+        #expect(engine.donePoints(daily(target: 3, [(day, 3)]), on: day) == 1)
     }
 
     @Test func donePointsAreZeroWithoutEntry() {
@@ -121,21 +115,22 @@ struct HabitEngineTests {
         #expect(engine.donePoints(habit, on: day) == 0)
     }
 
-    @Test func donePointsAreCappedAtTarget() {
+    @Test func donePointsAreOneAboveTarget() {
         // z.B. nachdem das Ziel von 5 auf 2 gesenkt wurde
         let habit = daily(target: 2, [(day, 5)])
-        #expect(engine.donePoints(habit, on: day) == 2)
+        #expect(engine.donePoints(habit, on: day) == 1)
     }
 
     // MARK: Tagesfortschritt (Spezifikation 3.4)
 
-    @Test func progressOfOnceAndThreeTimesDailyWithTwoCompletions() {
-        // Definition of Done Phase 2: "2 von 4 · 50 %"
+    @Test func progressCountsEachHabitOnceAndACounterOnlyWhenFull() {
+        // Phase 18.4: "1 von 2 · 50 %", der 3x tägliche Habit mit 1 von 3 ist noch offen.
         let once = daily(target: 1, [(day, 1)])
         let thrice = daily(target: 3, [(day, 1)])
         let progress = engine.dayProgress([once, thrice], on: day)
-        #expect(progress == DayProgress(done: 2, total: 4))
+        #expect(progress == DayProgress(done: 1, total: 2))
         #expect(progress.percent == 50)
+        #expect(engine.dayProgress([once, daily(target: 3, [(day, 3)])], on: day) == DayProgress(done: 2, total: 2))
     }
 
     @Test func progressRoundsToWholePercent() {
@@ -159,13 +154,13 @@ struct HabitEngineTests {
 
     @Test func progressCapsEachHabitAtItsTarget() {
         let habit = daily(target: 2, [(day, 9)])
-        #expect(engine.dayProgress([habit], on: day) == DayProgress(done: 2, total: 2))
+        #expect(engine.dayProgress([habit], on: day) == DayProgress(done: 1, total: 1))
     }
 
     @Test func progressStartsEmptyOnTheNextDay() {
         let habit = daily(target: 3, [(day, 3)])
         let tomorrow = date(2026, 10, 9, 8)
-        #expect(engine.dayProgress([habit], on: tomorrow) == DayProgress(done: 0, total: 3))
+        #expect(engine.dayProgress([habit], on: tomorrow) == DayProgress(done: 0, total: 1))
     }
 
     // MARK: 7 Tage Punkte (Spezifikation 3.6)

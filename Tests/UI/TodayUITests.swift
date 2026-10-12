@@ -85,12 +85,19 @@ final class TodayUITests: XCTestCase {
         detailField.typeText("20 Min\n")
         app.buttons["Speichern"].tap()
 
-        let rhythm = app.staticTexts["repeat-\(name)"]
-        XCTAssertTrue(rhythm.waitForExistence(timeout: 5))
-        XCTAssertTrue(rhythm.label.localizedCaseInsensitiveContains("20 Min"), "Rhythmus Zeile zeigt den Zusatz: \(rhythm.label)")
+        let extra = app.staticTexts["extra-\(name)"]
+        XCTAssertTrue(extra.waitForExistence(timeout: 5))
+        XCTAssertTrue(extra.label.localizedCaseInsensitiveContains("20 Min"), "Der Zusatz steht neben dem Namen: \(extra.label)")
+        XCTAssertFalse(app.staticTexts["repeat-\(name)"].label.localizedCaseInsensitiveContains("20 Min"), "Die Häufigkeit steht ohne Zusatz")
 
-        app.staticTexts[name].press(forDuration: 1.5)
-        XCTAssertFalse(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 1.5), "Langes Drücken tut nichts mehr")
+        // Langes Drücken öffnet das Kontextmenü (Phase 18.4), "Bearbeiten" darin öffnet das Sheet.
+        app.staticTexts[name].press(forDuration: 1.2)
+        XCTAssertTrue(app.buttons["Bearbeiten"].waitForExistence(timeout: 5), "Kontextmenü zeigt Bearbeiten")
+        XCTAssertTrue(app.buttons["Pausieren"].exists, "Kontextmenü zeigt Pausieren")
+        XCTAssertTrue(app.buttons["Habit beenden"].exists, "Kontextmenü zeigt Habit beenden")
+        app.buttons["Bearbeiten"].tap()
+        XCTAssertTrue(app.navigationBars["Habit bearbeiten"].waitForExistence(timeout: 5), "Bearbeiten im Kontextmenü öffnet das Sheet")
+        app.buttons["Abbrechen"].tap()
 
         app.openDetail(ofCard: name)
         app.buttons["detail-edit"].tap()
@@ -107,8 +114,8 @@ final class TodayUITests: XCTestCase {
         field.typeText(XCUIKeyboardKey.delete.rawValue)
         app.buttons["Speichern"].tap()
         app.goBack()
-        XCTAssertTrue(rhythm.waitForExistence(timeout: 5))
-        XCTAssertFalse(rhythm.label.localizedCaseInsensitiveContains("20 Min"), "Gelöschter Zusatz verschwindet: \(rhythm.label)")
+        XCTAssertTrue(app.staticTexts["repeat-\(name)"].waitForExistence(timeout: 5))
+        XCTAssertFalse(extra.exists && extra.label.localizedCaseInsensitiveContains("20 Min"), "Gelöschter Zusatz verschwindet")
     }
 
     /// Antippen öffnet das Detail mit dem Stand des Tages, Abhaken dort gilt auch für die Karte in Heute.

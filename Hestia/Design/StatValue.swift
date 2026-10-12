@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Eine Kennzahl: großer Wert in Rolle `stat`, darunter die Beschriftung in Rolle `meta`. Im Wert steht nur die Zahl
+/// Eine Kennzahl: Wert in Rolle `stat` (ab Phase 18.4 klein, 32 pt), darunter die Beschriftung in Rolle `meta`. Im Wert steht nur die Zahl
 /// bzw. Prozentzahl, die Einheit gehört in die Beschriftung (Spezifikation 4.5).
 struct StatValue: View {
     let title: LocalizedStringKey
@@ -14,7 +14,7 @@ struct StatValue: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.textSpacing) {
             Text(value)
-                .font(Theme.Typography.stat)
+                .font(Theme.Typography.statSmall)
                 .foregroundStyle(ink)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)

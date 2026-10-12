@@ -59,11 +59,15 @@ struct RhythmTextTests {
         #expect(snapshot(.monthDay, monthDay: 15).rhythmText(window: nil) == "Am 15. des Monats")
     }
 
-    // MARK: Zusatz (Phase 10)
+    // MARK: Zusatz (Phase 10, ab Phase 18.4 hinten)
 
-    @Test func detailStandsInFrontOfTheRhythm() {
-        #expect(snapshot(.daily, detail: "20 Min").rhythmText(window: nil) == "20 Min · Täglich")
-        #expect(snapshot(.weekdays, weekdays: [1, 4], detail: "Yoga").rhythmText(window: nil) == "Yoga · Mo · Do")
+    @Test func detailStandsBehindTheFrequency() {
+        #expect(snapshot(.daily, detail: "20 Min").rhythmText(window: nil) == "Täglich · 20 Min")
+        #expect(snapshot(.weekdays, weekdays: [1, 4], detail: "Yoga").rhythmText(window: nil) == "Mo · Do · Yoga")
+    }
+
+    @Test func frequencyTextLeavesOutTheDetail() {
+        #expect(snapshot(.daily, detail: "20 Min").frequencyText(window: nil) == "Täglich")
     }
 
     @Test func blankDetailIsNotShown() {

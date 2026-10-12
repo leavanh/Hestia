@@ -162,7 +162,7 @@ struct HabitEditorSheet: View {
                     Image(systemName: icon)
                         .font(Theme.Typography.icon)
                         .fixedControlTypeSize()
-                        .foregroundStyle(icon == iconName ? habitColor.color : Theme.inkSecondary)
+                        .foregroundStyle(habitColor.color)
                         .frame(width: Theme.iconSize, height: Theme.iconSize)
                         .background(icon == iconName ? habitColor.tint : Color.clear)
                         .contentShape(Rectangle())

@@ -10,12 +10,17 @@ struct CounterControl: View {
     var label = localized("Erledigt")
     /// Grundlage für die Bezeichner der drei Teile ("<id>-minus", "<id>-value", "<id>-plus").
     let id: String
+    /// Große Variante in der Tageszeile des Habit Details: größere Tasten, Gesamthöhe wie die große `CheckBox`.
+    var isLarge = false
     let onDecrement: () -> Void
     let onIncrement: () -> Void
 
+    private var keySize: CGFloat { isLarge ? Theme.counterKeySizeLarge : Theme.counterKeySize }
+    private var height: CGFloat { isLarge ? Theme.controlSizeLarge : Theme.controlSize }
+
     var body: some View {
         HStack(spacing: Theme.controlSpacing) {
-            StepButton(systemImage: "minus", color: habitColor.color, action: onDecrement)
+            StepButton(systemImage: "minus", color: habitColor.color, size: keySize, action: onDecrement)
                 .disabled(count <= 0)
                 .accessibilityLabel("Weniger")
                 .accessibilityHint("Zählt eins zurück.")
@@ -27,7 +32,7 @@ struct CounterControl: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
                 .fixedControlTypeSize()
-                .frame(minWidth: Theme.counterKeySize, minHeight: Theme.controlSize)
+                .frame(minWidth: keySize, minHeight: height)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(label)
                 .accessibilityValue(localized("\(count) von \(target)"))
@@ -40,13 +45,13 @@ struct CounterControl: View {
                 }
                 .accessibilityIdentifier("\(id)-value")
 
-            StepButton(systemImage: "plus", color: habitColor.color, action: onIncrement)
+            StepButton(systemImage: "plus", color: habitColor.color, size: keySize, action: onIncrement)
                 .disabled(count >= target)
                 .accessibilityLabel("Mehr")
                 .accessibilityHint("Zählt eins dazu.")
                 .accessibilityIdentifier("\(id)-plus")
         }
-        .frame(height: Theme.controlSize)
+        .frame(height: height)
     }
 }
 
@@ -56,6 +61,7 @@ struct StepButton: View {
 
     let systemImage: String
     let color: Color
+    var size = Theme.counterKeySize
     let action: () -> Void
 
     var body: some View {
@@ -67,7 +73,7 @@ struct StepButton: View {
                     .foregroundStyle(color)
                     .fixedControlTypeSize()
             }
-            .frame(width: Theme.counterKeySize, height: Theme.counterKeySize)
+            .frame(width: size, height: size)
             .frame(minHeight: Theme.controlSize)
             .contentShape(Rectangle())
             .opacity(isEnabled ? 1 : Theme.disabledOpacity)

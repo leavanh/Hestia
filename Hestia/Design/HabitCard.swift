@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Flache Zeile eines Habits mit Haarlinie oben: links Icon mit Statusmarke, Name und darunter Rhythmus Zeile mit den
-/// 7 Tage Punkten rechts daneben, rechts `CheckBox` oder `CounterControl`.
+/// Flache Zeile eines Habits mit Haarlinie oben: links Icon mit Statusmarke, daneben in drei festen Zeilen der Name mit
+/// dem Zusatz klein rechts daneben, die Häufigkeit und die 7 Tage Punkte (ab Phase 18.4), rechts `CheckBox` oder
+/// `CounterControl`.
 /// Antippen der linken Seite ruft `onOpen` auf (Habit Detail, für VoiceOver ein Button mit dem Namen des Habits),
 /// die rechte Seite bedient sich selbst. Ein pausierter Habit ist ausgegraut, trägt den Chip "Pausiert" neben dem Namen
 /// und lässt sich nicht abhaken.
@@ -10,6 +11,9 @@ struct HabitCard<Control: View>: View {
     let iconName: String
     let habitColor: HabitColor
     let status: HabitStatus
+    /// Der Zusatz (Spezifikation 5.3), leer wenn keiner da ist.
+    var extraText = ""
+    /// Die Häufigkeit ohne Zusatz (`HabitSnapshot.frequencyText`).
     let rhythmText: String
     let dots: [WeekDot]
     var isPaused = false
@@ -23,26 +27,25 @@ struct HabitCard<Control: View>: View {
                 HabitIconView(habitName: name, iconName: iconName, color: habitColor, status: isPaused ? .green : status)
                     .opacity(isPaused ? Theme.pausedOpacity : 1)
                 VStack(alignment: .leading, spacing: Theme.textSpacing) {
-                    AdaptiveStack(spacing: Theme.inlineSpacing) {
+                    AdaptiveStack(verticalAlignment: .firstTextBaseline, spacing: Theme.inlineSpacing) {
                         Text(name)
                             .titleText()
                             .foregroundStyle(isPaused ? Theme.inkSecondary : Theme.ink)
+                            .layoutPriority(1)
+                        if !extraText.isEmpty {
+                            Text(extraText)
+                                .metaText()
+                                .lineLimit(1)
+                                .foregroundStyle(Theme.inkSecondary)
+                                .accessibilityIdentifier("extra-\(name)")
+                        }
                         if isPaused {
                             Chip(text: "Pausiert")
                                 .accessibilityIdentifier("paused-\(name)")
                         }
                     }
-                    // Rhythmus Zeile und 7 Tage Punkte in einer Zeile, bei zu wenig Platz die Punkte darunter.
-                    ViewThatFits(in: .horizontal) {
-                        HStack(spacing: Theme.inlineSpacing) {
-                            rhythmLine.fixedSize()
-                            weekDots
-                        }
-                        VStack(alignment: .leading, spacing: Theme.textSpacing) {
-                            rhythmLine
-                            weekDots
-                        }
-                    }
+                    rhythmLine
+                    weekDots
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -80,7 +83,7 @@ struct HabitCard<Control: View>: View {
         PaperBackground()
         VStack(spacing: 0) {
             HabitCard(
-                name: "Sport", iconName: "figure.run", habitColor: .orange, status: .yellow,
+                name: "Sport", iconName: "figure.run", habitColor: .orange, status: .yellow, extraText: "45 Min",
                 rhythmText: "1 von 3 diese Woche",
                 dots: [.fill(0), .fill(0), .fill(1), .fill(1), .fill(0), .fill(1), .fill(0)], onOpen: {}
             ) {

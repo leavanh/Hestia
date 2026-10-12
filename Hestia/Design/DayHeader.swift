@@ -19,6 +19,8 @@ struct DayHeader: View {
     let onAdd: () -> Void
     let onBackToToday: () -> Void
     let onSelectDay: (Date) -> Void
+    /// Meldet, ob gerade über den Wochenstreifen gezogen wird.
+    var onScrubbingChange: (Bool) -> Void = { _ in }
 
     @Environment(\.firstWeekday) private var firstWeekday
 
@@ -36,7 +38,12 @@ struct DayHeader: View {
             sliding(id: dayKey, index: 0) { titleRow }
             sliding(id: dayKey, index: 1) { progressBlock }
             sliding(id: engine.startOfWeek(day, firstWeekday: firstWeekday), index: 0) {
-                WeekStrip(days: engine.weekStrip(day, today: today, firstWeekday: firstWeekday), calendar: engine.calendar, onSelect: onSelectDay)
+                WeekStrip(
+                    days: engine.weekStrip(day, today: today, firstWeekday: firstWeekday),
+                    calendar: engine.calendar,
+                    onScrubbingChange: onScrubbingChange,
+                    onSelect: onSelectDay
+                )
             }
         }
         .padding(.horizontal, Theme.spacing)

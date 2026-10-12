@@ -3,7 +3,8 @@ import SwiftUI
 
 /// Tab "Kalender": Monatskalender mit Pfeilen, der beim aktuellen Monat beginnt (Spezifikation 5.4). Jeder Tag ist
 /// nach Tagesfortschritt eingefärbt. Ein Tag antippen öffnet das Sheet "Tag bearbeiten", zukünftige Tage sind
-/// gesperrt. Darunter stehen alle Habits mit ihrem aktuellen Streak, ein Habit antippen öffnet sein Detail als ganze Seite.
+/// gesperrt. Darunter stehen alle Habits mit ihrem aktuellen Streak, ein Habit antippen öffnet sein Detail als ganze Seite,
+/// langes Drücken auf einen aktiven Habit das Kontextmenü.
 struct CalendarView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Query(sort: \Habit.createdAt) private var habits: [Habit]
@@ -15,19 +16,10 @@ struct CalendarView: View {
     @Environment(\.firstWeekday) private var firstWeekday
     @Environment(\.habitEngine) private var engine
 
-    /// So viele Monate vor dem aktuellen gibt es mindestens, auch wenn der älteste Habit jünger ist.
-    private static let minimumMonthsBack = 3
-
     /// Der Tag, dessen Sheet offen ist. Das Datum ist zugleich die Identität.
     private struct SelectedDay: Identifiable {
         let day: Date
         var id: Date { day }
-    }
-
-    /// Erster Monat, zu dem man blättern kann: der des ältesten Habits, mindestens `minimumMonthsBack` zurück.
-    private func firstMonth(for snapshots: [HabitSnapshot]) -> Date {
-        let fallback = engine.calendar.date(byAdding: .month, value: -Self.minimumMonthsBack, to: today) ?? today
-        return engine.firstOfMonth(containing: min(snapshots.map(\.createdAt).min() ?? fallback, fallback))
     }
 
     /// Aktive Habits zuerst, dann die beendeten, jeweils in der Reihenfolge von Heute.
@@ -48,7 +40,7 @@ struct CalendarView: View {
                 VStack(spacing: Theme.sectionSpacing) {
                     ScreenTitle("Kalender")
                     MonthCalendar(
-                        firstMonth: firstMonth(for: snapshots),
+                        firstMonth: engine.firstCalendarMonth(oldest: snapshots.map(\.createdAt).min(), today: today),
                         lastMonth: today,
                         today: today,
                         progress: { engine.dayProgress(snapshots, on: $0) },
@@ -104,6 +96,7 @@ extension CalendarView {
                 ) {
                     openedHabit = habit
                 }
+                .habitContextMenu(habit)
             }
         }
         .padding(.top, Theme.spacing)

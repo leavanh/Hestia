@@ -14,6 +14,8 @@ struct HabitDayControl: View {
     /// Counters hängen "-minus", "-value" und "-plus" an.
     var checkID: String?
     var counterID: String?
+    /// Große Variante für die Tageszeile des Habit Details.
+    var isLarge = false
 
     var body: some View {
         let snapshot = habit.snapshot
@@ -28,6 +30,7 @@ struct HabitDayControl: View {
                 habitColor: habitColor,
                 label: habit.name,
                 id: counterID ?? "counter-\(habit.name)",
+                isLarge: isLarge,
                 onDecrement: {
                     habit.setCount(engine.decrementedCount(count), on: day, engine: engine, in: context)
                 },
@@ -36,7 +39,10 @@ struct HabitDayControl: View {
                 }
             )
         } else {
-            CheckBox(isChecked: count >= 1, habitColor: habitColor, label: habit.name) {
+            CheckBox(
+                isChecked: count >= 1, habitColor: habitColor, label: habit.name,
+                size: isLarge ? Theme.controlSizeLarge : Theme.controlSize
+            ) {
                 habit.setCount(engine.toggledCount(count), on: day, engine: engine, in: context)
             }
             .accessibilityIdentifier(checkID ?? "check-\(habit.name)")

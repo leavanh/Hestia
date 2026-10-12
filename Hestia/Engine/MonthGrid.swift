@@ -45,6 +45,13 @@ extension HabitEngine {
 
     /// Der Monat `months` Monate nach `month` (negativ: davor), begrenzt auf den Bereich vom Monat, der `first`
     /// enthält, bis zu dem, der `last` enthält. Gibt den Anfang des Monats zurück (Spezifikation 5.4).
+    /// Erster Monat, zu dem ein Kalender blättern kann (Spezifikation 5.4): der Monat von `oldest` (ältester Habit
+    /// im Tab, der Habit selbst im Detail), mindestens `monthsBack` Monate vor `today`.
+    func firstCalendarMonth(oldest: Date?, today: Date, monthsBack: Int = 3) -> Date {
+        let fallback = calendar.date(byAdding: .month, value: -monthsBack, to: today) ?? today
+        return firstOfMonth(containing: min(oldest ?? fallback, fallback))
+    }
+
     func steppedMonth(_ month: Date, by months: Int, from first: Date, through last: Date) -> Date {
         let lower = firstOfMonth(containing: first)
         let upper = max(firstOfMonth(containing: last), lower)

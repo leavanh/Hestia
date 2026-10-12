@@ -24,6 +24,9 @@ struct TodayView: View {
     @State private var showsCompactBar = false
     /// Höhe des Kopfbands, für die Schwelle der kleinen Leiste.
     @State private var bandHeight: CGFloat = 0
+    /// Ob gerade über den Wochenstreifen gezogen wird. Ein Wischen, das dabei beginnt, wechselt den Tag nicht.
+    @State private var isScrubbingWeek = false
+    @State private var isSwipeBlocked = false
 
     @Environment(\.habitEngine) private var engine
 
@@ -86,7 +89,8 @@ struct TodayView: View {
                     entranceEdge: entranceEdge,
                     onAdd: { isCreating = true },
                     onBackToToday: { show(today) },
-                    onSelectDay: { show($0) }
+                    onSelectDay: { show($0) },
+                    onScrubbingChange: { isScrubbingWeek = $0 }
                 )
                 .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { bandHeight = $0 }
                 VStack(alignment: .leading, spacing: 0) {
@@ -106,7 +110,13 @@ struct TodayView: View {
         .scrollsToTopOnTabReselect()
         .simultaneousGesture(
             DragGesture(minimumDistance: Theme.swipeDistance)
-                .onEnded { swipe(by: $0.translation) }
+                .onChanged { _ in
+                    if isScrubbingWeek { isSwipeBlocked = true }
+                }
+                .onEnded {
+                    if !isSwipeBlocked { swipe(by: $0.translation) }
+                    isSwipeBlocked = false
+                }
         )
         .onScrollGeometryChange(for: Bool.self) { geometry in
             bandHeight > 0

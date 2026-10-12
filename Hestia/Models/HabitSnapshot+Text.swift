@@ -11,20 +11,24 @@ enum HabitDetail {
 }
 
 extension HabitSnapshot {
-    /// Rhythmus Zeile (Spezifikation 4.5.1): ein vorhandener Zusatz steht vorne, getrennt mit " · ".
-    /// Bei Woche und Monat steht im Rhythmus der Stand im Fenster, `window` kommt aus `HabitEngine.windowProgress`.
-    /// Feste Wochentage folgen dem Wochenbeginn `firstWeekday` (1 = Montag bis 7 = Sonntag). Bei Woche und Monat
-    /// hängt der Text von den Zeiträumen ab: "in 7 Tagen" bzw. "in 30 Tagen" rollierend, "diese Woche" bzw.
-    /// "diesen Monat" nach Kalender (ab Phase 15).
+    /// Rhythmus Zeile (Spezifikation 4.5.1): die Häufigkeit, ein vorhandener Zusatz dahinter, getrennt mit " · "
+    /// (ab Phase 18.4, vorher vorne).
     func rhythmText(
         window: WindowProgress?, firstWeekday: Int = 1, periods: Periods = .rolling, locale: Locale = .current
     ) -> String {
-        let base = baseRhythmText(window: window, firstWeekday: firstWeekday, periods: periods, locale: locale)
+        let base = frequencyText(window: window, firstWeekday: firstWeekday, periods: periods, locale: locale)
         let extra = HabitDetail.normalized(detail)
-        return extra.isEmpty ? base : "\(extra) · \(base)"
+        return extra.isEmpty ? base : "\(base) · \(extra)"
     }
 
-    private func baseRhythmText(window: WindowProgress?, firstWeekday: Int, periods: Periods, locale: Locale) -> String {
+    /// Die Häufigkeit ohne Zusatz, für die Karte, die den Zusatz neben dem Namen zeigt (ab Phase 18.4).
+    /// Bei Woche und Monat steht darin der Stand im Fenster, `window` kommt aus `HabitEngine.windowProgress`.
+    /// Feste Wochentage folgen dem Wochenbeginn `firstWeekday` (1 = Montag bis 7 = Sonntag). Bei Woche und Monat
+    /// hängt der Text von den Zeiträumen ab: "in 7 Tagen" bzw. "in 30 Tagen" rollierend, "diese Woche" bzw.
+    /// "diesen Monat" nach Kalender (ab Phase 15).
+    func frequencyText(
+        window: WindowProgress?, firstWeekday: Int = 1, periods: Periods = .rolling, locale: Locale = .current
+    ) -> String {
         switch rhythm {
         case .daily:
             return targetCount > 1 ? localized("\(targetCount) pro Tag", locale: locale) : localized("Täglich", locale: locale)

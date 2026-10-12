@@ -3,12 +3,11 @@ import SwiftUI
 
 /// Habit Detail (Spezifikation 5.4, ab Phase 18.3 eine ganze Seite): oben ein randloses Band in Habitfarbe mit Rhythmus
 /// Zeile (bei einem beendeten Habit "Beendet am …"), Name und aktuellem Streak. Darunter die Tageszeile mit dem Stand am
-/// Tag und dem Bedienelement zum Abhaken, ein Raster aus vier Kennzahlen, der kompakte Monatskalender und unten
+/// Tag groß und dem großen Bedienelement zum Abhaken, ein Raster aus vier kleinen Kennzahlen, der kompakte Monatskalender und unten
 /// "Pausieren" und "Habit beenden". Die Leiste hat keinen Titel und keinen Hintergrund, links den Zurück Button des
 /// Systems, rechts "Bearbeiten". Die Tab Bar ist ausgeblendet. Ein beendeter Habit zeigt nur Band, Kennzahlen und Kalender.
 struct HabitDetailView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var context
     @Environment(\.colorScheme) private var colorScheme
 
     let habit: Habit
@@ -16,9 +15,8 @@ struct HabitDetailView: View {
     let day: Date
     let today: Date
 
-    @State private var isEditing = false
-    @State private var isPausing = false
-    @State private var isConfirmingEnd = false
+    /// Bearbeiten, Pausieren und Beenden über dieselben Sheets und denselben Dialog wie das Kontextmenü.
+    @State private var actions = HabitActionState()
 
     @Environment(\.firstWeekday) private var firstWeekday
     @Environment(\.habitEngine) private var engine
@@ -42,7 +40,7 @@ struct HabitDetailView: View {
             if habit.isAlive, habit.endedAt == nil {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        isEditing = true
+                        actions.sheet = .edit
                     } label: {
                         Image(systemName: "pencil")
                     }
@@ -51,30 +49,8 @@ struct HabitDetailView: View {
                 }
             }
         }
-        .sheet(isPresented: $isEditing) {
-            HabitEditorSheet(habit: habit)
-        }
-        .sheet(isPresented: $isPausing) {
-            PauseEditorSheet(preselecting: habit)
-        }
-        .alert("Habit beenden?", isPresented: $isConfirmingEnd) {
-            Button("Historie behalten") { endHabit(keepingHistory: true) }
-            Button("Historie löschen", role: .destructive) { endHabit(keepingHistory: false) }
-            Button("Abbrechen", role: .cancel) {}
-        } message: {
-            Text("Der Habit erscheint nicht mehr in Heute. Historie in Kalender und Statistik behalten oder löschen? Gelöschte Historie lässt sich nicht wiederherstellen.")
-        }
-    }
-
-    /// Behalten: der Habit ist ab heute beendet, seine Historie bleibt, das Detail zeigt ihn als beendet. Löschen:
-    /// Habit, Erledigungen und Pausen Zuordnung sind weg (Spezifikation 3.9), die Seite geht zurück.
-    private func endHabit(keepingHistory: Bool) {
-        if keepingHistory {
-            habit.end(on: AppClock.now, engine: engine, in: context)
-        } else {
-            dismiss()
-            habit.deleteWithHistory(in: context)
-        }
+        // Nach "Historie löschen" geht die Seite zurück, nach "Historie behalten" zeigt sie den beendeten Habit.
+        .habitActions(habit, state: $actions) { dismiss() }
     }
 
     private var content: some View {
@@ -91,7 +67,7 @@ struct HabitDetailView: View {
                 statGrid(stats: stats)
                 calendar(snapshot: snapshot, habitColor: habitColor)
                 if habit.endedAt == nil {
-                    actions
+                    actionButtons
                 }
             }
             .padding(.horizontal, Theme.spacing)
@@ -147,14 +123,16 @@ struct HabitDetailView: View {
 
     // MARK: Tageszeile
 
-    /// Haarlinie oben, links der Tag relativ ("Heute", "Gestern") und darunter der Stand ("Erledigt", "Offen", bei einem
-    /// Counter "2 von 3"), rechts Kreis bzw. Counter wie in der Karte. An einem pausierten Tag steht die Kapsel
-    /// "Pausiert" und das Bedienelement ist ausgegraut und gesperrt.
+    /// Haarlinie oben, links klein der Tag relativ ("Heute", "Gestern") und darunter groß der Stand ("Erledigt",
+    /// "Offen", bei einem Counter "2 von 3"), rechts Kreis bzw. Counter in groß, mit derselben Logik wie in der Karte.
+    /// An einem pausierten Tag steht groß "Pausiert" und das Bedienelement ist ausgegraut und gesperrt.
     private func dayRow(snapshot: HabitSnapshot, habitColor: HabitColor) -> some View {
         let isPaused = engine.isPaused(snapshot, on: day)
         let target = engine.dailyTarget(snapshot)
         let count = min(engine.count(on: day, in: snapshot.counts), target)
-        let state: String = if engine.usesCounter(snapshot) {
+        let state: String = if isPaused {
+            localized("Pausiert")
+        } else if engine.usesCounter(snapshot) {
             localized("\(count) von \(target)")
         } else {
             localized(count >= 1 ? "Erledigt" : "Offen")
@@ -163,25 +141,24 @@ struct HabitDetailView: View {
         return AdaptiveStack {
             VStack(alignment: .leading, spacing: Theme.textSpacing) {
                 Text(RelativeDay.text(daysAgo: daysAgo))
-                    .titleText()
+                    .metaText()
+                    .foregroundStyle(habitColor.color.opacity(0.7))
                     .accessibilityIdentifier("detail-day")
-                if isPaused {
-                    Chip(text: "Pausiert")
-                } else {
-                    Text(state)
-                        .metaText()
-                        .foregroundStyle(Theme.inkSecondary)
-                        .accessibilityIdentifier("detail-state")
-                }
+                Text(state)
+                    .displayText(small: true)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                    .opacity(isPaused ? Theme.pausedOpacity : 1)
+                    .accessibilityIdentifier("detail-state")
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityElement(children: .contain)
 
-            HabitDayControl(habit: habit, day: day, checkID: "detail-check", counterID: "detail-counter")
+            HabitDayControl(habit: habit, day: day, checkID: "detail-check", counterID: "detail-counter", isLarge: true)
                 .disabled(isPaused)
                 .opacity(isPaused ? Theme.pausedOpacity : 1)
         }
-        .padding(.vertical, Theme.cardPadding)
+        .padding(.vertical, Theme.spacing)
         .frame(maxWidth: .infinity, alignment: .leading)
         .overlay(alignment: .top) { Hairline() }
     }
@@ -192,14 +169,14 @@ struct HabitDetailView: View {
 
     // MARK: Pausieren und Beenden
 
-    private var actions: some View {
+    private var actionButtons: some View {
         VStack(spacing: Theme.inlineSpacing) {
             HermesButton("Pausieren", variant: .quiet, fillsWidth: true) {
-                isPausing = true
+                actions.sheet = .pause
             }
             .accessibilityIdentifier("detail-pause")
             HermesButton("Habit beenden", variant: .destructive, role: .destructive, fillsWidth: true) {
-                isConfirmingEnd = true
+                actions.isConfirmingEnd = true
             }
             .accessibilityIdentifier("detail-end")
         }
@@ -207,7 +184,7 @@ struct HabitDetailView: View {
 
     // MARK: Kennzahlen
 
-    /// 2 × 2 Kennzahlen, getrennt durch Haarlinien. Die Einheit steht in der Beschriftung, im Wert nur die Zahl.
+    /// 2 × 2 kleine Kennzahlen, getrennt durch Haarlinien. Die Einheit steht in der Beschriftung, im Wert nur die Zahl.
     private func statGrid(stats: HabitStatistics) -> some View {
         VStack(spacing: 0) {
             Hairline()
@@ -227,25 +204,25 @@ struct HabitDetailView: View {
     private func statRow(_ first: StatValue, _ second: StatValue) -> some View {
         HStack(alignment: .top, spacing: 0) {
             first
-                .padding(.vertical, Theme.spacing)
+                .padding(.vertical, Theme.inlineSpacing)
             HairlineColor()
                 .frame(width: Theme.hairlineWidth)
                 .accessibilityHidden(true)
             second
-                .padding(.vertical, Theme.spacing)
+                .padding(.vertical, Theme.inlineSpacing)
                 .padding(.leading, Theme.spacing)
         }
     }
 
     // MARK: Monatskalender
 
-    /// Derselbe Kalender wie im Tab, kompakt, in Habitfarbe und nicht antippbar. Er reicht vom Erstellmonat bis zum
-    /// aktuellen Monat, bei einem beendeten Habit bis zum Monat des Beendens.
+    /// Derselbe Kalender wie im Tab, kompakt, in Habitfarbe und nicht antippbar. Er reicht wie im Tab vom Erstellmonat,
+    /// mindestens 3 Monate zurück, bis zum aktuellen Monat, bei einem beendeten Habit bis zum Monat des Beendens.
     private func calendar(snapshot: HabitSnapshot, habitColor: HabitColor) -> some View {
         let target = engine.dailyTarget(snapshot)
 
         return MonthCalendar(
-            firstMonth: habit.createdAt,
+            firstMonth: engine.firstCalendarMonth(oldest: habit.createdAt, today: today),
             lastMonth: habit.statisticsDay(today: today, engine: engine),
             today: today,
             progress: { DayProgress(done: min(engine.count(on: $0, in: snapshot.counts), target), total: target) },

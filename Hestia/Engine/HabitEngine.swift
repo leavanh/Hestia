@@ -111,6 +111,17 @@ nonisolated struct WeekStripDay: Equatable, Sendable {
     var isSelectable: Bool { !isFuture }
 }
 
+nonisolated extension Array where Element == WeekStripDay {
+    /// Der Tag unter dem Finger, wenn über den Wochenstreifen gezogen wird (ab Phase 18.4): `x` ist die Position im
+    /// Streifen der Breite `width`, alle Felder sind gleich breit. Links und rechts außerhalb gilt das erste bzw. letzte
+    /// Feld, ein Tag nach heute wird auf den letzten wählbaren Tag (heute) begrenzt. `nil` ohne wählbaren Tag.
+    func scrubIndex(atX x: Double, width: Double) -> Int? {
+        guard !isEmpty, width > 0, let lastSelectable = lastIndex(where: \.isSelectable) else { return nil }
+        let index = Int((x / width * Double(count)).rounded(.down))
+        return Swift.min(Swift.max(index, 0), lastSelectable)
+    }
+}
+
 /// Rechenlogik ohne Oberfläche und ohne SwiftData.
 /// "Heute" wird immer als Parameter übergeben, damit Tests mit festen Daten möglich sind.
 nonisolated struct HabitEngine: Sendable {
@@ -393,34 +404,24 @@ nonisolated struct HabitEngine: Sendable {
         count(on: day, in: habit.counts) >= dailyTarget(habit)
     }
 
-    /// Punkte, die ein Habit am Tag wert ist (3x täglich = 3, alle anderen Rhythmen 1).
-    func points(_ habit: HabitSnapshot, on day: Date) -> Int {
-        dailyTarget(habit)
-    }
-
-    /// Erledigte Punkte. Täglich: heutiger Wert, höchstens Zielanzahl. Feste Tage: 1, wenn heute
-    /// abgehakt. Pro Woche / pro Monat: 1, wenn heute abgehakt oder das Ziel im Fenster erfüllt ist.
+    /// Erledigte Punkte. Jeder Habit ist einen Punkt wert, auch bei mehreren Erledigungen am Tag (ab Phase 18.4). Täglich und feste Tage: 1, wenn das Tagesziel am Tag erreicht ist (Counter voll).
+    /// Pro Woche / pro Monat: 1, wenn am Tag abgehakt oder das Ziel im Fenster erfüllt ist.
     func donePoints(_ habit: HabitSnapshot, on day: Date) -> Int {
-        let value = min(max(count(on: day, in: habit.counts), 0), dailyTarget(habit))
         switch habit.rhythm {
         case .daily, .weekdays, .monthDay:
-            return value
+            return isCompleted(habit, on: day) ? 1 : 0
         case .weekly, .monthly:
-            if value > 0 { return 1 }
+            if count(on: day, in: habit.counts) > 0 { return 1 }
             guard let window = windowProgress(habit, on: day) else { return 0 }
             return window.done >= window.target ? 1 : 0
         }
     }
 
-    /// Fortschritt über alle übergebenen Habits. Nur die Habits der Hauptliste zählen mit (`section`), Habits in
-    /// Weitere nie, auch nicht, wenn sie am Tag abgehakt werden.
+    /// Fortschritt über alle übergebenen Habits, ein Punkt pro Habit. Nur die Habits der Hauptliste zählen mit
+    /// (`section`), Habits in Weitere nie, auch nicht, wenn sie am Tag abgehakt werden.
     func dayProgress(_ habits: [HabitSnapshot], on day: Date) -> DayProgress {
-        habits.filter { section($0, on: day) == .main }.reduce(DayProgress(done: 0, total: 0)) { progress, habit in
-            DayProgress(
-                done: progress.done + donePoints(habit, on: day),
-                total: progress.total + points(habit, on: day)
-            )
-        }
+        let main = habits.filter { section($0, on: day) == .main }
+        return DayProgress(done: main.reduce(0) { $0 + donePoints($1, on: day) }, total: main.count)
     }
 
     // MARK: Status (Spezifikation 3.5)

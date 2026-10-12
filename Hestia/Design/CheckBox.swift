@@ -8,6 +8,8 @@ struct CheckBox: View {
     var label = localized("Abhaken")
     var checkedText = localized("Erledigt")
     var uncheckedText = localized("Offen")
+    /// Kantenlänge, groß (`Theme.controlSizeLarge`) in der Tageszeile des Habit Details.
+    var size = Theme.controlSize
     let action: () -> Void
 
     var body: some View {
@@ -23,7 +25,7 @@ struct CheckBox: View {
                     Rectangle().strokeBorder(habitColor.color, lineWidth: Theme.strokeWidth)
                 }
             }
-            .frame(width: Theme.controlSize, height: Theme.controlSize)
+            .frame(width: size, height: size)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

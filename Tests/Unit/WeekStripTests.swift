@@ -76,4 +76,33 @@ struct DayTextTests {
     @Test func weekNumberText() {
         #expect(DayText.weekNumber(date(2026, 10, 11), engine: engine) == "KW 41")
     }
+
+    // MARK: Ziehen über den Streifen (Phase 18.4)
+
+    @Test func fingerPositionSelectsTheFieldBelowIt() {
+        let strip = engine.weekStrip(date(2026, 10, 11), today: date(2026, 10, 11))
+        #expect(strip.scrubIndex(atX: 0, width: 350) == 0)
+        #expect(strip.scrubIndex(atX: 49, width: 350) == 0)
+        #expect(strip.scrubIndex(atX: 51, width: 350) == 1)
+        #expect(strip.scrubIndex(atX: 220, width: 350) == 4)
+        #expect(strip.scrubIndex(atX: 349, width: 350) == 6)
+    }
+
+    @Test func fingerOutsideTheStripStaysOnTheFirstOrLastField() {
+        let strip = engine.weekStrip(date(2026, 10, 11), today: date(2026, 10, 11))
+        #expect(strip.scrubIndex(atX: -40, width: 350) == 0)
+        #expect(strip.scrubIndex(atX: 500, width: 350) == 6)
+    }
+
+    @Test func fingerOnAFutureDayStopsAtToday() {
+        // Mittwoch: Do bis So liegen in der Zukunft.
+        let strip = engine.weekStrip(date(2026, 10, 14), today: date(2026, 10, 14))
+        #expect(strip.scrubIndex(atX: 300, width: 350) == 2)
+        #expect(strip.scrubIndex(atX: 500, width: 350) == 2)
+    }
+
+    @Test func noFieldWithoutWidth() {
+        let strip = engine.weekStrip(date(2026, 10, 11), today: date(2026, 10, 11))
+        #expect(strip.scrubIndex(atX: 10, width: 0) == nil)
+    }
 }

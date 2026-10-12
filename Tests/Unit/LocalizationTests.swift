@@ -62,7 +62,7 @@ struct LocalizationTests {
             (snapshot(.monthly), single, .calendar, "1 von 1 diesen Monat", "1 of 1 this month"),
             (snapshot(.weekdays, weekdays: [4, 1]), nil, .rolling, "Mo · Do", "Mon · Thu"),
             (snapshot(.monthDay, monthDay: 15), nil, .rolling, "Am 15. des Monats", "Day 15 of the month"),
-            (snapshot(.daily, detail: "20 Min"), nil, .rolling, "20 Min · Täglich", "20 Min · Daily"),
+            (snapshot(.daily, detail: "20 Min"), nil, .rolling, "Täglich · 20 Min", "Daily · 20 Min"),
         ]
         for (habit, window, periods, german, english) in cases {
             #expect(habit.rhythmText(window: window, periods: periods, locale: de) == german)

@@ -136,4 +136,16 @@ struct MonthGridTests {
         #expect(engine.steppedMonth(day, by: 1, from: day, through: day) == date(2026, 10, 1, 0))
         #expect(engine.steppedMonth(day, by: -1, from: day, through: day) == date(2026, 10, 1, 0))
     }
+
+    // MARK: Erster Monat (Phase 18.4, Tab und Habit Detail)
+
+    @Test func firstMonthReachesAtLeastThreeMonthsBack() {
+        // Ein Habit aus diesem Monat: trotzdem lässt sich bis Juli zurückblättern.
+        #expect(engine.firstCalendarMonth(oldest: date(2026, 10, 3), today: date(2026, 10, 12)) == date(2026, 7, 1, 0))
+        #expect(engine.firstCalendarMonth(oldest: nil, today: date(2026, 10, 12)) == date(2026, 7, 1, 0))
+    }
+
+    @Test func firstMonthIsTheMonthOfAnOlderHabit() {
+        #expect(engine.firstCalendarMonth(oldest: date(2026, 2, 20), today: date(2026, 10, 12)) == date(2026, 2, 1, 0))
+    }
 }

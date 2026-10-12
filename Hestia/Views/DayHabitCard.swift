@@ -3,7 +3,8 @@ import SwiftUI
 
 /// Zeile eines Habits für einen angezeigten Tag, mit `CheckBox` oder Counter (`HabitDayControl`). Heute und das Sheet
 /// "Tag bearbeiten" nutzen dieselbe Karte. Abgehakt wird für `day`, Antippen der linken Seite öffnet das Habit Detail.
-/// Ist der Habit an dem Tag pausiert, ist die Karte ausgegraut und nicht bedienbar.
+/// Ist der Habit an dem Tag pausiert, ist die Karte ausgegraut und nicht bedienbar. Langes Drücken öffnet das
+/// Kontextmenü mit Bearbeiten, Pausieren und Habit beenden.
 struct DayHabitCard: View {
     let habit: Habit
     let day: Date
@@ -23,13 +24,15 @@ struct DayHabitCard: View {
                 iconName: habit.iconName,
                 habitColor: habitColor,
                 status: engine.status(snapshot, on: day),
-                rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: day), firstWeekday: firstWeekday, periods: engine.periods),
+                extraText: HabitDetail.normalized(habit.detail),
+                rhythmText: snapshot.frequencyText(window: engine.windowProgress(snapshot, on: day), firstWeekday: firstWeekday, periods: engine.periods),
                 dots: engine.weekDots(snapshot, on: day),
                 isPaused: engine.isPaused(snapshot, on: day),
                 onOpen: onOpen
             ) {
                 HabitDayControl(habit: habit, day: day)
             }
+            .habitContextMenu(habit)
         }
     }
 }

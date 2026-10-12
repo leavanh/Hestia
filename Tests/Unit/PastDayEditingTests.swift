@@ -80,17 +80,19 @@ struct PastDayEditingTests {
         let habits = [makeHabit("Wasser", target: 4), makeHabit("Lesen")]
         func progress() -> DayProgress { engine.dayProgress(habits.map(\.snapshot), on: day(7)) }
 
-        #expect(progress() == DayProgress(done: 0, total: 5))
+        #expect(progress() == DayProgress(done: 0, total: 2))
         #expect(MonthCalendar.fillOpacity(for: progress().fraction) == 0)
 
+        // Ein halb voller Counter zählt noch nicht (Phase 18.4), ein abgehakter Habit schon.
         habits[0].setCount(2, on: day(7), engine: engine, in: context)
-        #expect(progress() == DayProgress(done: 2, total: 5))
+        #expect(progress() == DayProgress(done: 0, total: 2))
+        habits[1].setCount(1, on: day(7), engine: engine, in: context)
+        #expect(progress() == DayProgress(done: 1, total: 2))
         let partial = MonthCalendar.fillOpacity(for: progress().fraction)
         #expect(partial > 0)
 
         habits[0].setCount(4, on: day(7), engine: engine, in: context)
-        habits[1].setCount(1, on: day(7), engine: engine, in: context)
-        #expect(progress() == DayProgress(done: 5, total: 5))
+        #expect(progress() == DayProgress(done: 2, total: 2))
         #expect(MonthCalendar.fillOpacity(for: progress().fraction) > partial)
     }
 

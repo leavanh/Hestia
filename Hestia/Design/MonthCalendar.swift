@@ -67,15 +67,16 @@ struct MonthCalendar: View {
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityIdentifier("\(identifierPrefix)-month-\(Self.monthIdentifier(for: grid.firstDay, calendar: engine.calendar))")
                 Spacer()
-                HStack(spacing: Theme.spacing) {
-                    Button("Voriger Monat", systemImage: "chevron.left") { step(-1) }
+                // Jeder Pfeil hat ein Tippziel von `minTapSize`, rechts ragt es über den Rand, damit das Symbol bündig steht.
+                HStack(spacing: 0) {
+                    arrow("Voriger Monat", systemImage: "chevron.left", by: -1)
                         .disabled(shownMonth <= engine.firstOfMonth(containing: firstMonth))
                         .accessibilityIdentifier("\(identifierPrefix)-previous")
-                    Button("Nächster Monat", systemImage: "chevron.right") { step(1) }
+                    arrow("Nächster Monat", systemImage: "chevron.right", by: 1)
                         .disabled(shownMonth >= engine.firstOfMonth(containing: lastMonth))
                         .accessibilityIdentifier("\(identifierPrefix)-next")
                 }
-                .labelStyle(.iconOnly)
+                .padding(.trailing, -Theme.spacing)
                 .font(Theme.Typography.symbol)
                 .foregroundStyle(ink)
                 .buttonStyle(.plain)
@@ -92,6 +93,17 @@ struct MonthCalendar: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func arrow(_ title: LocalizedStringKey, systemImage: String, by months: Int) -> some View {
+        Button {
+            step(months)
+        } label: {
+            Image(systemName: systemImage)
+                .frame(width: Theme.minTapSize, height: Theme.minTapSize)
+                .contentShape(Rectangle())
+        }
+        .accessibilityLabel(title)
     }
 
     private var spacing: CGFloat {

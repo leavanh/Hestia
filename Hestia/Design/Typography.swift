@@ -9,8 +9,7 @@ extension Theme {
         static var displaySmall: Font { custom(FontRegistry.barlowExtraLight, 40, .largeTitle) }
         /// Fortschritt "4/6", Streak im Detail.
         static var numeral: Font { custom(FontRegistry.antonioThin, 76, .largeTitle).monospacedDigit() }
-        /// Kennzahlen im Detail.
-        static var stat: Font { custom(FontRegistry.antonioThin, 52, .title).monospacedDigit() }
+        /// Kennzahlen im Detail und Streak in der Habit Liste.
         static var statSmall: Font { custom(FontRegistry.antonioThin, 32, .title).monospacedDigit() }
         /// Habit Name auf Karten und Zeilen, Sheet Titel.
         static var title: Font { custom(FontRegistry.barlowRegular, 21, .headline) }

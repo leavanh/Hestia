@@ -150,7 +150,6 @@ struct HabitEngineStatusTests {
     @Test func threePerWeekWithOneDoneIsOnePointAndOpen() {
         // Pflicht: 3x pro Woche, 1x erledigt: 1 Punkt im Fortschritt, offen.
         let habit = make(.weekly, target: 3, done: [ago(2)])
-        #expect(engine.points(habit, on: monday) == 1)
         #expect(engine.donePoints(habit, on: monday) == 0)
         #expect(engine.dayProgress([habit], on: monday) == DayProgress(done: 0, total: 1))
     }
@@ -164,7 +163,6 @@ struct HabitEngineStatusTests {
         // Pflicht: 2x pro Woche, im Fenster erfüllt, heute nicht abgehakt: Punkt zählt als erledigt.
         let habit = make(.weekly, target: 2, done: [ago(1), ago(3)])
         #expect(engine.count(on: monday, in: habit.counts) == 0)
-        #expect(engine.points(habit, on: monday) == 1)
         #expect(engine.donePoints(habit, on: monday) == 1)
         // Ab Phase 13 steht der erfüllte, grüne Habit in Weitere und zählt nicht im Tagesfortschritt (3.4).
         #expect(engine.section(habit, on: monday) == .other)
@@ -183,25 +181,23 @@ struct HabitEngineStatusTests {
 
     @Test func fixedDaysAreOnePointDoneOnlyWhenCheckedToday() {
         let weekdays = make(.weekdays, weekdays: [1], done: [ago(7)])
-        #expect(engine.points(weekdays, on: monday) == 1)
         #expect(engine.donePoints(weekdays, on: monday) == 0)
 
         let checked = make(.weekdays, weekdays: [1], done: [monday])
         #expect(engine.donePoints(checked, on: monday) == 1)
 
         let monthDay = make(.monthDay, monthDay: 12, done: [monday])
-        #expect(engine.points(monthDay, on: monday) == 1)
         #expect(engine.donePoints(monthDay, on: monday) == 1)
     }
 
     @Test func progressMixesAllRhythmsAndSkipsHabitsThatAreNotDue() {
-        let water = make(.daily, target: 3, done: [monday])                         // 1 von 3
+        let water = make(.daily, target: 3, done: [monday])                         // 1 von 3: noch offen
         let sport = make(.weekly, target: 2, done: [ago(1), ago(3)])               // erfüllt und grün: Weitere
         let yoga = make(.weekdays, weekdays: [1])                                   // fällig, offen: 0 von 1
         let rent = make(.monthDay, monthDay: 1)                                     // nicht fällig
         let tuesdayOnly = make(.weekdays, weekdays: [2], done: [monday])            // nicht fällig
         let progress = engine.dayProgress([water, sport, yoga, rent, tuesdayOnly], on: monday)
-        #expect(progress == DayProgress(done: 1, total: 4))
+        #expect(progress == DayProgress(done: 0, total: 2))
     }
 
     @Test func windowProgressCountsDaysInTheWindow() {
