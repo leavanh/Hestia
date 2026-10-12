@@ -1335,7 +1335,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - [x] Glossar und Texttabelle sind von mir freigegeben, bevor Code geändert wurde.
 - [x] Mit iPhone auf Englisch (oder Hestia in iOS auf Englisch gestellt) ist die ganze App englisch, auch Datum, Monatsnamen und VoiceOver. Kein deutsches Wort bleibt übrig außer Habit Namen.
 - [x] Mit Deutsch sieht die App aus wie freigegeben.
-- [ ] Die Zeile "Sprache" in den Einstellungen öffnet die iOS Einstellungen der App, dort lässt sich die Sprache wechseln.
+- [x] Die Zeile "Sprache" in den Einstellungen öffnet die iOS Einstellungen der App, dort lässt sich die Sprache wechseln.
 - [x] Keine Texte sprechen mich mit "du" oder "Sie" an.
 - [x] Eine Suche nach `de_DE` im Code findet nichts mehr.
 
@@ -1343,4 +1343,4 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 
 *Abweichungen von der Planung: Mehrzahl über den Katalog nur dort, wo die Zahl im Text steht (Xcode lehnt Mehrzahlvarianten ohne Zahl ab), "Tag in Folge" und "Tag" sind deshalb eigene Schlüssel (4.8). `STRING_CATALOG_GENERATE_SYMBOLS` ist aus, weil Schlüssel wie "Habit beenden" und "Habit beenden?" dasselbe Symbol ergeben. "Heute nichts fällig" heißt jetzt "Nichts fällig", weil es auch an vergangenen Tagen stand. HermesButton und Chip setzen den VoiceOver Text selbst, damit er nicht in Versalien gelesen wird.*
 
-*Offen: Die Zeile "Sprache" öffnet im Simulator die Startseite der iOS Einstellungen mit dem Zurück Link "Hestia", nicht die Seite der App. Ob sie auf dem iPhone direkt bei Hestia landet und dort die Sprache wählbar ist, ist noch nicht geprüft, deshalb steht dieser Punkt offen.*
+*Sprachzeile im Simulator geprüft: Tippen auf "Language / English" öffnet die iOS Einstellungen. Im Simulator landet der Sprung dort zuerst in der Suche der Einstellungs App; unter Apps › Hestia steht der Abschnitt "Preferred Language" mit "Language" (English, Deutsch zur Auswahl). Diesen Abschnitt zeigt iOS nur, weil die App seit dieser Phase zwei Sprachen mitbringt. Mit Deutsch (`-AppleLanguages (de)`) sieht Heute wie freigegeben aus ("Heute", "Erledigt 29 %", "Sortieren", "3 pro Tag", "20 Min · Täglich", "MO · 12. OKT · KW 42"). Ob der Sprung auf dem iPhone direkt bei Hestia landet, sieht man erst dort, die Sprachwahl selbst ist belegt.*
