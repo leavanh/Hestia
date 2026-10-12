@@ -1,7 +1,8 @@
 import SwiftData
 import SwiftUI
 
-/// Einstellungen (Spezifikation 5.5): Pausen, in Debug Builds der Entwicklerbereich und ganz unten der Fuß.
+/// Einstellungen (Spezifikation 5.5): Pausen, Kalender, Anzeige, Über, in Debug Builds der Entwicklerbereich und ganz
+/// unten der Fuß.
 struct SettingsView: View {
     var body: some View {
         NavigationStack {
@@ -9,6 +10,9 @@ struct SettingsView: View {
                 VStack(spacing: Theme.sectionSpacing) {
                     ScreenTitle("Einstellungen")
                     PausesSection()
+                    CalendarSection()
+                    DisplaySection()
+                    AboutSection()
                     #if DEBUG
                     DeveloperSection()
                     #endif
@@ -19,6 +23,78 @@ struct SettingsView: View {
             .scrollsToTopOnTabReselect()
             .background { PaperBackground() }
             .toolbarVisibility(.hidden, for: .navigationBar)
+        }
+    }
+}
+
+/// Einstellungen > Kalender: Wochenbeginn (Phase 14). Ändert nur die Anzeige, nie die Rechnung.
+private struct CalendarSection: View {
+    @AppStorage(SettingsKey.firstWeekday) private var firstWeekday = FirstWeekdaySetting.automatic
+
+    var body: some View {
+        PaperSection(title: "Kalender") {
+            VStack(alignment: .leading, spacing: Theme.inlineSpacing) {
+                Text("Wochenbeginn")
+                    .bodyText()
+                SegmentedChoice(
+                    options: FirstWeekdaySetting.allCases,
+                    selection: $firstWeekday,
+                    title: \.title,
+                    id: { "settings-first-weekday-\($0.rawValue)" }
+                )
+                .accessibilityIdentifier("settings-first-weekday")
+            }
+        }
+    }
+}
+
+/// Einstellungen > Anzeige: Darstellung System, Hell oder Dunkel (Phase 14).
+private struct DisplaySection: View {
+    @AppStorage(SettingsKey.appearance) private var appearance = AppearanceSetting.system
+
+    var body: some View {
+        PaperSection(title: "Anzeige") {
+            VStack(alignment: .leading, spacing: Theme.inlineSpacing) {
+                Text("Darstellung")
+                    .bodyText()
+                SegmentedChoice(
+                    options: AppearanceSetting.allCases,
+                    selection: $appearance,
+                    title: \.title,
+                    id: { "settings-appearance-\($0.rawValue)" }
+                )
+                .accessibilityIdentifier("settings-appearance")
+            }
+        }
+    }
+}
+
+/// Einstellungen > Über: Zeile "Über Hestia", die das Sheet mit Schriften und Bildquellen öffnet (Phase 14).
+private struct AboutSection: View {
+    @State private var isShowingAbout = false
+
+    var body: some View {
+        PaperSection(title: "Über") {
+            Button {
+                isShowingAbout = true
+            } label: {
+                HStack(spacing: Theme.controlSpacing) {
+                    Text("Über Hestia")
+                        .bodyText()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Image(systemName: "chevron.right")
+                        .font(Theme.Typography.symbolSmall)
+                        .accessibilityHidden(true)
+                }
+                .foregroundStyle(Theme.ink)
+                .frame(minHeight: Theme.controlSize)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("settings-about")
+        }
+        .sheet(isPresented: $isShowingAbout) {
+            AboutSheet()
         }
     }
 }

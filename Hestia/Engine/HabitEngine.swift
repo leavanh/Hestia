@@ -424,26 +424,36 @@ nonisolated struct HabitEngine: Sendable {
 
     // MARK: Wochenstreifen (Spezifikation 5.2)
 
-    /// Kalenderwoche nach ISO 8601: Wochen beginnen am Montag, Woche 1 enthält den ersten Donnerstag des Jahres.
-    func isoWeek(_ day: Date) -> Int {
-        var iso = Calendar(identifier: .iso8601)
-        iso.timeZone = calendar.timeZone
-        return iso.component(.weekOfYear, from: day)
+    /// Kalenderwoche. `firstWeekday` ist der Wochenbeginn (1 = Montag bis 7 = Sonntag). Bei Montag ist das die
+    /// ISO Kalenderwoche, sonst zählt sie Wochen ab diesem Tag mit der ISO Regel für die erste Woche
+    /// (mindestens 4 Tage im neuen Jahr), damit jeder Tag eines Wochenstreifens dieselbe Woche hat (Spezifikation 5.5).
+    func weekOfYear(_ day: Date, firstWeekday: Int = 1) -> Int {
+        var weekCalendar = Calendar(identifier: .gregorian)
+        weekCalendar.timeZone = calendar.timeZone
+        weekCalendar.firstWeekday = Self.calendarWeekday(firstWeekday)
+        weekCalendar.minimumDaysInFirstWeek = 4
+        return weekCalendar.component(.weekOfYear, from: day)
     }
 
-    /// Montag der Woche von `day`.
-    func startOfWeek(_ day: Date) -> Date {
+    /// Wochentag der App (1 = Montag bis 7 = Sonntag) als Wert von `Calendar` (1 = Sonntag bis 7 = Samstag).
+    static func calendarWeekday(_ weekday: Int) -> Int {
+        weekday % 7 + 1
+    }
+
+    /// Erster Tag der Woche von `day`. `firstWeekday` ist der Wochenbeginn (1 = Montag bis 7 = Sonntag).
+    func startOfWeek(_ day: Date, firstWeekday: Int = 1) -> Date {
         let start = startOfDay(day)
-        return calendar.date(byAdding: .day, value: 1 - weekday(of: start), to: start) ?? start
+        let offset = (weekday(of: start) - firstWeekday + 7) % 7
+        return calendar.date(byAdding: .day, value: -offset, to: start) ?? start
     }
 
-    /// Die 7 Tage Mo bis So der Woche von `day`. `day` ist angezeigt, Tage nach `today` sind Zukunft.
-    func weekStrip(_ day: Date, today: Date) -> [WeekStripDay] {
+    /// Die 7 Tage der Woche von `day`, beginnend am Wochenbeginn. `day` ist angezeigt, Tage nach `today` sind Zukunft.
+    func weekStrip(_ day: Date, today: Date, firstWeekday: Int = 1) -> [WeekStripDay] {
         let shown = startOfDay(day)
         let today = startOfDay(today)
-        let monday = startOfWeek(shown)
+        let first = startOfWeek(shown, firstWeekday: firstWeekday)
         return (0..<7).compactMap { offset in
-            guard let date = calendar.date(byAdding: .day, value: offset, to: monday) else { return nil }
+            guard let date = calendar.date(byAdding: .day, value: offset, to: first) else { return nil }
             let start = startOfDay(date)
             return WeekStripDay(day: start, isShown: start == shown, isFuture: start > today)
         }

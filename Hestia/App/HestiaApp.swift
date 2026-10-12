@@ -16,6 +16,8 @@ struct HestiaApp: App {
             if ProcessInfo.processInfo.arguments.contains("-HestiaResetData") {
                 try DebugData.resetAll(in: container.mainContext)
                 UserDefaults.standard.removeObject(forKey: OtherHabitsSection.expandedKey)
+                UserDefaults.standard.removeObject(forKey: SettingsKey.appearance)
+                UserDefaults.standard.removeObject(forKey: SettingsKey.firstWeekday)
             }
             // Startargument für Vorschauen: legt zusätzlich die Testdaten aus den Einstellungen an.
             if ProcessInfo.processInfo.arguments.contains("-HestiaSampleData") {
@@ -35,6 +37,7 @@ struct HestiaApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .modifier(AppSettingsModifier())
         }
         .modelContainer(container)
     }

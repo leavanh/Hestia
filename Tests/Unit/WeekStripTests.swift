@@ -14,17 +14,17 @@ struct WeekStripTests {
         engine.calendar.date(from: DateComponents(year: year, month: month, day: day, hour: hour))!
     }
 
-    @Test func isoWeekFollowsISO8601() {
-        #expect(engine.isoWeek(date(2026, 10, 11)) == 41)
-        #expect(engine.isoWeek(date(2025, 12, 29)) == 1)
-        #expect(engine.isoWeek(date(2027, 1, 1)) == 53)
+    @Test func weekOfYearFollowsISO8601() {
+        #expect(engine.weekOfYear(date(2026, 10, 11)) == 41)
+        #expect(engine.weekOfYear(date(2025, 12, 29)) == 1)
+        #expect(engine.weekOfYear(date(2027, 1, 1)) == 53)
     }
 
-    @Test func isoWeekIgnoresTheFirstWeekdayOfTheCalendar() {
+    @Test func weekOfYearIgnoresTheFirstWeekdayOfTheCalendar() {
         var calendar = engine.calendar
         calendar.firstWeekday = 1
         calendar.minimumDaysInFirstWeek = 1
-        #expect(HabitEngine(calendar: calendar).isoWeek(date(2026, 10, 11)) == 41)
+        #expect(HabitEngine(calendar: calendar).weekOfYear(date(2026, 10, 11)) == 41)
     }
 
     @Test func stripOnSundayTodayShowsMondayToSunday() {

@@ -1190,12 +1190,14 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - UI Test (einer): In den Einstellungen Wochenbeginn "Sonntag" wählen, in Heute ist das erste Feld des Wochenstreifens ein Sonntag. Danach "Über Hestia" öffnen, die Zeile für Barlow Condensed ist zu sehen, "Fertig" schließt das Sheet.
 
 **Definition of Done**
-- [ ] Ich kann Hell oder Dunkel fest einstellen, die App samt Sheets folgt sofort. Mit "System" folgt sie wieder dem iPhone.
-- [ ] Mit Wochenbeginn Sonntag beginnen Wochenstreifen, Kalender und Wochentagsauswahl mit Sonntag. Datumszeile und Wochenstreifen zeigen dieselbe Woche.
-- [ ] Mit "Automatisch" folgt der Wochenbeginn der Einstellung "Erster Wochentag" in iOS.
-- [ ] Status, Streaks und Quoten sind nach dem Umstellen des Wochenbeginns genau wie vorher.
-- [ ] Unter "Über Hestia" stehen die drei Schriften mit Lizenz, der volle Lizenztext ist lesbar.
-- [ ] Die Einstellungen bleiben nach einem Neustart der App erhalten.
+- [x] Ich kann Hell oder Dunkel fest einstellen, die App samt Sheets folgt sofort. Mit "System" folgt sie wieder dem iPhone.
+- [x] Mit Wochenbeginn Sonntag beginnen Wochenstreifen, Kalender und Wochentagsauswahl mit Sonntag. Datumszeile und Wochenstreifen zeigen dieselbe Woche.
+- [x] Mit "Automatisch" folgt der Wochenbeginn der Einstellung "Erster Wochentag" in iOS.
+- [x] Status, Streaks und Quoten sind nach dem Umstellen des Wochenbeginns genau wie vorher.
+- [x] Unter "Über Hestia" stehen die drei Schriften mit Lizenz, der volle Lizenztext ist lesbar.
+- [x] Die Einstellungen bleiben nach einem Neustart der App erhalten.
+
+*Geprüft im Simulator (iPhone 18 Pro): Die Einstellungen zeigen die Abschnitte Pausen, Kalender (Wochenbeginn), Anzeige (Darstellung), Über, Entwickler und den Fuß. "Über Hestia" öffnet das Sheet mit den drei Schriften (Urheber, SIL Open Font License 1.1, Tippen zeigt den Lizenztext) und den beiden Stichen (The Metropolitan Museum of Art, CC0). Unit Tests (268) grün, darunter die Pflicht Testfälle in `FirstWeekdayTests`. Komplett-Lauf vollständig grün (22 UI Tests, davon neu `Phase14UITests`), Build ohne Warnungen. `isoWeek` heißt jetzt `weekOfYear`, `-HestiaResetData` setzt auch die Einstellungen zurück.*
 
 ---
 

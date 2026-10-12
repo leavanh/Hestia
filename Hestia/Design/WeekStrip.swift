@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Wochenstreifen im Kopfband von Heute (Spezifikation 4.5 und 5.2): 7 Felder Mo bis So, der angezeigte Tag invertiert.
+/// Wochenstreifen im Kopfband von Heute (Spezifikation 4.5 und 5.2): 7 Felder ab dem Wochenbeginn, der angezeigte Tag invertiert.
 /// Tage nach heute sind blass und nicht antippbar. Innerhalb einer Woche wandert die Markierung kurz zum neuen Tag.
 struct WeekStrip: View {
     let days: [WeekStripDay]
@@ -8,14 +8,15 @@ struct WeekStrip: View {
     let onSelect: (Date) -> Void
 
     @Namespace private var marker
+    private var engine: HabitEngine { HabitEngine(calendar: calendar) }
 
     var body: some View {
         HStack(spacing: 0) {
-            ForEach(Array(days.enumerated()), id: \.element.day) { index, day in
+            ForEach(days, id: \.day) { day in
                 Button {
                     if !day.isShown { onSelect(day.day) }
                 } label: {
-                    Text(DayText.weekdayNames[index % 7])
+                    Text(DayText.weekdayName(engine.weekday(of: day.day)))
                         .labelText()
                         .lineLimit(1)
                         .foregroundStyle(day.isShown ? Theme.band : Theme.onBand)

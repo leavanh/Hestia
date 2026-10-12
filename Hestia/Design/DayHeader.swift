@@ -20,6 +20,8 @@ struct DayHeader: View {
     let onBackToToday: () -> Void
     let onSelectDay: (Date) -> Void
 
+    @Environment(\.firstWeekday) private var firstWeekday
+
     private var daysAgo: Int {
         engine.calendar.dateComponents([.day], from: engine.startOfDay(day), to: engine.startOfDay(today)).day ?? 0
     }
@@ -33,8 +35,8 @@ struct DayHeader: View {
             }
             sliding(id: dayKey, index: 0) { titleRow }
             sliding(id: dayKey, index: 1) { progressBlock }
-            sliding(id: engine.startOfWeek(day), index: 0) {
-                WeekStrip(days: engine.weekStrip(day, today: today), calendar: engine.calendar, onSelect: onSelectDay)
+            sliding(id: engine.startOfWeek(day, firstWeekday: firstWeekday), index: 0) {
+                WeekStrip(days: engine.weekStrip(day, today: today, firstWeekday: firstWeekday), calendar: engine.calendar, onSelect: onSelectDay)
             }
         }
         .padding(.horizontal, Theme.spacing)
@@ -69,8 +71,8 @@ struct DayHeader: View {
                 .accessibilityIdentifier("today-date")
             Text(" · ")
                 .accessibilityHidden(true)
-            Text(DayText.weekNumber(day, engine: engine))
-                .accessibilityLabel("Kalenderwoche \(engine.isoWeek(day))")
+            Text(DayText.weekNumber(day, engine: engine, firstWeekday: firstWeekday))
+                .accessibilityLabel("Kalenderwoche \(engine.weekOfYear(day, firstWeekday: firstWeekday))")
                 .accessibilityIdentifier("week-number")
         }
         .metaText()

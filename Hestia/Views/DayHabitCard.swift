@@ -11,6 +11,7 @@ struct DayHabitCard: View {
     let day: Date
     let onEdit: () -> Void
 
+    @Environment(\.firstWeekday) private var firstWeekday
     private let engine = HabitEngine()
 
     var body: some View {
@@ -24,7 +25,7 @@ struct DayHabitCard: View {
                 iconName: habit.iconName,
                 habitColor: habitColor,
                 status: engine.status(snapshot, on: day),
-                rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: day)),
+                rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: day), firstWeekday: firstWeekday),
                 dots: engine.weekDots(snapshot, on: day),
                 isPaused: engine.isPaused(snapshot, on: day),
                 onEdit: onEdit

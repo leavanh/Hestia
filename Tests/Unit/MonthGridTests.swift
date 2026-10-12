@@ -8,7 +8,7 @@ struct MonthGridTests {
     let engine: HabitEngine = {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "Europe/Berlin")!
-        // Absichtlich Sonntag: das Raster muss unabhängig von der Region mit Montag beginnen.
+        // Absichtlich Sonntag: ohne Wochenbeginn muss das Raster unabhängig von der Region mit Montag beginnen.
         calendar.firstWeekday = 1
         return HabitEngine(calendar: calendar)
     }()

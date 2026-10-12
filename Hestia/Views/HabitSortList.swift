@@ -12,6 +12,7 @@ struct HabitSortList: View {
     /// Beendet den Sortiermodus. "Fertig" steht rechts im Listenkopf, wie in Heute "Sortieren".
     let onDone: () -> Void
 
+    @Environment(\.firstWeekday) private var firstWeekday
     private let engine = HabitEngine()
 
     var body: some View {
@@ -78,7 +79,7 @@ struct HabitSortList: View {
                 Text(habit.name)
                     .titleText()
                     .foregroundStyle(isPaused ? Theme.inkSecondary : Theme.ink)
-                Text(snapshot.rhythmText(window: engine.windowProgress(snapshot, on: day)))
+                Text(snapshot.rhythmText(window: engine.windowProgress(snapshot, on: day), firstWeekday: firstWeekday))
                     .metaText()
                     .foregroundStyle(Theme.inkSecondary)
             }

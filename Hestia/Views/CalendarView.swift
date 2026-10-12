@@ -12,6 +12,7 @@ struct CalendarView: View {
     @State private var selectedDay: SelectedDay?
     @State private var detailHabit: Habit?
 
+    @Environment(\.firstWeekday) private var firstWeekday
     private let engine = HabitEngine()
 
     /// So viele Monate vor dem aktuellen gibt es mindestens, auch wenn der älteste Habit jünger ist.
@@ -98,7 +99,7 @@ extension CalendarView {
                     name: habit.name,
                     iconName: habit.iconName,
                     habitColor: HabitColor(key: habit.colorKey),
-                    rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: today)),
+                    rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: today), firstWeekday: firstWeekday),
                     streak: engine.currentStreak(snapshot, on: habit.statisticsDay(today: today, engine: engine))
                 ) {
                     detailHabit = habit

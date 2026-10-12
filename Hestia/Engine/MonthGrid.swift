@@ -6,17 +6,17 @@ nonisolated struct MonthGrid: Equatable, Sendable {
     var firstDay: Date
     /// Tagesbeginn aller Tage des Monats, aufsteigend.
     var days: [Date]
-    /// Leere Felder vor dem 1., weil die Woche am Montag beginnt (Montag 0, Sonntag 6).
+    /// Leere Felder vor dem 1., je nach Wochenbeginn (am Wochenbeginn selbst 0).
     var leadingBlanks: Int
 }
 
 extension HabitEngine {
-    /// Der Monat, der `date` enthält. Die Woche beginnt am Montag, unabhängig von der Region des Geräts.
-    func monthGrid(containing date: Date) -> MonthGrid {
+    /// Der Monat, der `date` enthält. `firstWeekday` ist der Wochenbeginn (1 = Montag bis 7 = Sonntag).
+    func monthGrid(containing date: Date, firstWeekday: Int = 1) -> MonthGrid {
         let first = firstOfMonth(containing: date)
         let count = calendar.range(of: .day, in: .month, for: first)?.count ?? 30
         let days = (0..<count).compactMap { calendar.date(byAdding: .day, value: $0, to: first) }
-        return MonthGrid(firstDay: first, days: days, leadingBlanks: weekday(of: first) - 1)
+        return MonthGrid(firstDay: first, days: days, leadingBlanks: (weekday(of: first) - firstWeekday + 7) % 7)
     }
 
     /// Tagesbeginn des 1. des Monats, der `date` enthält.

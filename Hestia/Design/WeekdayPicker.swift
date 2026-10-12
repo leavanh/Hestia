@@ -1,23 +1,21 @@
 import SwiftUI
 
-/// Sieben Quadrate M D M D F S S zur Auswahl von Wochentagen (1 = Montag bis 7 = Sonntag).
+/// Sieben Quadrate mit den Anfangsbuchstaben der Wochentage, ab dem Wochenbeginn, zur Auswahl von Wochentagen
+/// (1 = Montag bis 7 = Sonntag).
 struct WeekdayPicker: View {
     @Binding var selection: Set<Int>
     let habitColor: HabitColor
 
-    private static let days: [(number: Int, initial: String, name: String)] = [
-        (1, "M", "Montag"), (2, "D", "Dienstag"), (3, "M", "Mittwoch"), (4, "D", "Donnerstag"),
-        (5, "F", "Freitag"), (6, "S", "Samstag"), (7, "S", "Sonntag"),
-    ]
+    @Environment(\.firstWeekday) private var firstWeekday
 
     var body: some View {
         HStack(spacing: 0) {
-            ForEach(Self.days, id: \.number) { day in
-                let isSelected = selection.contains(day.number)
+            ForEach(DayText.weekdays(startingAt: firstWeekday), id: \.self) { day in
+                let isSelected = selection.contains(day)
                 Button {
-                    toggle(day.number)
+                    toggle(day)
                 } label: {
-                    Text(day.initial)
+                    Text(DayText.weekdayInitial(day))
                         .labelText()
                         .fixedControlTypeSize()
                         .foregroundStyle(isSelected ? habitColor.onColor : habitColor.color)
@@ -33,9 +31,9 @@ struct WeekdayPicker: View {
                 }
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
-                .accessibilityLabel(day.name)
+                .accessibilityLabel(DayText.weekdayFullName(day))
                 .accessibilityAddTraits(isSelected ? .isSelected : [])
-                .accessibilityIdentifier("weekday-\(day.number)")
+                .accessibilityIdentifier("weekday-\(day)")
             }
         }
     }

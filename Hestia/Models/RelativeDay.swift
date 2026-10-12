@@ -15,14 +15,47 @@ enum RelativeDay {
 
 /// Datumstexte im Kopfband von Heute (Spezifikation 5.2).
 enum DayText {
-    /// Kurznamen der Wochentage, Index 0 = Montag.
-    static let weekdayNames = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
-
     private static let locale = Locale(identifier: "de_DE")
+
+    private static let calendar: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = locale
+        return calendar
+    }()
+
+    /// Die Symbole von `Calendar` beginnen am Sonntag, die Wochentage der App am Montag (1 = Montag bis 7 = Sonntag).
+    private static func symbol(_ symbols: [String], _ weekday: Int) -> String {
+        symbols[HabitEngine.calendarWeekday(weekday) - 1]
+    }
+
+    /// Kurzname eines Wochentags der App: "Mo", "Di" und so weiter.
+    static func weekdayName(_ weekday: Int) -> String {
+        symbol(calendar.shortStandaloneWeekdaySymbols, weekday)
+    }
+
+    /// Anfangsbuchstabe eines Wochentags der App: "M", "D" und so weiter.
+    static func weekdayInitial(_ weekday: Int) -> String {
+        symbol(calendar.veryShortStandaloneWeekdaySymbols, weekday)
+    }
+
+    /// Voller Name eines Wochentags der App: "Montag", "Dienstag" und so weiter.
+    static func weekdayFullName(_ weekday: Int) -> String {
+        symbol(calendar.standaloneWeekdaySymbols, weekday)
+    }
+
+    /// Die 7 Wochentage der App ab dem Wochenbeginn (1 = Montag bis 7 = Sonntag).
+    static func weekdays(startingAt firstWeekday: Int) -> [Int] {
+        (0..<7).map { (firstWeekday - 1 + $0) % 7 + 1 }
+    }
+
+    /// Kurznamen der Wochentage ab dem Wochenbeginn.
+    static func weekdayNames(startingAt firstWeekday: Int) -> [String] {
+        weekdays(startingAt: firstWeekday).map { weekdayName($0) }
+    }
 
     /// Datumszeile ohne Kalenderwoche: "So · 11. Okt".
     static func dateLine(_ day: Date, engine: HabitEngine) -> String {
-        "\(weekdayNames[engine.weekday(of: day) - 1]) · \(shortDate(day, engine: engine))"
+        "\(weekdayName(engine.weekday(of: day))) · \(shortDate(day, engine: engine))"
     }
 
     /// Tag und Monat: "11. Okt".
@@ -47,8 +80,8 @@ enum DayText {
     }
 
     /// Kalenderwoche: "KW 41".
-    static func weekNumber(_ day: Date, engine: HabitEngine) -> String {
-        "KW \(engine.isoWeek(day))"
+    static func weekNumber(_ day: Date, engine: HabitEngine, firstWeekday: Int = 1) -> String {
+        "KW \(engine.weekOfYear(day, firstWeekday: firstWeekday))"
     }
 
     /// Vollständiges Datum für VoiceOver: "Sonntag, 11. Oktober".

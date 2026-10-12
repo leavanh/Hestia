@@ -33,6 +33,7 @@ struct MonthCalendar: View {
     /// Der gezeigte Monat. Beim Start der letzte, also der aktuelle.
     @State private var month: Date?
     @Environment(\.inkOverride) private var inkOverride
+    @Environment(\.firstWeekday) private var firstWeekday
 
     /// Tinte für Monatsname, Pfeile, Tageszahlen und Pausen: `Theme.ink`, im Habit Detail die Habitfarbe.
     private var ink: Color { inkOverride ?? Theme.ink }
@@ -56,7 +57,7 @@ struct MonthCalendar: View {
     }
 
     var body: some View {
-        let grid = engine.monthGrid(containing: shownMonth)
+        let grid = engine.monthGrid(containing: shownMonth, firstWeekday: firstWeekday)
 
         VStack(alignment: .leading, spacing: Theme.spacing) {
             HStack {
@@ -187,9 +188,10 @@ struct MonthCalendar: View {
     }
 }
 
-/// Wochentagszeile Mo bis So unter dem Monatsnamen.
+/// Wochentagszeile ab dem Wochenbeginn unter dem Monatsnamen.
 struct CalendarWeekdayHeader: View {
     @Environment(\.inkOverride) private var inkOverride
+    @Environment(\.firstWeekday) private var firstWeekday
     var spacing: CGFloat = Theme.calendarDaySpacing
 
     /// Sieben gleich breite Spalten, auch für die Tage darunter.
@@ -201,8 +203,8 @@ struct CalendarWeekdayHeader: View {
 
     var body: some View {
         LazyVGrid(columns: Self.columns(spacing: spacing), spacing: 0) {
-            ForEach(DayText.weekdayNames, id: \.self) { weekday in
-                Text(weekday)
+            ForEach(DayText.weekdays(startingAt: firstWeekday), id: \.self) { weekday in
+                Text(DayText.weekdayName(weekday))
                     .labelText(small: true)
                     .fixedControlTypeSize()
                     .foregroundStyle((inkOverride ?? Theme.ink).opacity(0.7))
