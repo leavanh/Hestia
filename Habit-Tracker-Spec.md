@@ -1357,6 +1357,8 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - **Händlerstatus (EU):** "kein Händler", weil ich kein Geld mit der App verdiene. Die Angabe gilt für den ganzen Account, mein Freund muss sie in App Store Connect machen bzw. bestätigen.
 - **Datenschutz und Support:** ein Abschnitt in der README auf GitHub. Die App erhebt keine Daten, alles bleibt auf dem iPhone.
 - **Buy Me a Coffee** (`https://buymeacoffee.com/leavanh`) nur in der README, nicht in der App: Apple lässt Trinkgeld an Entwickler in der App nur über In-App-Kauf zu (Richtlinie 3.1.1). Ein Link nach außen riskiert die Ablehnung, ein In-App-Kauf bräuchte Bankdaten und Verträge im Account und würde den Händlerstatus berühren.
+- **Lizenz:** keine Lizenzdatei. Das Repository ist öffentlich zum Lesen, alle Rechte vorbehalten (steht in der README). Schriften und Bilder behalten ihre eigenen Lizenzen.
+- **Copyright** im Store: "2026 Lea Schulz-Vanheyden". Als Anbieter steht der Account meines Freundes da, das darf abweichen.
 - **Name im Store:** "Hestia Habits". Auf dem Homescreen bleibt "Hestia".
 - **Daten beim Handywechsel:** Die Datenbank liegt im App-Ordner (Application Support) und ist nicht vom Backup ausgenommen. Sie kommt deshalb mit dem iCloud-Backup, einem Backup über den Mac und der direkten Übertragung beim Einrichten eines neuen iPhones mit, ebenso die Einstellungen (UserDefaults). Ein Abgleich über iCloud (CloudKit) zwischen mehreren Geräten gibt es in 1.0 nicht. Er wäre eine eigene spätere Phase, weil das Modell dafür angepasst werden muss (alle Felder optional oder mit Standardwert, Beziehungen optional) und der Account meines Freundes die iCloud-Berechtigung braucht.
 
