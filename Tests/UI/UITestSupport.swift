@@ -5,13 +5,31 @@ enum TabID: String {
     case today, calendar, settings
 
     var identifier: String { "tab-\(rawValue)" }
+
+    /// Beschriftung in der Tab Bar (Tests laufen auf Deutsch). Direkt nach dem Start meldet die System Tab Bar ihre
+    /// Buttons manchmal nur mit Beschriftung und noch ohne Bezeichner, deshalb gilt beides.
+    var label: String {
+        switch self {
+        case .today: "Heute"
+        case .calendar: "Kalender"
+        case .settings: "Einstellungen"
+        }
+    }
 }
 
 extension XCUIApplication {
-    /// Tippt in der Tab Bar auf den Tab.
+    /// Der Button des Tabs in der Tab Bar, gefunden über Bezeichner oder Beschriftung.
+    @MainActor
+    func tabButton(_ tab: TabID) -> XCUIElement {
+        tabBars.buttons.matching(NSPredicate(format: "identifier == %@ OR label == %@", tab.identifier, tab.label)).firstMatch
+    }
+
+    /// Tippt in der Tab Bar auf den Tab. Wartet, bis die Tab Bar nach dem Start da ist.
     @MainActor
     func openTab(_ tab: TabID) {
-        tabBars.buttons[tab.identifier].tap()
+        let button = tabButton(tab)
+        XCTAssertTrue(button.waitForExistence(timeout: 10), "Tab \(tab.rawValue) fehlt in der Tab Bar")
+        button.tap()
     }
 
     /// Ein Baustein mit Bezeichner, egal welchen Typ ihn XCTest meldet (z.B. `StepperControl`).
