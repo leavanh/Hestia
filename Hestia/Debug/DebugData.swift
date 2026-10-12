@@ -34,17 +34,28 @@ enum DebugData {
         let created = engine.calendar.date(byAdding: .day, value: -historyDays, to: today) ?? today
         let samples = samples(today: today, created: created, engine: engine)
 
+        // Startargument für Store Screenshots: englische Namen. Nicht mit `-HestiaSamplePauses` kombinieren, das sucht
+        // die Habits über die deutschen Namen.
+        let englishNames = ProcessInfo.processInfo.arguments.contains("-HestiaSampleEnglish")
+        let englishName = [
+            "Wasser trinken": "Drink water", "Lesen": "Reading", "Meditieren": "Meditation", "Vitamine": "Vitamins",
+            "Hautpflege": "Skincare", "Sport": "Workout", "Joggen": "Running", "Gitarre üben": "Practice guitar",
+            "Fenster putzen": "Clean windows", "Pflanzen düngen": "Fertilize plants", "Auto waschen": "Wash car",
+            "Tagebuch": "Journal", "Yoga": "Yoga", "Wäsche waschen": "Do laundry", "Blumen gießen": "Water flowers",
+            "Miete überweisen": "Pay rent", "Rechnungen prüfen": "Check bills",
+        ]
+
         var habits: [Habit] = []
         for (index, sample) in samples.enumerated() {
             let habit = Habit(
-                name: sample.name,
+                name: englishNames ? (englishName[sample.name] ?? sample.name) : sample.name,
                 iconName: sample.iconName,
                 colorKey: sample.color.rawValue,
                 rhythm: sample.rhythm,
                 targetCount: sample.target,
                 weekdays: sample.weekdays,
                 monthDay: sample.monthDay,
-                detail: sample.detail,
+                detail: englishNames ? sample.detail.replacingOccurrences(of: "Min", with: "min") : sample.detail,
                 // Eine Sekunde Abstand, damit die Reihenfolge in "Heute" fest ist.
                 createdAt: created.addingTimeInterval(TimeInterval(index))
             )
