@@ -1377,7 +1377,7 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 **Definition of Done**
 - [ ] In den Einstellungen gibt es kein "Über" mehr.
 - [ ] Meine Habits auf dem iPhone sind nach dem Update auf diese Version noch alle da.
-- [ ] Nach "Backup wiederherstellen" im Simulator (oder auf einem zweiten Gerät) sind Habits, Erledigungen, Pausen und Einstellungen wieder da.
+- [ ] Die Datenbank liegt im App-Ordner und ist nicht vom Backup ausgenommen (per Unit Test geprüft, der Simulator kann kein iCloud-Backup wiederherstellen).
 - [ ] Ein Archiv (Product › Archive) mit dem Team meines Freundes baut und lässt sich in Xcode ohne Fehler prüfen ("Validate App").
 - [ ] Die README ist auf GitHub öffentlich lesbar, mit Datenschutz, Support und Buy-Me-a-Coffee-Link.
 
