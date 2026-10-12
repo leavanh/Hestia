@@ -13,7 +13,7 @@ struct CalendarView: View {
     @State private var detailHabit: Habit?
 
     @Environment(\.firstWeekday) private var firstWeekday
-    private let engine = HabitEngine()
+    @Environment(\.habitEngine) private var engine
 
     /// So viele Monate vor dem aktuellen gibt es mindestens, auch wenn der älteste Habit jünger ist.
     private static let minimumMonthsBack = 3
@@ -99,7 +99,7 @@ extension CalendarView {
                     name: habit.name,
                     iconName: habit.iconName,
                     habitColor: HabitColor(key: habit.colorKey),
-                    rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: today), firstWeekday: firstWeekday),
+                    rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: today), firstWeekday: firstWeekday, periods: engine.periods),
                     streak: engine.currentStreak(snapshot, on: habit.statisticsDay(today: today, engine: engine))
                 ) {
                     detailHabit = habit

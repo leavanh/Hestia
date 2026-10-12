@@ -13,7 +13,7 @@ struct HabitSortList: View {
     let onDone: () -> Void
 
     @Environment(\.firstWeekday) private var firstWeekday
-    private let engine = HabitEngine()
+    @Environment(\.habitEngine) private var engine
 
     var body: some View {
         let shown = Habit.inSavedOrder(habits.filter { $0.isAlive && $0.endedAt == nil })
@@ -79,7 +79,7 @@ struct HabitSortList: View {
                 Text(habit.name)
                     .titleText()
                     .foregroundStyle(isPaused ? Theme.inkSecondary : Theme.ink)
-                Text(snapshot.rhythmText(window: engine.windowProgress(snapshot, on: day), firstWeekday: firstWeekday))
+                Text(snapshot.rhythmText(window: engine.windowProgress(snapshot, on: day), firstWeekday: firstWeekday, periods: engine.periods))
                     .metaText()
                     .foregroundStyle(Theme.inkSecondary)
             }

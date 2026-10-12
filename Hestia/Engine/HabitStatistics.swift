@@ -112,6 +112,8 @@ extension HabitEngine {
     /// - Feste Wochentage / fester Monatstag: nur fällige Tage, erfüllt, wenn abgehakt.
     /// - Pro Woche / pro Monat: erfüllt, solange das Fenster des Tages das Ziel erreicht (Status grün oder
     ///   gelb). Im ersten Fenster nach der Erstellung ist ein unerfülltes Ziel noch nicht verpasst (3.5).
+    /// - Pro Woche / pro Monat mit Kalenderzeiträumen (ab Phase 15): ein Tag übernimmt das Ergebnis seines Zeitraums
+    ///   (`calendarOutcome`).
     /// - Ein heute nicht erfüllter Tag ist noch offen und wird nicht bewertet.
     /// - Pausierte Tage und Tage ab dem Beenden werden übersprungen: sie unterbrechen keinen Streak, zählen nicht
     ///   mit und gehören nicht zur Quote. Fenster überspringen Pausentage ebenfalls.
@@ -127,6 +129,8 @@ extension HabitEngine {
         /// Nicht pausierte Tage seit der Erstellung vor dem aktuellen Tag: so alt ist der Habit in Tagen,
         /// die zählen (Pausentage zählen nicht mit).
         var activeAge = 0
+        /// Kalenderzeiträume und ihr Stand, nach Beginn des Zeitraums (nur bei Zeiträumen "Kalender").
+        var periodCache: [Date: (period: CalendarPeriod, target: Int, done: Int)] = [:]
         while day <= today {
             defer { day = calendar.date(byAdding: .day, value: 1, to: day).map(startOfDay) ?? today.addingTimeInterval(1) }
 
@@ -143,6 +147,10 @@ extension HabitEngine {
             case .weekdays, .monthDay:
                 outcome = isDue(habit, on: day) ? ((values[day] ?? 0) > 0 ? .met : .missed) : nil
             case .weekly, .monthly:
+                if periods == .calendar {
+                    outcome = calendarOutcome(habit, values: values, day: day, today: today, cache: &periodCache)
+                    break
+                }
                 guard let length else { continue }
                 if windowSum(values, endingOn: day, length: length, skipping: { isPaused(habit, on: $0) }) >= windowTarget {
                     outcome = .met
@@ -156,5 +164,27 @@ extension HabitEngine {
             result.append((day, outcome))
         }
         return result
+    }
+
+    /// Ergebnis eines Tages bei Kalenderzeiträumen (Spezifikation 3.7): Ist das Ziel des Zeitraums erreicht, ist der
+    /// Tag erfüllt, auch im laufenden Zeitraum (bis heute). Sonst verpasst, wenn der Zeitraum vorbei ist und nicht nur
+    /// bei erreichtem Ziel zählt, und in allen anderen Fällen noch offen.
+    private func calendarOutcome(
+        _ habit: HabitSnapshot,
+        values: [Date: Int],
+        day: Date,
+        today: Date,
+        cache: inout [Date: (period: CalendarPeriod, target: Int, done: Int)]
+    ) -> Outcome? {
+        guard let first = period(for: habit, on: day) else { return nil }
+        let entry: (period: CalendarPeriod, target: Int, done: Int)
+        if let cached = cache[first.start] {
+            entry = cached
+        } else {
+            entry = (first, periodTarget(habit, period: first), periodDone(values, habit: habit, period: first, through: min(first.end, today)))
+            cache[first.start] = entry
+        }
+        if entry.done >= entry.target { return .met }
+        return entry.period.end < today && !entry.period.countsOnlyIfReached ? .missed : nil
     }
 }

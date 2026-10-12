@@ -27,9 +27,11 @@ struct SettingsView: View {
     }
 }
 
-/// Einstellungen > Kalender: Wochenbeginn (Phase 14). Ändert nur die Anzeige, nie die Rechnung.
+/// Einstellungen > Kalender: Wochenbeginn (Phase 14) und Zeiträume (Phase 15). Der Wochenbeginn ändert bei
+/// rollierenden Zeiträumen nur die Anzeige, bei "Kalender" auch die Rechnung.
 private struct CalendarSection: View {
     @AppStorage(SettingsKey.firstWeekday) private var firstWeekday = FirstWeekdaySetting.automatic
+    @AppStorage(SettingsKey.periods) private var periods = Periods.rolling
 
     var body: some View {
         PaperSection(title: "Kalender") {
@@ -43,6 +45,20 @@ private struct CalendarSection: View {
                     id: { "settings-first-weekday-\($0.rawValue)" }
                 )
                 .accessibilityIdentifier("settings-first-weekday")
+                Text("Zeiträume")
+                    .bodyText()
+                    .padding(.top, Theme.inlineSpacing)
+                SegmentedChoice(
+                    options: Periods.allCases,
+                    selection: $periods,
+                    title: \.title,
+                    id: { "settings-periods-\($0.rawValue)" }
+                )
+                .accessibilityIdentifier("settings-periods")
+                Text(periods.explanation)
+                    .metaText()
+                    .foregroundStyle(Theme.inkSecondary)
+                    .accessibilityIdentifier("settings-periods-explanation")
             }
         }
     }

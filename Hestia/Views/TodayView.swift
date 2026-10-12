@@ -24,7 +24,7 @@ struct TodayView: View {
     /// Höhe des Kopfbands, für die Schwelle der kleinen Leiste.
     @State private var bandHeight: CGFloat = 0
 
-    private let engine = HabitEngine()
+    @Environment(\.habitEngine) private var engine
 
     /// Habits der Hauptliste am angezeigten Tag (Spezifikation 3.2): offene zuerst, dann erledigte.
     private var dueHabits: [Habit] {

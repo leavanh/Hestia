@@ -22,17 +22,32 @@ struct RhythmTextTests {
 
     @Test func weeklyShowsDoneOfTargetThisWeek() {
         let habit = snapshot(.weekly, target: 3)
-        #expect(habit.rhythmText(window: WindowProgress(done: 1, target: 3)) == "1 von 3 diese Woche")
-        #expect(habit.rhythmText(window: WindowProgress(done: 0, target: 3)) == "0 von 3 diese Woche")
+        #expect(habit.rhythmText(window: WindowProgress(done: 1, target: 3), periods: .calendar) == "1 von 3 diese Woche")
+        #expect(habit.rhythmText(window: WindowProgress(done: 0, target: 3), periods: .calendar) == "0 von 3 diese Woche")
     }
 
     @Test func monthlyShowsDoneOfTargetThisMonth() {
         let habit = snapshot(.monthly)
-        #expect(habit.rhythmText(window: WindowProgress(done: 1, target: 1)) == "1 von 1 diesen Monat")
+        #expect(habit.rhythmText(window: WindowProgress(done: 1, target: 1), periods: .calendar) == "1 von 1 diesen Monat")
+    }
+
+    // MARK: Zeiträume (Phase 15)
+
+    @Test func rollingPeriodsSayInSevenOrThirtyDays() {
+        let window = WindowProgress(done: 1, target: 3)
+        #expect(snapshot(.weekly, target: 3).rhythmText(window: window, periods: .rolling) == "1 von 3 in 7 Tagen")
+        #expect(snapshot(.weekly, target: 3).rhythmText(window: window, periods: .calendar) == "1 von 3 diese Woche")
+        #expect(snapshot(.monthly, target: 3).rhythmText(window: window, periods: .rolling) == "1 von 3 in 30 Tagen")
+        #expect(snapshot(.monthly, target: 3).rhythmText(window: window, periods: .calendar) == "1 von 3 diesen Monat")
+    }
+
+    @Test func rollingIsTheDefault() {
+        let window = WindowProgress(done: 1, target: 3)
+        #expect(snapshot(.weekly, target: 3).rhythmText(window: window) == "1 von 3 in 7 Tagen")
     }
 
     @Test func weeklyFallsBackToZeroWithoutWindow() {
-        #expect(snapshot(.weekly, target: 2).rhythmText(window: nil) == "0 von 2 diese Woche")
+        #expect(snapshot(.weekly, target: 2).rhythmText(window: nil, periods: .calendar) == "0 von 2 diese Woche")
     }
 
     @Test func weekdaysListShortNamesInOrder() {

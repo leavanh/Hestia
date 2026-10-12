@@ -44,6 +44,26 @@ nonisolated struct WindowProgress: Equatable, Sendable {
     var target: Int
 }
 
+/// Wie "x pro Woche" und "x pro Monat" gezählt werden (Spezifikation 5.5, ab Phase 15).
+nonisolated enum Periods: String, CaseIterable, Sendable {
+    /// Die letzten 7 bzw. 30 Tage.
+    case rolling
+    /// Die laufende Kalenderwoche bzw. der laufende Kalendermonat.
+    case calendar
+}
+
+/// Kalenderzeitraum eines Wochen oder Monats Habits an einem Tag (Spezifikation 2 und 3.5).
+nonisolated struct CalendarPeriod: Equatable, Sendable {
+    /// Erster Tag des Zeitraums (Tagesbeginn).
+    var start: Date
+    /// Letzter Tag des Zeitraums (Tagesbeginn), eingeschlossen.
+    var end: Date
+    /// Anzahl der Tage im Zeitraum.
+    var dayCount: Int
+    /// Der Zeitraum zählt nur, wenn das Ziel erreicht ist (angebrochen, mit Pause, mit Beenden): kein Rot, nie verpasst.
+    var countsOnlyIfReached: Bool
+}
+
 /// Ein Punkt der 7 Tage Anzeige (Spezifikation 3.6).
 nonisolated enum WeekDot: Equatable, Sendable {
     /// Wert des Tages geteilt durch Tagesziel, 0 bis 1. Tage vor der Erstellung haben 0.
@@ -95,9 +115,15 @@ nonisolated struct WeekStripDay: Equatable, Sendable {
 /// "Heute" wird immer als Parameter übergeben, damit Tests mit festen Daten möglich sind.
 nonisolated struct HabitEngine: Sendable {
     var calendar: Calendar
+    /// Zeiträume bei pro Woche / pro Monat (Spezifikation 5.5). Voreinstellung rollierend.
+    var periods: Periods
+    /// Wochenbeginn für Kalenderwochen (1 = Montag bis 7 = Sonntag). Die rollierende Rechnung kennt ihn nicht.
+    var firstWeekday: Int
 
-    init(calendar: Calendar = .current) {
+    init(calendar: Calendar = .current, periods: Periods = .rolling, firstWeekday: Int = 1) {
         self.calendar = calendar
+        self.periods = periods
+        self.firstWeekday = firstWeekday
     }
 
     /// Tagesbeginn in der Zeitzone des Kalenders (Wechsel um Mitternacht).
@@ -236,10 +262,98 @@ nonisolated struct HabitEngine: Sendable {
     /// Stand im Fenster. `nil`, wenn der Rhythmus kein Fenster hat.
     func windowProgress(_ habit: HabitSnapshot, on day: Date) -> WindowProgress? {
         guard let length = windowLength(habit.rhythm) else { return nil }
+        if let period = period(for: habit, on: day) {
+            return WindowProgress(
+                done: periodDone(cappedValues(habit), habit: habit, period: period, through: day),
+                target: periodTarget(habit, period: period)
+            )
+        }
         let done = windowSum(
             cappedValues(habit), endingOn: startOfDay(day), length: length, skipping: { isPaused(habit, on: $0) }
         )
         return WindowProgress(done: done, target: max(habit.targetCount, 1))
+    }
+
+    // MARK: Kalenderzeiträume (Spezifikation 2 und 3.5, ab Phase 15)
+
+    /// Der Kalenderzeitraum des Tages: Woche ab `firstWeekday` bzw. Kalendermonat. `nil` bei rollierenden Zeiträumen
+    /// und bei Rhythmen ohne Fenster. Diese Stelle entscheidet, ob die Rechnung rollierend oder nach Kalender läuft.
+    func period(for habit: HabitSnapshot, on day: Date) -> CalendarPeriod? {
+        guard periods == .calendar else { return nil }
+        let day = startOfDay(day)
+        let start: Date
+        let dayCount: Int
+        switch habit.rhythm {
+        case .weekly:
+            start = startOfWeek(day, firstWeekday: firstWeekday)
+            dayCount = 7
+        case .monthly:
+            guard let interval = calendar.dateInterval(of: .month, for: day),
+                  let days = calendar.range(of: .day, in: .month, for: day)?.count else { return nil }
+            start = startOfDay(interval.start)
+            dayCount = days
+        case .daily, .weekdays, .monthDay:
+            return nil
+        }
+        guard let end = calendar.date(byAdding: .day, value: dayCount - 1, to: start).map(startOfDay) else { return nil }
+
+        // Angebrochen: erstellt nach dem ersten Tag, beendet im Zeitraum oder mit mindestens einem Pausentag.
+        let created = startOfDay(habit.createdAt)
+        var partial = created > start && created <= end
+        if let endedAt = habit.endedAt {
+            let ended = startOfDay(endedAt)
+            partial = partial || (start <= ended && ended <= end)
+        }
+        if !partial {
+            partial = days(from: start, through: end).contains { isPaused(habit, on: $0) }
+        }
+        return CalendarPeriod(start: start, end: end, dayCount: dayCount, countsOnlyIfReached: partial)
+    }
+
+    /// Die Tage von `first` bis `last`, beide eingeschlossen.
+    private func days(from first: Date, through last: Date) -> [Date] {
+        var result: [Date] = []
+        var date = startOfDay(first)
+        let last = startOfDay(last)
+        while date <= last {
+            result.append(date)
+            guard let next = calendar.date(byAdding: .day, value: 1, to: date) else { break }
+            date = startOfDay(next)
+        }
+        return result
+    }
+
+    /// Ziel im Zeitraum: die Zielanzahl, höchstens die Anzahl der Tage im Zeitraum (30x pro Monat im Februar: 28).
+    func periodTarget(_ habit: HabitSnapshot, period: CalendarPeriod) -> Int {
+        min(max(habit.targetCount, 1), period.dayCount)
+    }
+
+    /// Erledigungen vom Beginn des Zeitraums bis `day`, nur nicht pausierte Tage.
+    func periodDone(_ values: [Date: Int], habit: HabitSnapshot, period: CalendarPeriod, through day: Date) -> Int {
+        let last = min(startOfDay(day), period.end)
+        return days(from: period.start, through: last)
+            .filter { !isPaused(habit, on: $0) }
+            .reduce(0) { $0 + (values[$1] ?? 0) }
+    }
+
+    /// Nicht pausierte Tage von `day` (eingeschlossen) bis zum Ende des Zeitraums.
+    private func remainingDays(_ habit: HabitSnapshot, period: CalendarPeriod, from day: Date) -> Int {
+        days(from: max(startOfDay(day), period.start), through: period.end)
+            .filter { !isPaused(habit, on: $0) && !isEnded(habit, on: $0) }
+            .count
+    }
+
+    /// Pro Woche / pro Monat mit Kalenderzeiträumen: grün, solange noch mehr Tage übrig sind als nötig. Gelb, wenn
+    /// jeder verbleibende Tag gebraucht wird. Rot, wenn das Ziel nicht mehr zu schaffen ist, in angebrochenen
+    /// Zeiträumen statt Rot Gelb (Spezifikation 3.5).
+    private func periodStatus(_ habit: HabitSnapshot, period: CalendarPeriod, on day: Date) -> HabitStatus {
+        let needed = periodTarget(habit, period: period)
+            - periodDone(cappedValues(habit), habit: habit, period: period, through: day)
+        if needed <= 0 { return .green }
+        let possible = remainingDays(habit, period: period, from: day)
+        if possible > needed { return .green }
+        if possible == needed { return .yellow }
+        return period.countsOnlyIfReached ? .yellow : .red
     }
 
     // MARK: Hauptliste und Weitere (Spezifikation 3.2)
@@ -318,6 +432,7 @@ nonisolated struct HabitEngine: Sendable {
         case .daily:
             return dailyStatus(habit, on: day)
         case .weekly, .monthly:
+            if let period = period(for: habit, on: day) { return periodStatus(habit, period: period, on: day) }
             return windowStatus(habit, on: day)
         case .weekdays, .monthDay:
             return fixedDayStatus(habit, on: day)

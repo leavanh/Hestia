@@ -12,7 +12,7 @@ struct DayHabitCard: View {
     let onEdit: () -> Void
 
     @Environment(\.firstWeekday) private var firstWeekday
-    private let engine = HabitEngine()
+    @Environment(\.habitEngine) private var engine
 
     var body: some View {
         // Ein eben gelöschter Habit kann hier noch einmal ankommen, bevor die Liste neu aufgebaut ist.
@@ -25,7 +25,7 @@ struct DayHabitCard: View {
                 iconName: habit.iconName,
                 habitColor: habitColor,
                 status: engine.status(snapshot, on: day),
-                rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: day), firstWeekday: firstWeekday),
+                rhythmText: snapshot.rhythmText(window: engine.windowProgress(snapshot, on: day), firstWeekday: firstWeekday, periods: engine.periods),
                 dots: engine.weekDots(snapshot, on: day),
                 isPaused: engine.isPaused(snapshot, on: day),
                 onEdit: onEdit

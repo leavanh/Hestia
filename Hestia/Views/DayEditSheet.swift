@@ -11,7 +11,7 @@ struct DayEditSheet: View {
 
     @State private var editingHabit: Habit?
 
-    private let engine = HabitEngine()
+    @Environment(\.habitEngine) private var engine
 
     var body: some View {
         let due = Habit.mainInTodayOrder(habits, on: day, engine: engine)

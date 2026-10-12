@@ -12,7 +12,7 @@ struct HabitDetailSheet: View {
     let today: Date
 
     @Environment(\.firstWeekday) private var firstWeekday
-    private let engine = HabitEngine()
+    @Environment(\.habitEngine) private var engine
 
     var body: some View {
         NavigationStack {
@@ -99,7 +99,7 @@ struct HabitDetailSheet: View {
         if let endedAt = habit.endedAt {
             return "Beendet am \(DayText.shortDate(endedAt, engine: engine))"
         }
-        return snapshot.rhythmText(window: engine.windowProgress(snapshot, on: today), firstWeekday: firstWeekday)
+        return snapshot.rhythmText(window: engine.windowProgress(snapshot, on: today), firstWeekday: firstWeekday, periods: engine.periods)
     }
 
     // MARK: Kennzahlen

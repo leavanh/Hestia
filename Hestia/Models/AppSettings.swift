@@ -4,6 +4,24 @@ import SwiftUI
 enum SettingsKey {
     static let appearance = "HestiaAppearance"
     static let firstWeekday = "HestiaFirstWeekday"
+    static let periods = "HestiaPeriods"
+}
+
+extension Periods {
+    var title: String {
+        switch self {
+        case .rolling: "Rollierend"
+        case .calendar: "Kalender"
+        }
+    }
+
+    /// Erklärzeile unter der Auswahl (Spezifikation 5.5).
+    var explanation: String {
+        switch self {
+        case .rolling: "Die letzten 7 bzw. 30 Tage"
+        case .calendar: "Die laufende Woche bzw. der laufende Monat"
+        }
+    }
 }
 
 /// Darstellung der App (Spezifikation 5.5). Gespeichert wird `rawValue`.
@@ -73,14 +91,29 @@ extension EnvironmentValues {
     }
 }
 
-/// Setzt Darstellung und Wochenbeginn aus den Einstellungen für die ganze App samt Sheets.
+private struct HabitEngineKey: EnvironmentKey {
+    static let defaultValue = HabitEngine()
+}
+
+extension EnvironmentValues {
+    /// Die `HabitEngine` mit den aktuellen Einstellungen (Zeiträume, Wochenbeginn), gesetzt an der Wurzel der App.
+    /// Ändert sich eine Einstellung, rechnen die Ansichten damit neu (Spezifikation 6).
+    var habitEngine: HabitEngine {
+        get { self[HabitEngineKey.self] }
+        set { self[HabitEngineKey.self] = newValue }
+    }
+}
+
+/// Setzt Darstellung, Wochenbeginn und die `HabitEngine` aus den Einstellungen für die ganze App samt Sheets.
 struct AppSettingsModifier: ViewModifier {
     @AppStorage(SettingsKey.appearance) private var appearance = AppearanceSetting.system
     @AppStorage(SettingsKey.firstWeekday) private var firstWeekday = FirstWeekdaySetting.automatic
+    @AppStorage(SettingsKey.periods) private var periods = Periods.rolling
 
     func body(content: Content) -> some View {
         content
             .environment(\.firstWeekday, firstWeekday.start())
+            .environment(\.habitEngine, HabitEngine(periods: periods, firstWeekday: firstWeekday.start()))
             .preferredColorScheme(appearance.colorScheme)
     }
 }
