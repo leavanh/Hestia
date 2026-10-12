@@ -105,6 +105,8 @@ enum Theme {
     /// Höhe eines Stichs im Leerzustand (`EngravingImage`, Phase 12). Beide Stiche sind hochkant, auf Inhaltsbreite
     /// wären sie höher, deshalb ist das zugleich die Höchsthöhe.
     static let engravingMaxHeight: CGFloat = 200
+    /// Höhe der kleinen Figur neben der Wortmarke im Fuß der Einstellungen, etwas niedriger als die zwei Zeilen der Wortmarke.
+    static let footerFigureHeight: CGFloat = 80
 
     /// Abstand der zwei Zeilen der Wortmarke im Fuß der Einstellungen. Negativ, damit sie eng wie ein Block stehen.
     static let wordmarkLineSpacing: CGFloat = -16

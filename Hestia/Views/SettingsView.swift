@@ -99,7 +99,7 @@ private struct AboutSection: View {
     }
 }
 
-/// Fuß der Einstellungen (Phase 12): Wortmarke und Version. Der einzige Ort der Wortmarke in der App.
+/// Fuß der Einstellungen (Phase 12): Wortmarke mit kleiner Figur und Version. Der einzige Ort der Wortmarke in der App.
 private struct Footer: View {
     private var version: String {
         let info = Bundle.main.infoDictionary
@@ -110,18 +110,27 @@ private struct Footer: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.inlineSpacing) {
-            // Zwei Texte statt Zeilenumbruch: negativer Zeilenabstand greift bei `Text` nicht.
-            VStack(alignment: .leading, spacing: Theme.wordmarkLineSpacing) {
-                Text("Hestia")
-                Text("Habits")
+            HStack(alignment: .lastTextBaseline, spacing: Theme.spacing) {
+                // Zwei Texte statt Zeilenumbruch: negativer Zeilenabstand greift bei `Text` nicht.
+                VStack(alignment: .leading, spacing: Theme.wordmarkLineSpacing) {
+                    Text("Hestia")
+                    Text("Habits")
+                }
+                .font(Theme.Typography.wordmark)
+                .textCase(.uppercase)
+                .tracking(Theme.Typography.wordmarkTracking)
+                .foregroundStyle(Theme.inkSecondary)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Hestia Habits")
+                .accessibilityIdentifier("settings-wordmark")
+                // Dieselbe Figur wie in Heute ohne Habits, klein neben der Wortmarke. Dekorativ.
+                Image(EngravingImage.Motif.vestal.rawValue)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: Theme.footerFigureHeight)
+                    .accessibilityHidden(true)
+                    .accessibilityIdentifier("settings-figure")
             }
-            .font(Theme.Typography.wordmark)
-            .textCase(.uppercase)
-            .tracking(Theme.Typography.wordmarkTracking)
-            .foregroundStyle(Theme.inkSecondary)
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Hestia Habits")
-            .accessibilityIdentifier("settings-wordmark")
             Text(version)
                 .metaText()
                 .foregroundStyle(Theme.inkSecondary)
