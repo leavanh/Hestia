@@ -19,7 +19,7 @@ enum DebugData {
     /// Beispielhabits für alle Rhythmen mit 60 Tagen Historie. Die Historie ist relativ zu `now`
     /// aufgebaut, damit "Heute" an jedem Wochentag grüne, gelbe und rote Habits zeigt:
     ///
-    /// - täglich: Lesen und Vitamine grün, Meditieren rot, Wasser trinken zählt hoch
+    /// - täglich: Lesen und Vitamine grün, Hautpflege offen, Meditieren rot, Wasser trinken zählt hoch
     /// - pro Woche: Sport grün, Joggen gelb, Gitarre üben rot
     /// - pro Monat: Fenster putzen grün, Pflanzen düngen gelb, Auto waschen rot
     /// - feste Wochentage: Tagebuch grün und Yoga rot (beide heute fällig), Wäsche waschen erst morgen, Blumen gießen erst übermorgen
@@ -131,6 +131,8 @@ enum DebugData {
                    history: dailyHistory(target: 1, seed: 3, yesterday: 0, today: 0)),
             Sample(name: "Vitamine", iconName: "pills.fill", color: .orange, rhythm: .daily,
                    history: dailyHistory(target: 1, seed: 4, yesterday: 1, today: 1)),
+            Sample(name: "Hautpflege", iconName: "sparkles", color: .pink, rhythm: .daily,
+                   history: dailyHistory(target: 1, seed: 5, yesterday: 1, today: 0)),
             // Pro Woche
             Sample(name: "Sport", iconName: "dumbbell.fill", color: .orange, rhythm: .weekly, target: 2, detail: "Gym",
                    history: once(every(3, from: 1))),
@@ -143,7 +145,7 @@ enum DebugData {
                    history: once([10, 40])),
             Sample(name: "Pflanzen düngen", iconName: "leaf.fill", color: .green, rhythm: .monthly,
                    history: once([26, 56])),
-            Sample(name: "Auto waschen", iconName: "cart.fill", color: .yellow, rhythm: .monthly,
+            Sample(name: "Auto waschen", iconName: "bubbles.and.sparkles.fill", color: .yellow, rhythm: .monthly,
                    history: once([35])),
             // Feste Wochentage
             fixedDays("Tagebuch", "pencil", .blue, weekdays: [todayWeekday, weekday(plus: 3)].sorted()),
@@ -152,8 +154,8 @@ enum DebugData {
             // Nie heute fällig (übermorgen), damit "Weitere" mit Testdaten nicht leer ist.
             fixedDays("Blumen gießen", "leaf.fill", .blue, weekdays: [weekday(plus: 2)]),
             // Fester Monatstag
-            fixedDays("Miete überweisen", "creditcard.fill", .green, monthDay: dayOfMonth),
-            fixedDays("Rechnungen prüfen", "envelope.fill", .orange, monthDay: 1),
+            fixedDays("Miete überweisen", "banknote.fill", .green, monthDay: dayOfMonth),
+            fixedDays("Rechnungen prüfen", "pencil", .orange, monthDay: 1),
         ]
     }
 

@@ -165,7 +165,7 @@ struct SampleDataTests {
 
     @Test func snapshotCarriesWeekdaysAndMonthDay() {
         let yoga = Habit(name: "Yoga", iconName: "figure.yoga", colorKey: "violet", rhythm: .weekdays, weekdays: [1, 4])
-        let rent = Habit(name: "Miete", iconName: "creditcard.fill", colorKey: "green", rhythm: .monthDay, monthDay: 31)
+        let rent = Habit(name: "Miete", iconName: "banknote.fill", colorKey: "green", rhythm: .monthDay, monthDay: 31)
         #expect(yoga.snapshot.rhythm == .weekdays)
         #expect(yoga.snapshot.weekdays == [1, 4])
         #expect(rent.snapshot.monthDay == 31)

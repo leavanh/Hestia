@@ -1220,8 +1220,10 @@ Jede Phase baut auf der vorherigen auf und ergibt eine App, die auf dem iPhone l
 - Kein neuer UI Test.
 
 **Definition of Done**
-- [ ] Im Sheet sehe ich 6 Zeilen Symbole in der Reihenfolge aus 4.6, Schwimmen ist nicht mehr dabei, Hautpflege schon.
-- [ ] Alle Symbole sehen im Schnitt `.regular` auf der Kachel in Hell und Dunkel ordentlich aus.
+- [x] Im Sheet sehe ich 6 Zeilen Symbole in der Reihenfolge aus 4.6, Schwimmen ist nicht mehr dabei, Hautpflege schon.
+- [x] Alle Symbole sehen im Schnitt `.regular` auf der Kachel in Hell und Dunkel ordentlich aus.
+
+*Geprüft im Simulator (iPhone 18 Pro): Das Sheet zeigt 6 Zeilen zu je 6 Symbole in der Reihenfolge aus 4.6, ohne Schwimmen, mit Hautpflege (`sparkles`) vorn in Zeile 2. In Heute steht der neue Testhabit "Hautpflege" mit `sparkles`, "Auto waschen" trägt `bubbles.and.sparkles.fill`. Die Testdaten "Miete überweisen" und "Rechnungen prüfen" nutzten die entfallenen Symbole `creditcard.fill` und `envelope.fill` und tragen jetzt `banknote.fill` und `pencil`, damit im Sheet immer ein Symbol ausgewählt ist. Unit Tests (269) grün, darunter `iconListHasThirtySixLoadableSymbols`. Komplett-Lauf vollständig grün (22 UI Tests, keiner neu), Build ohne Warnungen.*
 
 ---
 
